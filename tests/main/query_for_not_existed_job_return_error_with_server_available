@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#!!!!!The scripts must be run under super user!!!!!!
+# test for the following senario:
+# Client starts a job, but suddenly his network connection to server is destroyed
+# (by some walls, e.g). Luckily, if he remember the session id he get after job started,
+# he can still get back and retrieve what belongs to him.
+# parameters:
+# 1:the name of the to-run server-side program
+# 2:the process taken to run mpiexec
+
+JOB_NOT_EXIST_MESSAGE="get status error, job id not exist"
+_start_server | _contains "$JOB_NOT_EXIST_MESSAGE" | _at server &
+session.rb block_till_result.rb | _contains "$JOB_NOT_EXIST_MESSAGE" | _at client
+_prepare_program $1; execute_program $1 $2 | _contains_$1_output $2 | _at state
+_kill_server
+_collect client server state

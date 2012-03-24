@@ -1,0 +1,11 @@
+bash|||bash|||[B] compile-libs|||
+thrift|||thrift|||[B] compile-libs|||
+--gen|||--gen|||[B] compile-libs|||
+hpgcjob.thrift|||hpgcjob.thrift|||[B] compile-libs|||
+java|||java|||[B] compile-libs|||
+csharp|||csharp|||[B] compile-libs|||
+gen-cpp|||gen-cpp|||[B] compile-libs|||
+gen-rb|||gen-rb|||[B] compile-libs|||
+gen-java|||gen-java|||[B] compile-libs|||
+gen-csharp|||gen-csharp|||[B] compile-libs|||
+clients|||clients|||[B] compile-libs|||

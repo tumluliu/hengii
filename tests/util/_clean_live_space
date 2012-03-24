@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [ -d "$THOME" ]; then
+	mv $THOME/live trash/live$(date +%s)
+	mkdir $THOME/live
+else
+	echo "THOME not defineded"
+	exit 1
+fi

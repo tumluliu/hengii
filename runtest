@@ -1,0 +1,13 @@
+#!/bin/bash
+set -e
+
+source ./env
+
+getopts "i" opt
+if [ $opt == "i" ]; then
+	_clean_live_space
+fi
+
+statements | std-simplelog $MAIN/$0.log | sum_false
+
+trap "_kill_server" EXIT

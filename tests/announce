@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# hypothesis: higine will work properly when got a start-getstatus-return request flow
+# constraint variable: server-side program, process
+# hypothesis(with c v): to all the server-side program, with all possible process number, ...
+# predicate: given a server-side program x and a process num n, ...
+# antecedant: program x prepared(condition); 
+# > create job flow for x, with process number n, then start-wait-return to std(experiment consuming)
+# consquence: std contains the output of program x
+
+echo $1 $($2)
+trap "_kill_server" EXIT

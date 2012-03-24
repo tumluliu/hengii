@@ -1,0 +1,5 @@
+.*.un~
+.*.swp
+trash/
+*.pbserr
+*.pbsout

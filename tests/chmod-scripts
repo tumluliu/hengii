@@ -1,0 +1,18 @@
+#!/bin/bash
+
+chmod +x ../runtest
+chmod +x ../env
+chmod +x ./statements
+chmod +x ./announce
+chmod +x ./act/add_job.rb
+chmod +x ./act/create_empty_flow.rb
+chmod +x ./act/execute_program
+chmod +x ./act/session.rb
+chmod +x ./analyzer/*
+chmod +x ./main/*
+chmod +x ./post/*
+chmod +x ./pre/_prepare_program
+chmod +x ./pre/_prepare_server
+chmod +x ./pre/_start_server
+chmod +x ./printer/*
+chmod +x ./util/*

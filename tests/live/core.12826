@@ -1,0 +1,13 @@
+ruby|||ruby|||[B] print_id.rb|||
+job_flow|||job_flow|||[B] print_id.rb|||
+YAML::load|||YAML::load|||[B] print_id.rb|||
+STDIN|||STDIN|||[B] print_id.rb|||
+logger|||logger|||[B] print_id.rb|||
+info|||info|||[B] print_id.rb|||
+flow|||flow|||[B] print_id.rb|||
+staring|||staring|||[B] print_id.rb|||
+client|||client|||[B] print_id.rb|||
+start|||start|||[B] print_id.rb|||
+started|||started|||[B] print_id.rb|||
+waiting|||waiting|||[B] print_id.rb|||
+response|||response|||[B] print_id.rb|||

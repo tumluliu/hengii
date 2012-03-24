@@ -1,0 +1,1 @@
+mpiexec -n 8  /restore-home2/RECOVERED_FILES/geohpc/higine/tests/live/apps/hello   

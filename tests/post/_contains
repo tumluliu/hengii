@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# check if stdin contains specifical message
+
+result="true"
+actual=$(cat)
+
+for arg in $*
+do
+	echo $actual | grep "$arg" >/dev/null
+	if [ ! $? -eq 0 ]; then
+		result="false"
+	fi
+done
+
+# show result
+if [ $result == "false" ]; then
+	echo "false; not contain $1"
+else
+	echo true
+fi
