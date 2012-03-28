@@ -1,0 +1,4 @@
+tests/trash/
+tests/live/
+.*.un~
+.*.sw*

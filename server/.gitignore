@@ -1,0 +1,8 @@
+.*.un~
+.*.swp~
+*.o
+higine
+config.h
+tags/
+run.log
+cscope.out

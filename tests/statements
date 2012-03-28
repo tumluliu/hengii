@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# example: happy_in_happy_path
+# hypothesis: higine will work properly when got a start-getstatus-return request flow
+# constraint variable: server-side program, process
+# hypothesis(with c v): to all the server-side program, with all possible process number, ...
+# predicate: given a server-side program x and a process num n, ...
+# antecedant: program x prepared(condition); 
+# > create job flow for x, with process number n, then start-wait-return to std(experiment consuming)
+# consquence: std contains the output of program x
+
+announce "作业流能正常执行" "happy_in_happy_path hello 8"
+announce "单个作业能正常执行" "happy_single_job_in_happy_path hello 8"
+announce "已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系" "who_net_destroyed_can_get_back_available hello 8"
+announce "查询不存在的作业的状态，返回错误信息，服务正常继续" "query_for_not_existed_job_return_error_with_server_available hello 8"
+#announce "提交作业，要求执行不存在的程序，返回错误信息，服务正常继续" "execute_not_existed_program_return_error_with_server_available hello 8"
+announce "作业内的程序异常中止，返回错误信息，服务正常继续" "program_error_return_it_with_server_available null_pointer 2 hello 8"

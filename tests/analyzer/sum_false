@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# check the false announce number
+
+tee >(grep -c "false" | tr -d "\n" | cat - <(echo 不成立的陈述))
