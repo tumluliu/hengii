@@ -1,5 +1,4 @@
+tests/trash/
+tests/live/
 .*.un~
-.*.swp
-trash/
-*.pbserr
-*.pbsout
+.*.sw*

@@ -1,1 +1,0 @@
-mpiexec -n 2  /home/geohpc/higine/server/higine/apps/hello   

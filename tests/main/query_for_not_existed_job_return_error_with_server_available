@@ -10,6 +10,7 @@
 # 2:the process taken to run mpiexec
 
 JOB_NOT_EXIST_MESSAGE="get status error, job id not exist"
+_prepare_server
 _start_server | _contains "$JOB_NOT_EXIST_MESSAGE" | _at server &
 session.rb block_till_result.rb | _contains "$JOB_NOT_EXIST_MESSAGE" | _at client
 _prepare_program $1; execute_program $1 $2 | _contains_$1_output $2 | _at state

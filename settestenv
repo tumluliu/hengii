@@ -21,6 +21,5 @@ export PATH=$PATH:$MAIN/tests/post
 export PATH=$PATH:$MAIN/tests/printer
 export PATH=$PATH:$MAIN/tests/analyzer
 export PATH=$PATH:$MAIN/tests/live
-export PATH=$PATH:$MAIN/tests/live/higine
 export PATH=$PATH:$MAIN/tests/util
 export PATH=$PATH:$MAIN/tests/

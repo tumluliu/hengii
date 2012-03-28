@@ -9,8 +9,9 @@
 
 _prepare_program $1
 PROGRAM_ERROR_MESSAGE=$(mpiexec -np $2 $APPSHOME/$1)
+_prepare_server
 _start_server | _contains "$PROGRAM_ERROR_MESSAGE" | _at server &
-execute_program $1 $2 | _contains $PROGRAM_ERROR_MESSAGE | _at client 
+execute_program $1 $2 | _contains "$PROGRAM_ERROR_MESSAGE" | _at client 
 _prepare_program $3; execute_program $3 $4 | _contains_$3_output $4 | _at state
 _kill_server
 _collect client server state

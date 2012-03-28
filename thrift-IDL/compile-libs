@@ -6,11 +6,11 @@ thrift --gen java hpgcjob.thrift
 thrift --gen csharp hpgcjob.thrift
 
 cp -r gen-cpp/* ../server/lib/
-rm -r clients/gen-rb
-rm -r clients/gen-cpp
-rm -r clients/gen-java
-rm -r clients/gen-csharp
-mv gen-rb clients/
-mv gen-cpp clients/
-mv gen-java clients/
-mv gen-csharp clients/
+rm -r ../clients/gen-rb
+rm -r ../clients/gen-cpp
+rm -r ../clients/gen-java
+rm -r ../clients/gen-csharp
+mv gen-rb ../clients/
+mv gen-cpp ../clients/
+mv gen-java ../clients/
+mv gen-csharp ../clients/

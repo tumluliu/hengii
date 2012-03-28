@@ -1,3 +1,3 @@
 #!/bin/bash
 
-killall -q $SERVERHOME/higine
+killall -q higine

@@ -5,7 +5,6 @@
 
 if [ ! -s "$SERVERHOME/higine" ]; then
 	opath=$PWD
-	# strange because the lib is out of main directory
 	cp -rf $SRCHOME/* $SERVERHOME
 	cd $SERVERHOME
 	make clean >&2

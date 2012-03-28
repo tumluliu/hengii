@@ -9,7 +9,9 @@
 # 1:the name of the to-run server-side program
 # 2:the process taken to run mpiexec
 
+_prepare_server
 _start_server | _contains_$1_output $2 | _at server &
 create_empty_flow.rb | add_job.rb $1 $2 | session.rb start.rb print_id.rb > id; cat id | session.rb read_id.rb block_till_result.rb | _contains_$1_output $2 | _at client
 _kill_server
 _collect server client
+rm id
