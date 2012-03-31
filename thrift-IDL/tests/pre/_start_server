@@ -1,4 +1,0 @@
-#!/bin/bash
-
-_prepare_server ; 
-higine 2>&1 | tee -a $SERVERLOG

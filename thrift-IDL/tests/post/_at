@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# announce a result is a test at specific check point
-# arg 1: the name of the check point
-
-# a simple implementation, can only deal with sequential tests
-cat > $1.out

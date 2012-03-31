@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# print to log,
-
-echo $(date) >> $1
-cat >> $1

@@ -1,3 +1,0 @@
-#!/bin/bash
-
-create_empty_flow.rb | add_job.rb $1 $2 | session.rb start.rb block_till_result.rb

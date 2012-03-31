@@ -1,6 +1,0 @@
-#!/bin/bash
-
-# print both to std and log,
-
-echo $(date) >> $1
-tee -a $1

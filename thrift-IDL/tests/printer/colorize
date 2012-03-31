@@ -1,9 +1,0 @@
-#!/bin/bash
-
-# colorize stdout,
-
-ORIGIN_COLOR="0"
-
-cat > tmpout
-sed -i "s/true/\\E[32mtrue\\E[$(ORIGIN_COLOR)mtrue" tmpout
-rm tmpout
