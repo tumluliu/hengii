@@ -42,7 +42,11 @@ Job JobTracker::getUserJob() const {
 }
 
 string JobTracker::getResult() const {
-	return qJob.getOutput();
+	return output == "" ? qJob.getOutput() : output;
+}
+
+void JobTracker::setResult(const string &result) {
+	output = result;
 }
 
 string JobTracker::getCmdline() const {
@@ -56,7 +60,7 @@ string JobTracker::getStatus() const {
 int JobTracker::getConnection() const {
 	return qJob.getConnection();
 }
-		
+
 string JobTracker::getId() const {
 	return qJob.getId();
 }
@@ -111,6 +115,7 @@ void* JobTracker::jobWorker(void* threadParam)
 	JobTracker* job = (JobTracker*) threadParam;
 	Job userJob = job->getUserJob();
 	string cmdline = "";
+	string response = "";
 	int processCount;
 	ParallelEnv::type parallel_env = userJob.runtime_context.parallel_env;
 	map<string, string> envOptions = userJob.runtime_context.options;
@@ -124,14 +129,23 @@ void* JobTracker::jobWorker(void* threadParam)
 					string mpiConf = ""; 
 					if (Utility::readFile(MPI_CONF_PATH, mpiConf) != 0) {
 						cout << "read mpi config file " << MPI_CONF_PATH << " error!" << endl;
+						job->setThreadState(THREAD_STATE_FINISHED_FAILED);
 						return NULL;
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
 				}
-				string appConfFile = APP_DIR + userJob.app_options["program_name"] + ".meta";
-				ifstream appOptionsFile(appConfFile.c_str(), ios::in);
+				string appMetaFile = APP_DIR + userJob.app_options["program_name"] + ".meta";
+				ifstream appOptionsFile(appMetaFile.c_str(), ios::in);
 				if (!appOptionsFile) { 
-					cout << "open application config file " << appConfFile << " error!" << endl;
+					response = "";
+					response 
+						= response 
+						+ "start job error, program "
+						+ userJob.app_options["program_name"]
+						+ " not exist";
+					cout << response << endl;
+					job->setResult(response);
+					job->setThreadState(THREAD_STATE_FINISHED_FAILED);
 					return NULL;
 				}
 				cmdline = cmdline + APP_DIR + userJob.app_options["program_name"] + " ";
@@ -177,6 +191,6 @@ void* JobTracker::jobWorker(void* threadParam)
 		cout << "output by invoking JobTracker::getResult() : " << endl;
 		cout << job->getResult() << endl;
 	}
-	pthread_exit(NULL);
+	return NULL;
 }
 

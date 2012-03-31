@@ -130,16 +130,33 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 		cout << "get status error, job id not exist" << endl;
 	}
 	else {
-		_return.status = JOB_STATUS_FINISHED;
+		_return.status = JOB_STATUS_UNKNOWN;
 		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 			JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-			if (tracker.getThreadState() != THREAD_STATE_FINISHED_SUCCESS) {
-				_return.status = JOB_STATUS_UNFINISHED;
+
+			switch ( tracker.getThreadState() ) {
+				case THREAD_STATE_FINISHED_SUCCESS:	
+					_return.status = JOB_STATUS_FINISHED;
+					break;
+
+				case THREAD_STATE_FINISHED_FAILED:	
+					_return.status = JOB_STATUS_FAILED;
+					break;
+
+				case THREAD_STATE_FREE:
+				case THREAD_STATE_BUSY:	
+					_return.status = JOB_STATUS_UNFINISHED;
+					break;
+
+				default:	
+					break;
+			}				/* -----  end switch  ----- */
+			if (_return.status == JOB_STATUS_UNFINISHED) {
 				break;
 			}
 		}
 		cout << "the job status is: " << _return.status << endl;
-		if (_return.status == JOB_STATUS_FINISHED) { 
+		if (_return.status != JOB_STATUS_UNFINISHED) { 
 			for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 				JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
 				msgToClient += tracker.getResult();
