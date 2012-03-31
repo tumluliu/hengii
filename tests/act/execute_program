@@ -1,3 +1,25 @@
-#!/bin/bash
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: execute_program
+# 
+#         USAGE: ./execute_program 
+# 
+#   DESCRIPTION: the convenient wrapper for the standard start-block-until-return cycle,
+#   			 submitting a jobflow containing single program
+#		 INPUTS: 1:the name of the program; 2:the process number to be used
+#		 		 3:(optional)addtional option, use key:value pattern
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 03/31/2012 06:02:33 PM CST
+#      REVISION:  ---
+#===============================================================================
 
-create_empty_flow.rb | add_job.rb $1 $2 | session.rb start.rb block_till_result.rb
+#<warning>not used here because $3 is optional, however there should be more elegant way...
+#set -o nounset                              # Treat unset variables as an error
+
+create_empty_flow.rb | add_job.rb $1 $2 $3 | session.rb start.rb block_till_result.rb

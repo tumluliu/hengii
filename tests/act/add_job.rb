@@ -23,9 +23,10 @@ job1.children     = []
 job1.child_count  = job1.children.count
 job1.app_options  = {
 	'program_name'   => ARGV[0],
-	'program_input'  => '',
-	'program_output' => ''
 }	
+if ARGV[3] != nil
+	job1.app_options.merge(Hash[*ARGV[3].split(":")])
+end
 job1.runtime_context              = Context.new()
 job1.runtime_context.parallel_env = ParallelEnv::MPI
 job1.runtime_context.options      = { 'process_count' => ARGV[1] || '2' }
