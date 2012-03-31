@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# compile and copy certain server-side program to live space
+# parameters:
+# 1:the name of the program
+
+if [ ! -d $APPSHOME ]; then mkdir $APPSHOME; fi
+
+if [ ! -s $APPSHOME/$1 ] || [ ! -s $APPSHOME/$1.meta ]; then
+	mpicc $THOME/pre/$1.c -o $APPSHOME/$1
+	cp $THOME/pre/$1.meta $APPSHOME/
+fi

@@ -1,0 +1,1 @@
+mpiexec -n 8  /home/geohpc/higine/tests/.live/apps/hello   
