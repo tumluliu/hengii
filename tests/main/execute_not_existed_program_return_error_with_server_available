@@ -7,12 +7,11 @@
 # (implicit)3:a script called _contains_<program name>_output
 # The last param exists because to know a MPI program's exact output is impossible
 
-PROGRAM_NOT_EXIST_MESSAGE="start job error, program not exist"
+PROGRAM_NOT_EXIST_MESSAGE="start job error, program not_exist not exist"
 _prepare_server
 _start_server | _contains $PROGRAM_NOT_EXIST_MESSAGE | _at server &
-mv $APPSHOME/not_exist $THOME/trash/not_exist$(date +%s) ; execute_program not_exist 2 | _contains $PROGRAM_NOT_EXIST_MESSAGE  | _at client 
-_kill_server
-_collect server client | _at response
+sleep 0.1
+rm -f $APPSHOME/not_exist $THOME/trash/not_exist$(date +%s) ; execute_program not_exist 2 | _contains $PROGRAM_NOT_EXIST_MESSAGE  | _at client 
 _prepare_program $1; execute_program $1 $2 | _contains_$1_output $2 | _at state
 _kill_server
 _collect client server state

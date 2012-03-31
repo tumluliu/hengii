@@ -5,7 +5,7 @@
 # at last, print the result's message to std
 
 ret = client.get_status(id)
-while(ret.status != 0 && ret.status != -1)
+while(ret.status > 0)
 	sleep(0.1)
 	ret = client.get_status(id)
 end
@@ -14,6 +14,8 @@ case ret.status
 when 0
 	log_level = :info
 when -1
+	log_level = :fatal
+when -2
 	log_level = :fatal
 else
 

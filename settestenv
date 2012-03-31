@@ -11,7 +11,7 @@ export THOME=$MAIN/tests
 export SRCHOME=$MAIN/server/
 export PROCLOG=$MAIN/runtest.proc.log
 export SERVERLOG=$MAIN/runtest.server.log
-export SERVERHOME=$THOME/live/
+export SERVERHOME=$THOME/.live/
 export APPSHOME=$SERVERHOME/apps/
 
 export PATH=$PATH:$MAIN/tests/main
@@ -20,6 +20,6 @@ export PATH=$PATH:$MAIN/tests/act
 export PATH=$PATH:$MAIN/tests/post
 export PATH=$PATH:$MAIN/tests/printer
 export PATH=$PATH:$MAIN/tests/analyzer
-export PATH=$PATH:$MAIN/tests/live
+export PATH=$PATH:$MAIN/tests/.live
 export PATH=$PATH:$MAIN/tests/util
 export PATH=$PATH:$MAIN/tests/
