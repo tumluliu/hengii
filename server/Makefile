@@ -8,6 +8,7 @@ TORQUE_DIR :=/usr/local/include
 
 INC := -I$(THRIFT_DIR) -I$(BOOST_DIR) -I$(EVENT_DIR) -I$(TORQUE_DIR)
 LIB := -L/usr/local/lib -L/opt/torque/lib -L/opt/thrift/lib
+HOSTNAME := $(shell hostname)
 
 .PHONY: all clean
 
@@ -19,6 +20,7 @@ config.h: config.h.in
 	sed -i "s%@APP_DIR@%\"\$(PWD)/apps/\"%g" config.h
 	sed -i "s%@RUN_LOG_FILE@%\"\$(PWD)/run.log\"%g" config.h
 	sed -i "s%@PBS_OUT_DIR@%\"\$(PWD)/pbstmp/\"%g" config.h
+	sed -i "s%@PBS_SERVER_HOST@%\"$(HOSTNAME)\"%g" config.h
 
 %.o: %.cpp
 	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wno-return-type $(INC) -c $< -g -o $@

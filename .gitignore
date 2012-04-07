@@ -1,4 +1,12 @@
-tests/trash/
-tests/live/
+runtest.log
+runtest.proc.log
+runtest.server.log
+tests/.trash/
+tests/.live/
 .*.un~
 .*.sw*
+tags
+cscope.external.files
+cscope.files
+cscope.out
+cscope.external.out

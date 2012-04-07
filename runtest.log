@@ -1,188 +1,145 @@
-Wed Mar 28 15:42:29 CST 2012
+Sun Apr 1 09:29:01 CST 2012
 作业流能正常执行 server:true; client:true;
 单个作业能正常执行 server:true; client:true;
 已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
 查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
 作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 15:45:19 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 15:50:13 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 16:01:29 CST 2012
-Wed Mar 28 16:01:48 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 16:12:15 CST 2012
-Wed Mar 28 16:17:16 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 18:14:50 CST 2012
-Wed Mar 28 18:16:07 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:05:34 CST 2012
-Wed Mar 28 20:06:07 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:20:38 CST 2012
-Wed Mar 28 20:21:23 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:22:02 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:22:18 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:23:26 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:24:40 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:27:51 CST 2012
-作业流能正常执行 server:true; client:true;
-Wed Mar 28 20:27:55 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-Wed Mar 28 20:31:18 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:31:51 CST 2012
-Wed Mar 28 20:32:00 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:34:31 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:37:10 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:39:49 CST 2012
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:true;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:true;
+Thu Apr 5 09:45:36 CST 2012
+Thu Apr 5 09:45:50 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 09:46:17 CST 2012
 作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:true; state:false; cannot find message from No.0 processes.;
-Wed Mar 28 20:44:47 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:46:08 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:46:50 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:55:25 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:56:51 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-Wed Mar 28 20:58:21 CST 2012
-作业流能正常执行 server:false; cannot find message from No.0 processes.; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:false; not contain start job error, program not exist; server:false; not contain start job error, program not exist; state:true;
-Wed Mar 28 20:58:45 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:false; not contain start job error, program not exist; server:false; not contain start job error, program not exist; state:true;
-Wed Mar 28 21:20:35 CST 2012
-作业流能正常执行 server:true; client:true;
-Wed Mar 28 21:20:38 CST 2012
-作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:false; not contain get status error, job id not exist; server:false; not contain get status error, job id not exist; state:false; cannot find message from No.0 processes.;
 作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:false; cannot find message from No.0 processes.;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:false; not contain start job error, program hello not exist; server:false; not contain start job error, program hello not exist; state:false; cannot find message from No.0 processes.;
-Wed Mar 28 21:20:48 CST 2012
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:false; cannot find message from No.0 processes.;
+Thu Apr 5 09:47:05 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 09:47:39 CST 2012
+Thu Apr 5 09:48:06 CST 2012
+Thu Apr 5 10:14:41 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:33:36 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:34:19 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:35:23 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:37:37 CST 2012
+Thu Apr 5 10:40:26 CST 2012
+Thu Apr 5 10:47:47 CST 2012
+Thu Apr 5 10:49:30 CST 2012
 作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:false; not contain get status error, job id not exist; server:false; not contain get status error, job id not exist; state:false; cannot find message from No.0 processes.;
-Wed Mar 28 21:21:19 CST 2012
-作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-Wed Mar 28 21:21:38 CST 2012
+查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:false; cannot find message from No.0 processes.;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:51:30 CST 2012
 作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
 单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
-Wed Mar 28 21:22:02 CST 2012
+已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:false; cannot find message from No.0 processes.;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:55:03 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:false; cannot find message from No.0 processes.;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:56:13 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:56:37 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+单个作业能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:false; cannot find message from No.0 processes.;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:false; cannot find message from No.0 processes.;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:false; cannot find message from No.0 processes.;
+Thu Apr 5 10:59:08 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 11:00:48 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 11:08:29 CST 2012
+Thu Apr 5 11:12:16 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 11:44:24 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 11:44:34 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 14:54:33 CST 2012
+Thu Apr 5 14:54:54 CST 2012
+Thu Apr 5 15:06:59 CST 2012
+Thu Apr 5 15:08:49 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 15:14:30 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 15:48:31 CST 2012
+Thu Apr 5 15:49:51 CST 2012
+Thu Apr 5 15:50:19 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 16:07:22 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 16:29:19 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 17:14:40 CST 2012
+Thu Apr 5 17:16:42 CST 2012
+Thu Apr 5 17:20:17 CST 2012
+Thu Apr 5 17:23:42 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 17:25:57 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 17:26:15 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 17:27:45 CST 2012
+作业流能正常执行 server:false; cannot find message from No.0 processes.; client:false; cannot find message from No.0 processes.;
+Thu Apr 5 17:28:00 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 17:29:42 CST 2012
+Thu Apr 5 17:33:29 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 17:58:23 CST 2012
+Thu Apr 5 17:58:51 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 17:59:22 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 18:00:28 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 18:04:10 CST 2012
+作业流能正常执行 server:true; client:true;
+Thu Apr 5 18:05:44 CST 2012
 作业流能正常执行 server:true; client:true;
 单个作业能正常执行 server:true; client:true;
 已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
 查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
 作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:false; not contain start job error, program hello not exist; server:false; not contain start job error, program hello not exist; state:true;
-Wed Mar 28 21:23:17 CST 2012
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:true;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:true;
+Thu Apr 5 18:12:44 CST 2012
+作业流能正常执行 server:true; client:true;
+单个作业能正常执行 server:true; client:true;
+已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
+查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
+作业内的程序异常中止，返回错误信息，服务正常继续 client:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); server:false; not contain Try getting member values from null pointer...Try getting member values from null pointer...[mpiexec@gdos-yanan] ONE OF THE PROCESSES TERMINATED BADLY: CLEANING UP APPLICATION TERMINATED WITH THE EXIT STRING: Segmentation fault (signal 11); state:true;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:true;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:true;
+Fri Apr 6 10:40:31 CST 2012
 作业流能正常执行 server:true; client:true;
 单个作业能正常执行 server:true; client:true;
 已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
 查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
 作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:false; not contain start job error, program hello not exist; server:false; not contain start job error, program hello not exist; state:true;
-Wed Mar 28 21:24:11 CST 2012
-作业流能正常执行 server:true; client:true;
-单个作业能正常执行 server:true; client:true;
-已经提交作业的用户连接中断后，可以重新连接，并凭之前拿到的id重新建立与其作业的联系 server:true; client:true;
-查询不存在的作业的状态，返回错误信息，服务正常继续 client:true; server:true; state:true;
-作业内的程序异常中止，返回错误信息，服务正常继续 client:true; server:true; state:true;
-提交作业，要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:true;
+要求执行不存在的程序，返回错误信息，服务正常继续 client:true; server:true; state:true;
+提交的参数无法识别，返回错误信息，服务正常继续 client:false; not contain start job error, app option invalidopt not recognized; server:false; not contain start job error, app option invalidopt not recognized; state:true;
