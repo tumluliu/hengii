@@ -21,6 +21,7 @@
 #include <vector>
 #include <iostream>
 #include <sstream>
+#include <cstring>
 #include "torquejob.h"
 #include "utility.h"
 #include "config.h"
@@ -79,13 +80,15 @@ string TorqueJob::generateNameByTime() {
 
 int TorqueJob::submit() {
 	string scriptFileName = generateNameByTime();
+
 	int exist;
 	while ((exist = access((PBS_OUT_DIR + scriptFileName).c_str(), F_OK)) == 0) {
 		scriptFileName = generateNameByTime();
 	}
+
 	scriptPath = PBS_OUT_DIR + scriptFileName;
-	outputPath = PBS_OUT_DIR + scriptFileName + PBS_OUTPUT_FILE_EXT;
-	errlogPath = PBS_OUT_DIR + scriptFileName + PBS_ERRLOG_FILE_EXT;
+	outputPath = scriptPath + PBS_OUTPUT_FILE_EXT;
+	errlogPath = scriptPath + PBS_ERRLOG_FILE_EXT;
 
 	ofstream outputFile(scriptPath.c_str(), ios::out);
 	if (!outputFile) {
@@ -100,16 +103,28 @@ int TorqueJob::submit() {
 	// in the real environment? I doubt it.
 	// by Liu Lu
 	// 2012/3/17
-	char hostname[PARAM_SIZE];
-	gethostname(hostname, sizeof(hostname));
-	connection = pbs_connect(hostname); 
+	// I added a env var in config.h, which may be a solution to this
+	// by YANG Anran
+	// 2012/4/5
+	connection = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
 	if (connection < 0) {
 		cout << "Connect to Torque PBS server failed!" << endl;
 		cout << "ERROR " << pbs_errno << ": " << pbs_strerror(pbs_errno) << endl;
 		return -1;
 	}
 	
+	char hostPrefix[PARAM_SIZE];
+	cout << gethostname(hostPrefix, PARAM_SIZE) << endl;
+	cout << "prefix: " << hostPrefix << endl;
+	strncat(hostPrefix, ":", 1);
+	cout << "prefix: " << hostPrefix << endl;
+	const string prefix(hostPrefix);
+	string fullloc;//this var is to solve a very strange error, whose reason's still unknown
+
 	struct attropl qSubAttr[3];
+	//use strncpy?
+	//by YANG Anran
+	//2012/4/5
 	string qJobName = ATTR_N;
 	qSubAttr[0].name = const_cast<char*>(qJobName.c_str());
 	qSubAttr[0].value = const_cast<char*>(scriptPath.c_str());
@@ -117,12 +132,16 @@ int TorqueJob::submit() {
 	qSubAttr[0].next = &qSubAttr[1];
 	string qOutputPath = ATTR_o;
 	qSubAttr[1].name = const_cast<char*>(qOutputPath.c_str());
-	qSubAttr[1].value = const_cast<char*>(outputPath.c_str());
+	fullloc = prefix + outputPath;
+	qSubAttr[1].value = const_cast<char*>(fullloc.c_str());
+	cout << "outloc: " << qSubAttr[1].value << endl;
 	qSubAttr[1].resource = '\0';
 	qSubAttr[1].next = &qSubAttr[2];
 	string qErrorPath = ATTR_e;
 	qSubAttr[2].name = const_cast<char*>(qErrorPath.c_str());
-	qSubAttr[2].value = const_cast<char*>(errlogPath.c_str());
+	fullloc = prefix + errlogPath;
+	qSubAttr[2].value = const_cast<char*>(fullloc.c_str());
+	cout << "errloc: " << qSubAttr[2].value << endl;
 	qSubAttr[2].resource = '\0';
 	qSubAttr[2].next = NULL;
 	// !!!! The commented codes below may cause some unpredictable PBS error.

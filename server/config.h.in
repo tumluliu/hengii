@@ -25,6 +25,7 @@ using namespace std;
 
 const string MPI_CONF_PATH    = @MPI_CONF_PATH@;
 const string RUN_LOG_FILE     = @RUN_LOG_FILE@;
+const string PBS_SERVER_HOST  = @PBS_SERVER_HOST@;
 const string PBS_OUT_DIR      = @PBS_OUT_DIR@;
 const string APP_DIR          = @APP_DIR@;
 

@@ -33,7 +33,7 @@
 #include <transport/TBufferTransports.h>
 #include "hpgcjobhandler.h"
 
-const string VERSION = "0.6.7";
+const string VERSION = "0.6.9";
 const int PORT = 9990;
 
 using namespace ::apache::thrift;

@@ -6,7 +6,7 @@
 
 ret = client.get_status(id)
 while(ret.status > 0)
-	sleep(0.1)
+	sleep(0.2)
 	ret = client.get_status(id)
 end
 

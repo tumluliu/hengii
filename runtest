@@ -1,4 +1,35 @@
-#!/bin/bash
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: runtest
+# 
+#         USAGE: ./runtest 
+# 
+#   DESCRIPTION: The entrance of tests
+#   			 !!!!!!!!!!!!IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#   			 !!! Please setup env manually, 
+#   			 !!! cause auto-settings(which uses *SUDO*(using pbsnodes -o somewhere?)) 
+#   			 !!! may cause terrible problems.
+#   			 !!! RECOMMENDED Env !!!!!!!!!!!!!!!!!!!!!!!!!!
+#   			 !!! 1.single: pbs_server, maui, pbs_mom 
+#   			 !!! 2.standard: 1+ pbs_mom, testing programs
+#   			 !!!   deployed on every nodes(if cluster is distributed)
+#				 !!! 3.master-slave: 2+ pbs_mom on every nodes except server nodes
+#				 !!!
+#
+#		 INPUTS: ---
+#       OPTIONS: [-i] with initialization, i.e. clean live space, copy source and remake
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/05/2012 06:24:06 PM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
 #set -e
 
 source settestenv

@@ -5,8 +5,15 @@ tests/.trash/
 tests/.live/
 .*.un~
 .*.sw*
+<<<<<<< HEAD
+=======
+tags
+>>>>>>> 4587d300d73df65a9bb5e3d5857e7663ff9d842f
 cscope.external.files
 cscope.files
 cscope.out
 cscope.external.out
+<<<<<<< HEAD
 tags
+=======
+>>>>>>> 4587d300d73df65a9bb5e3d5857e7663ff9d842f
