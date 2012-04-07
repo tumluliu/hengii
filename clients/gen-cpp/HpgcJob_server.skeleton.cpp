@@ -14,7 +14,7 @@ using namespace ::apache::thrift::server;
 
 using boost::shared_ptr;
 
-using namespace  ::HPGC::HiGIS::Server;
+using namespace HPGC::HiGIS::Server;
 
 class HpgcJobHandler : virtual public HpgcJobIf {
  public:

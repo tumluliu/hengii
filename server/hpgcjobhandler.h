@@ -32,9 +32,7 @@ const string PROJECT_NAME = "HiGIS";
 const int SESSION_POOL_SIZE = 16;
 const int JOB_STATUS_FINISHED = 0;
 const int JOB_STATUS_UNFINISHED = 1;
-const int JOB_STATUS_FAILED= -1;
-const int JOB_NOT_EXIST = -2;
-const int JOB_STATUS_UNKNOWN = -999;
+const int JOB_NOT_EXIST = -1;
 
 using namespace HPGC::HiGIS::Server;
 

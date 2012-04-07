@@ -21,6 +21,20 @@ enum ParallelEnv
 	MAPREDUCE = 4
 }
 
+enum JobStatus
+{
+	FINISHED = 1,
+	RUNNING = 2,
+	WAITING_FOR_SUBMIT = 3,
+	QUEUING = 4,
+	EXIT_WITH_ERROR = 5
+}
+
+struct JobFlowStatus
+{
+	1: list<JobStatus> job_status_list
+}
+
 struct Context
 {
 	1: ParallelEnv parallel_env,
@@ -36,12 +50,13 @@ struct Job
 	5: i32 child_count,
 	6: i32 app_id,
 	7: map<string,string> app_options,
-	8: Context runtime_context 
+	8: Context runtime_context,
+	9: string app_uri
 }
 
 struct Result 
 {
-	1: i32 status,
+	1: JobFlowStatus status,
 	2: string message,
 	3: double progress
 }

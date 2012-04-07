@@ -36,14 +36,12 @@ class JobTracker{
 		int threadState;
 		TorqueJob qJob;
 		Job userJob;
-		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
 		vector<int>::iterator busyParentCountListIter;
 	public:
 		JobTracker();
 		void setUserJob(const Job&);
 		Job getUserJob() const;
 		string getResult() const;
-		void setResult(const string &result);
 		string getCmdline() const;
 		string getStatus() const;
 		int getConnection() const;

@@ -18,8 +18,6 @@
  * =====================================================================================
  */
 
-//#include "higine.h"
-//#include "jobscheduler.h"
 #include "higine.h"
 
 using namespace HPGC::HiGIS::Server;
