@@ -28,7 +28,8 @@ int _kJobStatusValues[] = {
   JobStatus::WAITING_FOR_SUBMIT,
   JobStatus::QUEUING,
   JobStatus::FAILED,
-  JobStatus::NOT_EXIST
+  JobStatus::NOT_EXIST,
+  JobStatus::PAUSED
 };
 const char* _kJobStatusNames[] = {
   "FINISHED",
@@ -36,9 +37,10 @@ const char* _kJobStatusNames[] = {
   "WAITING_FOR_SUBMIT",
   "QUEUING",
   "FAILED",
-  "NOT_EXIST"
+  "NOT_EXIST",
+  "PAUSED"
 };
-const std::map<int, const char*> _JobStatus_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kJobStatusValues, _kJobStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _JobStatus_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(7, _kJobStatusValues, _kJobStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 int _kStatusValues[] = {
   Status::FINISHED,

@@ -16,67 +16,83 @@
  * =====================================================================================
  */
 #include <stdlib.h>
-#include <logger.h>
 #include <fstream>
+#include <iostream>
 #include <unistd.h>
+#include "logger.h"
+#include "config.h"
 
-void Logger::log(LogOutputType output, Severity level, EventSource sender, const string& msg)
-{
+void Logger::log(LogOutputType output, Severity level, EventSource sender, const string& msg) {
 	string severityLvl;
 	switch (level) {
-		case Severity.FATAL:
-			severityLvl = "fatal";
+		case FATAL:
+			severityLvl = "FATAL";
 			break;
-		case Severity.ERROR:
-			severityLvl = "error";
+		case ERROR:
+			severityLvl = "ERROR";
 			break;
-		case Severity.WARN:
-			severityLvl = "warn";
+		case WARN:
+			severityLvl = "WARN";
 			break;
-		case Severity.INFO:
-			severityLvl = "info";
+		case INFO:
+			severityLvl = "INFO";
 			break;
-		case Severity.DEBUG:
-			severityLvl = "debug";
+		case DEBUG:
+			severityLvl = "DEBUG";
 			break;
 		default:
 			break;
 	}
 	string eventSender; 
 	switch (sender) {
-		case EventSource.APPLICATION:
-			eventSender = "user app";
+		case APPLICATION:
+			eventSender = "USER APP";
 			break;
-		case EventSource.TORQUE:
-			eventSender = "torque pbs";
+		case TORQUE:
+			eventSender = "TORQUE PBS";
 			break;
-		case EventSource.MPI_ENV:
-			eventSender = "mpi";
+		case MPI_ENV:
+			eventSender = "MPI";
 			break;
-		case EventSource.DATABASE:
-			eventSender = "database";
+		case DATABASE:
+			eventSender = "DATABASE";
 			break;
 		default:
 			break;
 	}
 	time_t t = time(0);
-	string now = asctime(localtime(&t)).str();
-	string logInfo = now + ", " + severityLvl + ", " + eventSender + ", " + msg; 
-	string logFilePath = LOG_DIR + LOG_FILE_NAME;
-	ofstream logFile;
-	logFile.open(logFilePath.c_str(), ofstream::app);
-	if (!logFile) {
-		cerr << "error: unable to open higine log file: "
-			<< logFilePath << endl;
-		return;
-	}
+	string now = string(asctime(localtime(&t)));
+	string logInfo = "--" + now + severityLvl + ", " + eventSender + ", " + msg; 
 
-	time_t t;
-	fp = fopen(file.c_str(), "a");
-	if ((fp) >= 0) {
-		t = time(0);
-		fprintf(fp, "%s:%s\n", asctime(localtime(&t)), content.c_str());
-		fclose(fp);
-	}
-	logFile.close();
+	switch ( output ) {
+		case STDOUT:	
+			cout << logInfo << endl;
+			break;
+
+		case STDERR:	
+			cerr << logInfo << endl;
+			break;
+
+		case LOG_FILE:
+			{ 	
+				ofstream logFile;
+				logFile.open(RUN_LOG_FILE.c_str(), ofstream::app);
+				if (!logFile) {
+					cerr << "error: unable to open higine log file: "
+						<< RUN_LOG_FILE << endl;
+					return;
+				}
+				logFile << logInfo << endl;
+				logFile.close();
+				break;
+			}
+
+		case LOG_DB:
+			//write log to database
+			cout << "Write to database: " << logInfo << endl;
+			break;
+
+		default:	
+			break;
+	}				/* -----  end switch  ----- */
 }

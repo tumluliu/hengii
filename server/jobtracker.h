@@ -24,16 +24,12 @@
 using namespace HPGC::HiGIS::Server;
 
 const string MPI_EXEC_CMD = "mpiexec ";
-const int THREAD_STATE_FINISHED_SUCCESS = 0;
-const int THREAD_STATE_FINISHED_FAILED = -1;
-const int THREAD_STATE_BUSY = 1;
-const int THREAD_STATE_FREE = 2;
 
 class JobTracker{
 	private:
 		pthread_mutex_t* threadMutex;
 		pthread_cond_t* waitingCond;
-		int threadState;
+		JobStatus::type jobStatus;
 		TorqueJob qJob;
 		Job userJob;
 		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
@@ -45,7 +41,6 @@ class JobTracker{
 		string getResult() const;
 		void setResult(const string &result);
 		string getCmdline() const;
-		string getStatus() const;
 		int getConnection() const;
 		int submit();
 		int collect();
@@ -58,8 +53,8 @@ class JobTracker{
 		vector<int>::iterator getBusyParentCountListIter();
 		void setBusyParentCountListIter(vector<int>::iterator);
 		void setWaitingCond(pthread_cond_t* cond);
-		int getThreadState() const;
-		void setThreadState(int);
+		JobStatus::type getStatus() const;
+		void setStatus(JobStatus::type);
 		static void* jobWorker(void*);
 };
 

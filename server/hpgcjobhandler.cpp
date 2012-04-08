@@ -18,6 +18,7 @@
  */
 #include <sys/time.h>
 #include "hpgcjobhandler.h"
+#include "logger.h"
 
 int HpgcJobHandler::findEmptyPoolSlot() {
 	sessionItr = sessionPool.begin();
@@ -78,11 +79,11 @@ void HpgcJobHandler::pause(const int32_t client_ticket) {
 	string sig = "suspend";
 	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-		if (tracker.getStatus() == "R")
+		if (tracker.getStatus() == JobStatus::RUNNING)
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
 					const_cast<char*>(sig.c_str()), 0);
-		else if (tracker.getStatus() == "C")
+		else if (tracker.getStatus() == JobStatus::FINISHED)
 			cout << "job " << tracker.getUserJob().id<< "has done!"<<endl;
 		else
 			pbs_holdjob(tracker.getConnection(), const_cast<char*>(tracker.getId().c_str()), 0, 0);
@@ -94,15 +95,14 @@ void HpgcJobHandler::resume(const int32_t client_ticket) {
 	string sig = "resume";
 	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-		if (tracker.getStatus() == "S") {
+		if (tracker.getStatus() == JobStatus::PAUSED) {
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
 					const_cast<char *>(sig.c_str()), 0);
 		}		
-		else if (tracker.getStatus() == "H")
-			pbs_rlsjob(tracker.getConnection(), const_cast<char*>(tracker.getId().c_str()), 0, 0);	 
-		else
-			cout << "job " << tracker.getUserJob().id << " hasn't suspended!" << endl;
+		else {
+			cout << "job " << tracker.getUserJob().id << " hasn't been suspended!" << endl;
+		}
 	}
 	cout << "resume_flow" << endl;
 }
@@ -110,73 +110,58 @@ void HpgcJobHandler::resume(const int32_t client_ticket) {
 void HpgcJobHandler::cancel(const int32_t client_ticket) {
 	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {	
 		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-		if (tracker.getStatus() != "C") {
+		if (tracker.getStatus() != JobStatus::RUNNING && tracker.getStatus() != JobStatus::FAILED ) {
 			pbs_deljob(tracker.getConnection(), 
 					const_cast<char*>((tracker.getId()).c_str()), 0);
 		}
-		else
+		else {
 			cout << "job " << tracker.getUserJob().id << " has done!" << endl;
+		}
 	}
 	cout << "cancel_flow" << endl;
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
-	string msgToClient;
 	cout << "get job flow status..." << endl;
 	if (sessionPool.count(client_ticket) == 0) {
-		_return.status = JOB_NOT_EXIST;
+		_return.flow_status = Status::NOT_EXIST;
 		_return.message = "get status error, job id not exist";
-		_return.progress = 0.0;
 		cout << "get status error, job id not exist" << endl;
 	}
 	else {
-		_return.status = JOB_STATUS_UNKNOWN;
+		_return.flow_status = Status::FINISHED;
+		_return.message = "";
+
+		cout << "the job status is: " << _return.flow_status << endl;
+		cout << "The result sent to client is:" << endl;
+
 		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 			JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-
-			switch ( tracker.getThreadState() ) {
-				case THREAD_STATE_FINISHED_SUCCESS:	
-					_return.status = JOB_STATUS_FINISHED;
-					break;
-
-				case THREAD_STATE_FINISHED_FAILED:	
-					_return.status = JOB_STATUS_FAILED;
-					break;
-
-				case THREAD_STATE_FREE:
-				case THREAD_STATE_BUSY:	
-					_return.status = JOB_STATUS_UNFINISHED;
-					break;
-
-				default:	
-					break;
-			}				/* -----  end switch  ----- */
-			if (_return.status == JOB_STATUS_UNFINISHED) {
-				break;
+			JobResult jr;
+			jr.message = tracker.getResult();
+			jr.status = tracker.getStatus();
+			if (jr.status == JobStatus::FAILED) {
+				_return.flow_status = Status::FAILED;
+			}	
+			if (jr.status != JobStatus::FAILED && jr.status != JobStatus::FINISHED) {
+				_return.flow_status = Status::RUNNING;
 			}
+			_return.job_result_list.push_back(jr);
+			// log and print
+			Logger::log(LOG_FILE, INFO, APPLICATION, jr.message);	
+			cout << jr.message << endl;
 		}
-		cout << "the job status is: " << _return.status << endl;
-		if (_return.status != JOB_STATUS_UNFINISHED) { 
-			for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
-				JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
-				msgToClient += tracker.getResult();
-			}
-			Utility::log(RUN_LOG_FILE, msgToClient);
-			cout << "The result sent to client is:" << endl;
-			cout << msgToClient << endl;
-			_return.message = msgToClient;
-			// The progress getting function has not been implemented yet!
-			_return.progress = 0.618;
+
+		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {
 			sessionPool[client_ticket].setAvailable(true);
+			sessionPool[client_ticket].finalize();
 		}
-		else
-			_return.message = "";
+
 		//	cout<<"HPGC flow finished."<<endl;
 		//	!!!! the finalize of the current active session should not be placed only here
 		//	it should be invoked when the job or jobflow is really finished. !!!!
 		//	by Liu Lu
 		//	2012/3/19
-		sessionPool[client_ticket].finalize();
 	}
 	//  pthread_cond_destroy(&waitingCond);
 }

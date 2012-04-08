@@ -19,18 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "utility.h"
-
-void Utility::log(const string& file, const string& content)
-{
-	FILE *fp;
-	time_t t;
-	fp = fopen(file.c_str(), "a");
-	if ((fp) >= 0) {
-		t = time(0);
-		fprintf(fp, "%s:%s\n", asctime(localtime(&t)), content.c_str());
-		fclose(fp);
-	}
-}
+#include "logger.h"
 
 int Utility::readFile(const string& file, string& content) {
 	ifstream infile(file.c_str(), ios::in);

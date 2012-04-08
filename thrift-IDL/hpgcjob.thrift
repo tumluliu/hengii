@@ -28,7 +28,8 @@ enum JobStatus
 	WAITING_FOR_SUBMIT = 3,
 	QUEUING = 4,
 	FAILED = 5,
-	NOT_EXIST = 6
+	NOT_EXIST = 6,
+	PAUSED = 7
 }
 
 enum Status

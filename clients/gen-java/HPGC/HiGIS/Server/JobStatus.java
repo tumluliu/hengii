@@ -17,7 +17,8 @@ public enum JobStatus implements org.apache.thrift.TEnum {
   WAITING_FOR_SUBMIT(3),
   QUEUING(4),
   FAILED(5),
-  NOT_EXIST(6);
+  NOT_EXIST(6),
+  PAUSED(7);
 
   private final int value;
 
@@ -50,6 +51,8 @@ public enum JobStatus implements org.apache.thrift.TEnum {
         return FAILED;
       case 6:
         return NOT_EXIST;
+      case 7:
+        return PAUSED;
       default:
         return null;
     }

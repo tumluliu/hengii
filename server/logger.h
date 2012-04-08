@@ -20,6 +20,7 @@
 #define _LOGGER_H_ 
 
 #include <string>
+#include <config.h>
 
 using namespace std;
 
@@ -28,13 +29,14 @@ enum EventSource {
 	TORQUE = 2,
 	MPI_ENV = 3,
 	DATABASE = 4
-}
+};
 
 enum LogOutputType {
 	STDOUT = 1,
 	STDERR = 2,
-	LOG_FILE = 3
-}
+	LOG_FILE = 3,
+	LOG_DB = 4
+};
 
 enum Severity {
 	FATAL = 1,
@@ -42,14 +44,11 @@ enum Severity {
 	WARN = 3,
 	INFO = 4,
 	DEBUG = 5
-}
-
-const string LOG_FILE_NAME = "higine.log";
-const string LOG_DIR = "~/";
+};
 
 class Logger {
 	public:
 		static void log(LogOutputType, Severity, EventSource, const string&);
-}
+};
 
 #endif

@@ -6,6 +6,7 @@ thrift --gen java hpgcjob.thrift
 thrift --gen csharp hpgcjob.thrift
 
 cp -r gen-cpp/* ../server/lib/
+cp -r gen-rb/* ../tests/act/lib/
 cp -r gen-rb ../clients/
 cp -r gen-cpp ../clients/
 cp -r gen-java ../clients/

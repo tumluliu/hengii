@@ -22,19 +22,11 @@
 #include "config.h"
 #include "utility.h"
 
-JobTracker::JobTracker(): threadState(THREAD_STATE_FREE) {
+JobTracker::JobTracker() {
 }
 
 void JobTracker::setUserJob(const Job& job) {
 	userJob = job;
-}
-
-int JobTracker::getThreadState() const {
-	return threadState;
-}
-
-void JobTracker::setThreadState(int state) {
-	threadState = state;
 }
 
 Job JobTracker::getUserJob() const {
@@ -53,8 +45,28 @@ string JobTracker::getCmdline() const {
 	return qJob.getCmdline();
 }
 
-string JobTracker::getStatus() const {
-	return qJob.getStatus();
+JobStatus::type JobTracker::getStatus() const {
+	JobStatus::type innerStatus;
+	string pbsStatus = qJob.getStatus();
+
+	if (pbsStatus == "C") {
+		innerStatus = JobStatus::FINISHED;
+	}
+	else if (pbsStatus == "R") {
+		innerStatus = JobStatus::RUNNING;
+	}
+	else if (pbsStatus == "S" || pbsStatus == "H") {
+		innerStatus = JobStatus::PAUSED;
+	}
+	else {
+		innerStatus = JobStatus::RUNNING;
+	}
+
+	return jobStatus == JobStatus::RUNNING ? innerStatus : jobStatus ;
+}
+
+void JobTracker::setStatus(JobStatus::type stat) {
+	jobStatus = stat;
 }
 
 int JobTracker::getConnection() const {
@@ -113,6 +125,7 @@ void JobTracker::setBusyParentCountListIter(vector<int>::iterator it) {
 void* JobTracker::jobWorker(void* threadParam)
 {
 	JobTracker* job = (JobTracker*) threadParam;
+	job->setStatus(JobStatus::WAITING_FOR_SUBMIT);
 	Job userJob = job->getUserJob();
 	string cmdline = "";
 	string response = "";
@@ -129,7 +142,7 @@ void* JobTracker::jobWorker(void* threadParam)
 					string mpiConf = ""; 
 					if (Utility::readFile(MPI_CONF_PATH, mpiConf) != 0) {
 						cout << "read mpi config file " << MPI_CONF_PATH << " error!" << endl;
-						job->setThreadState(THREAD_STATE_FINISHED_FAILED);
+						job->setStatus(JobStatus::FAILED);
 						return NULL;
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
@@ -145,7 +158,7 @@ void* JobTracker::jobWorker(void* threadParam)
 						+ " not exist";
 					cout << response << endl;
 					job->setResult(response);
-					job->setThreadState(THREAD_STATE_FINISHED_FAILED);
+					job->setStatus(JobStatus::FAILED);
 					return NULL;
 				}
 				cmdline = cmdline + APP_DIR + userJob.app_options["program_name"] + " ";
@@ -175,9 +188,10 @@ void* JobTracker::jobWorker(void* threadParam)
 		cout << "Torque PBS job submission met some problem." << endl;
 		cout << "The process has been terminated. See you next time!" << endl;
 		cout << "================================================" << endl;
-		job->setThreadState(THREAD_STATE_FINISHED_FAILED);
+		job->setStatus(JobStatus::FAILED);
 	}
 	else {
+		job->setStatus(JobStatus::RUNNING);
 		job->collect();
 		cout << "Torque PBS job collects." << endl;
 		pthread_mutex_lock(job->getThreadMutex());
@@ -187,7 +201,7 @@ void* JobTracker::jobWorker(void* threadParam)
 		}
 		pthread_mutex_unlock(job->getThreadMutex());
 		pthread_cond_broadcast(job->getWaitingCond());
-		job->setThreadState(THREAD_STATE_FINISHED_SUCCESS);
+		job->setStatus(JobStatus::FINISHED);
 		cout << "output by invoking JobTracker::getResult() : " << endl;
 		cout << job->getResult() << endl;
 	}

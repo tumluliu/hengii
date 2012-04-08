@@ -29,7 +29,6 @@ const int PARAM_SIZE = 1024;
 class Utility {
 	public:
 		static int readFile(const string&, string&);
-		static void log(const string&, const string&);
 		static int getCurrentDir(string&);
 		static int deleteFile(const string&);
 };

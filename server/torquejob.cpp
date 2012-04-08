@@ -17,13 +17,14 @@
  */
 #include <stdlib.h>
 #include <sys/time.h>
+#include <cstring>
 #include <fstream>
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include <cstring>
 #include "torquejob.h"
 #include "utility.h"
+#include "logger.h"
 #include "config.h"
 
 extern "C"
@@ -43,7 +44,7 @@ string TorqueJob::getStatus() const {
 int TorqueJob::getConnection() const {
 	return connection;
 }
-		
+
 string TorqueJob::getId() const {
 	return id;
 }
@@ -92,57 +93,62 @@ int TorqueJob::submit() {
 
 	ofstream outputFile(scriptPath.c_str(), ios::out);
 	if (!outputFile) {
-		cout << "open file " << scriptPath << " error!" << endl;
+		// cout << "open file " << scriptPath << " error!" << endl;
+		Logger::log(STDOUT, ERROR, TORQUE, "unable to open torque script file " + scriptPath);
 		return -1;
 	}
 	outputFile << cmdline << endl;
 	outputFile.close();
 
-	// Here the semantic is the higine MUST be installed on 
-	// the SAME server as the PBS server. But is that true 
-	// in the real environment? I doubt it.
-	// by Liu Lu
-	// 2012/3/17
-	// I added a env var in config.h, which may be a solution to this
-	// by YANG Anran
-	// 2012/4/5
 	connection = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
 	if (connection < 0) {
-		cout << "Connect to Torque PBS server failed!" << endl;
-		cout << "ERROR " << pbs_errno << ": " << pbs_strerror(pbs_errno) << endl;
+		//cout << "Connect to Torque PBS server failed!" << endl;
+		Logger::log(STDOUT, ERROR, TORQUE, "Connect to Torque PBS server failed!");
+		//cout << "ERROR " << pbs_errno << ": " << pbs_strerror(pbs_errno) << endl;
+		Logger::log(STDOUT, ERROR, TORQUE, pbs_strerror(pbs_errno));
 		return -1;
 	}
-	
+
 	char hostPrefix[PARAM_SIZE];
-	cout << gethostname(hostPrefix, PARAM_SIZE) << endl;
-	cout << "prefix: " << hostPrefix << endl;
+	gethostname(hostPrefix, PARAM_SIZE);
 	strncat(hostPrefix, ":", 1);
-	cout << "prefix: " << hostPrefix << endl;
 	const string prefix(hostPrefix);
-	string fullloc;//this var is to solve a very strange error, whose reason's still unknown
+	string fullloc;
 
 	struct attropl qSubAttr[3];
-	//use strncpy?
-	//by YANG Anran
-	//2012/4/5
-	string qJobName = ATTR_N;
-	qSubAttr[0].name = const_cast<char*>(qJobName.c_str());
-	qSubAttr[0].value = const_cast<char*>(scriptPath.c_str());
-	qSubAttr[0].resource = '\0';
+	// ATTR_N is defined as "Job_Name"
+	qSubAttr[0].name = ATTR_N;
+	qSubAttr[0].value = (char *)malloc(scriptPath.size() + 1);
+	if (qSubAttr[0].value == NULL) {
+		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[0].value, scriptPath.c_str(), scriptPath.size() + 1);
+	qSubAttr[0].resource = (char *)NULL;
 	qSubAttr[0].next = &qSubAttr[1];
-	string qOutputPath = ATTR_o;
-	qSubAttr[1].name = const_cast<char*>(qOutputPath.c_str());
+	// ATTR_o is defined as "Output_Path"
+	qSubAttr[1].name = ATTR_o;
 	fullloc = prefix + outputPath;
-	qSubAttr[1].value = const_cast<char*>(fullloc.c_str());
-	cout << "outloc: " << qSubAttr[1].value << endl;
-	qSubAttr[1].resource = '\0';
+	qSubAttr[1].value = (char *)malloc(fullloc.size() + 1);
+	if (qSubAttr[1].value == NULL) {
+		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[1].value, fullloc.c_str(), fullloc.size() + 1);
+	Logger::log(STDOUT, DEBUG, TORQUE, "output location: " + fullloc);
+	qSubAttr[1].resource = (char *)NULL;
 	qSubAttr[1].next = &qSubAttr[2];
-	string qErrorPath = ATTR_e;
-	qSubAttr[2].name = const_cast<char*>(qErrorPath.c_str());
+	// ATTR_e is defined as "Error_Path"
+	qSubAttr[2].name = ATTR_e;
 	fullloc = prefix + errlogPath;
-	qSubAttr[2].value = const_cast<char*>(fullloc.c_str());
-	cout << "errloc: " << qSubAttr[2].value << endl;
-	qSubAttr[2].resource = '\0';
+	qSubAttr[2].value = (char *)malloc(fullloc.size() + 1);
+	if (qSubAttr[2].value == NULL) {
+		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[2].value, fullloc.c_str(), fullloc.size() + 1);
+	Logger::log(STDOUT, DEBUG, TORQUE, "error location: " + fullloc);
+	qSubAttr[2].resource = (char *)NULL;
 	qSubAttr[2].next = NULL;
 	// !!!! The commented codes below may cause some unpredictable PBS error.
 	// !!!! But the reason is not clear yet.
@@ -161,13 +167,18 @@ int TorqueJob::submit() {
 	char *ret = pbs_submit(connection, qSubAttr, const_cast<char*>(scriptPath.c_str()), 0, 0);
 	if (!ret)
 	{
-		cout << endl << "================================================" << endl;
-		cout << "Torque PBS job submission failed!" << endl;
-		cout << "ERROR " << pbs_errno << ": " << pbs_strerror(pbs_errno) << endl;
+		Logger::log(STDOUT, ERROR, TORQUE, "Torque PBS job submission failed!");
+		Logger::log(STDOUT, ERROR, TORQUE, pbs_strerror(pbs_errno));
 		return -1;
 	}
 	id = ret;
-	cout << "Torque PBS job has been submitted successfully, job ID is: " << id << endl;
+	stringstream msg;
+	msg << "Torque PBS job has been submitted successfully, job ID is: " << id << endl;
+	Logger::log(STDOUT, INFO, TORQUE, msg.str());
+
+	for (int i = 0; i < 3; i++) {
+		free(qSubAttr[i].value);
+	}
 
 	return 0;
 }

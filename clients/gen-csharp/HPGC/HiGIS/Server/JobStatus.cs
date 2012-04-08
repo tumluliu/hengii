@@ -15,5 +15,6 @@ namespace HPGC.HiGIS.Server
     QUEUING = 4,
     FAILED = 5,
     NOT_EXIST = 6,
+    PAUSED = 7,
   }
 }
