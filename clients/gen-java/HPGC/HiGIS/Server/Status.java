@@ -11,15 +11,15 @@ import java.util.Map;
 import java.util.HashMap;
 import org.apache.thrift.TEnum;
 
-public enum ParallelEnv implements org.apache.thrift.TEnum {
-  MPI(1),
-  OPENMP(2),
-  CUDA(3),
-  MAPREDUCE(4);
+public enum Status implements org.apache.thrift.TEnum {
+  FINISHED(1),
+  RUNNING(2),
+  FAILED(3),
+  NOT_EXIST(4);
 
   private final int value;
 
-  private ParallelEnv(int value) {
+  private Status(int value) {
     this.value = value;
   }
 
@@ -34,16 +34,16 @@ public enum ParallelEnv implements org.apache.thrift.TEnum {
    * Find a the enum type by its integer value, as defined in the Thrift IDL.
    * @return null if the value is not found.
    */
-  public static ParallelEnv findByValue(int value) { 
+  public static Status findByValue(int value) { 
     switch (value) {
       case 1:
-        return MPI;
+        return FINISHED;
       case 2:
-        return OPENMP;
+        return RUNNING;
       case 3:
-        return CUDA;
+        return FAILED;
       case 4:
-        return MAPREDUCE;
+        return NOT_EXIST;
       default:
         return null;
     }

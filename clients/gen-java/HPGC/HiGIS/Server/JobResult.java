@@ -27,28 +27,36 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class HpgcJobException extends Exception implements org.apache.thrift.TBase<HpgcJobException, HpgcJobException._Fields>, java.io.Serializable, Cloneable {
-  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("HpgcJobException");
+public class JobResult implements org.apache.thrift.TBase<JobResult, JobResult._Fields>, java.io.Serializable, Cloneable {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("JobResult");
 
-  private static final org.apache.thrift.protocol.TField APP_ID_FIELD_DESC = new org.apache.thrift.protocol.TField("app_id", org.apache.thrift.protocol.TType.I32, (short)1);
-  private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)2);
-  private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRING, (short)3);
+  private static final org.apache.thrift.protocol.TField MESSAGE_FIELD_DESC = new org.apache.thrift.protocol.TField("message", org.apache.thrift.protocol.TType.STRING, (short)1);
+  private static final org.apache.thrift.protocol.TField PROGRESS_FIELD_DESC = new org.apache.thrift.protocol.TField("progress", org.apache.thrift.protocol.TType.DOUBLE, (short)2);
+  private static final org.apache.thrift.protocol.TField STATUS_FIELD_DESC = new org.apache.thrift.protocol.TField("status", org.apache.thrift.protocol.TType.I32, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
-    schemes.put(StandardScheme.class, new HpgcJobExceptionStandardSchemeFactory());
-    schemes.put(TupleScheme.class, new HpgcJobExceptionTupleSchemeFactory());
+    schemes.put(StandardScheme.class, new JobResultStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new JobResultTupleSchemeFactory());
   }
 
-  public int app_id; // required
-  public String name; // required
   public String message; // required
+  public double progress; // required
+  /**
+   * 
+   * @see JobStatus
+   */
+  public JobStatus status; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    APP_ID((short)1, "app_id"),
-    NAME((short)2, "name"),
-    MESSAGE((short)3, "message");
+    MESSAGE((short)1, "message"),
+    PROGRESS((short)2, "progress"),
+    /**
+     * 
+     * @see JobStatus
+     */
+    STATUS((short)3, "status");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -63,12 +71,12 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // APP_ID
-          return APP_ID;
-        case 2: // NAME
-          return NAME;
-        case 3: // MESSAGE
+        case 1: // MESSAGE
           return MESSAGE;
+        case 2: // PROGRESS
+          return PROGRESS;
+        case 3: // STATUS
+          return STATUS;
         default:
           return null;
       }
@@ -109,115 +117,68 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
   }
 
   // isset id assignments
-  private static final int __APP_ID_ISSET_ID = 0;
+  private static final int __PROGRESS_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.APP_ID, new org.apache.thrift.meta_data.FieldMetaData("app_id", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
-    tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.MESSAGE, new org.apache.thrift.meta_data.FieldMetaData("message", org.apache.thrift.TFieldRequirementType.DEFAULT, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
+    tmpMap.put(_Fields.PROGRESS, new org.apache.thrift.meta_data.FieldMetaData("progress", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+    tmpMap.put(_Fields.STATUS, new org.apache.thrift.meta_data.FieldMetaData("status", org.apache.thrift.TFieldRequirementType.DEFAULT, 
+        new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, JobStatus.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
-    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(HpgcJobException.class, metaDataMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(JobResult.class, metaDataMap);
   }
 
-  public HpgcJobException() {
+  public JobResult() {
   }
 
-  public HpgcJobException(
-    int app_id,
-    String name,
-    String message)
+  public JobResult(
+    String message,
+    double progress,
+    JobStatus status)
   {
     this();
-    this.app_id = app_id;
-    setApp_idIsSet(true);
-    this.name = name;
     this.message = message;
+    this.progress = progress;
+    setProgressIsSet(true);
+    this.status = status;
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
-  public HpgcJobException(HpgcJobException other) {
+  public JobResult(JobResult other) {
     __isset_bit_vector.clear();
     __isset_bit_vector.or(other.__isset_bit_vector);
-    this.app_id = other.app_id;
-    if (other.isSetName()) {
-      this.name = other.name;
-    }
     if (other.isSetMessage()) {
       this.message = other.message;
     }
+    this.progress = other.progress;
+    if (other.isSetStatus()) {
+      this.status = other.status;
+    }
   }
 
-  public HpgcJobException deepCopy() {
-    return new HpgcJobException(this);
+  public JobResult deepCopy() {
+    return new JobResult(this);
   }
 
   @Override
   public void clear() {
-    setApp_idIsSet(false);
-    this.app_id = 0;
-    this.name = null;
     this.message = null;
-  }
-
-  public int getApp_id() {
-    return this.app_id;
-  }
-
-  public HpgcJobException setApp_id(int app_id) {
-    this.app_id = app_id;
-    setApp_idIsSet(true);
-    return this;
-  }
-
-  public void unsetApp_id() {
-    __isset_bit_vector.clear(__APP_ID_ISSET_ID);
-  }
-
-  /** Returns true if field app_id is set (has been assigned a value) and false otherwise */
-  public boolean isSetApp_id() {
-    return __isset_bit_vector.get(__APP_ID_ISSET_ID);
-  }
-
-  public void setApp_idIsSet(boolean value) {
-    __isset_bit_vector.set(__APP_ID_ISSET_ID, value);
-  }
-
-  public String getName() {
-    return this.name;
-  }
-
-  public HpgcJobException setName(String name) {
-    this.name = name;
-    return this;
-  }
-
-  public void unsetName() {
-    this.name = null;
-  }
-
-  /** Returns true if field name is set (has been assigned a value) and false otherwise */
-  public boolean isSetName() {
-    return this.name != null;
-  }
-
-  public void setNameIsSet(boolean value) {
-    if (!value) {
-      this.name = null;
-    }
+    setProgressIsSet(false);
+    this.progress = 0.0;
+    this.status = null;
   }
 
   public String getMessage() {
     return this.message;
   }
 
-  public HpgcJobException setMessage(String message) {
+  public JobResult setMessage(String message) {
     this.message = message;
     return this;
   }
@@ -237,24 +198,63 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
     }
   }
 
+  public double getProgress() {
+    return this.progress;
+  }
+
+  public JobResult setProgress(double progress) {
+    this.progress = progress;
+    setProgressIsSet(true);
+    return this;
+  }
+
+  public void unsetProgress() {
+    __isset_bit_vector.clear(__PROGRESS_ISSET_ID);
+  }
+
+  /** Returns true if field progress is set (has been assigned a value) and false otherwise */
+  public boolean isSetProgress() {
+    return __isset_bit_vector.get(__PROGRESS_ISSET_ID);
+  }
+
+  public void setProgressIsSet(boolean value) {
+    __isset_bit_vector.set(__PROGRESS_ISSET_ID, value);
+  }
+
+  /**
+   * 
+   * @see JobStatus
+   */
+  public JobStatus getStatus() {
+    return this.status;
+  }
+
+  /**
+   * 
+   * @see JobStatus
+   */
+  public JobResult setStatus(JobStatus status) {
+    this.status = status;
+    return this;
+  }
+
+  public void unsetStatus() {
+    this.status = null;
+  }
+
+  /** Returns true if field status is set (has been assigned a value) and false otherwise */
+  public boolean isSetStatus() {
+    return this.status != null;
+  }
+
+  public void setStatusIsSet(boolean value) {
+    if (!value) {
+      this.status = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case APP_ID:
-      if (value == null) {
-        unsetApp_id();
-      } else {
-        setApp_id((Integer)value);
-      }
-      break;
-
-    case NAME:
-      if (value == null) {
-        unsetName();
-      } else {
-        setName((String)value);
-      }
-      break;
-
     case MESSAGE:
       if (value == null) {
         unsetMessage();
@@ -263,19 +263,35 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
       }
       break;
 
+    case PROGRESS:
+      if (value == null) {
+        unsetProgress();
+      } else {
+        setProgress((Double)value);
+      }
+      break;
+
+    case STATUS:
+      if (value == null) {
+        unsetStatus();
+      } else {
+        setStatus((JobStatus)value);
+      }
+      break;
+
     }
   }
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case APP_ID:
-      return Integer.valueOf(getApp_id());
-
-    case NAME:
-      return getName();
-
     case MESSAGE:
       return getMessage();
+
+    case PROGRESS:
+      return Double.valueOf(getProgress());
+
+    case STATUS:
+      return getStatus();
 
     }
     throw new IllegalStateException();
@@ -288,12 +304,12 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
     }
 
     switch (field) {
-    case APP_ID:
-      return isSetApp_id();
-    case NAME:
-      return isSetName();
     case MESSAGE:
       return isSetMessage();
+    case PROGRESS:
+      return isSetProgress();
+    case STATUS:
+      return isSetStatus();
     }
     throw new IllegalStateException();
   }
@@ -302,32 +318,14 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
   public boolean equals(Object that) {
     if (that == null)
       return false;
-    if (that instanceof HpgcJobException)
-      return this.equals((HpgcJobException)that);
+    if (that instanceof JobResult)
+      return this.equals((JobResult)that);
     return false;
   }
 
-  public boolean equals(HpgcJobException that) {
+  public boolean equals(JobResult that) {
     if (that == null)
       return false;
-
-    boolean this_present_app_id = true;
-    boolean that_present_app_id = true;
-    if (this_present_app_id || that_present_app_id) {
-      if (!(this_present_app_id && that_present_app_id))
-        return false;
-      if (this.app_id != that.app_id)
-        return false;
-    }
-
-    boolean this_present_name = true && this.isSetName();
-    boolean that_present_name = true && that.isSetName();
-    if (this_present_name || that_present_name) {
-      if (!(this_present_name && that_present_name))
-        return false;
-      if (!this.name.equals(that.name))
-        return false;
-    }
 
     boolean this_present_message = true && this.isSetMessage();
     boolean that_present_message = true && that.isSetMessage();
@@ -335,6 +333,24 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
       if (!(this_present_message && that_present_message))
         return false;
       if (!this.message.equals(that.message))
+        return false;
+    }
+
+    boolean this_present_progress = true;
+    boolean that_present_progress = true;
+    if (this_present_progress || that_present_progress) {
+      if (!(this_present_progress && that_present_progress))
+        return false;
+      if (this.progress != that.progress)
+        return false;
+    }
+
+    boolean this_present_status = true && this.isSetStatus();
+    boolean that_present_status = true && that.isSetStatus();
+    if (this_present_status || that_present_status) {
+      if (!(this_present_status && that_present_status))
+        return false;
+      if (!this.status.equals(that.status))
         return false;
     }
 
@@ -346,40 +362,40 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
     return 0;
   }
 
-  public int compareTo(HpgcJobException other) {
+  public int compareTo(JobResult other) {
     if (!getClass().equals(other.getClass())) {
       return getClass().getName().compareTo(other.getClass().getName());
     }
 
     int lastComparison = 0;
-    HpgcJobException typedOther = (HpgcJobException)other;
+    JobResult typedOther = (JobResult)other;
 
-    lastComparison = Boolean.valueOf(isSetApp_id()).compareTo(typedOther.isSetApp_id());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetApp_id()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.app_id, typedOther.app_id);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
-    lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetName()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.name, typedOther.name);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
     lastComparison = Boolean.valueOf(isSetMessage()).compareTo(typedOther.isSetMessage());
     if (lastComparison != 0) {
       return lastComparison;
     }
     if (isSetMessage()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.message, typedOther.message);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetProgress()).compareTo(typedOther.isSetProgress());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetProgress()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.progress, typedOther.progress);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStatus()).compareTo(typedOther.isSetStatus());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStatus()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.status, typedOther.status);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -401,26 +417,26 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("HpgcJobException(");
+    StringBuilder sb = new StringBuilder("JobResult(");
     boolean first = true;
 
-    sb.append("app_id:");
-    sb.append(this.app_id);
-    first = false;
-    if (!first) sb.append(", ");
-    sb.append("name:");
-    if (this.name == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.name);
-    }
-    first = false;
-    if (!first) sb.append(", ");
     sb.append("message:");
     if (this.message == null) {
       sb.append("null");
     } else {
       sb.append(this.message);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("progress:");
+    sb.append(this.progress);
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("status:");
+    if (this.status == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.status);
     }
     first = false;
     sb.append(")");
@@ -449,15 +465,15 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
     }
   }
 
-  private static class HpgcJobExceptionStandardSchemeFactory implements SchemeFactory {
-    public HpgcJobExceptionStandardScheme getScheme() {
-      return new HpgcJobExceptionStandardScheme();
+  private static class JobResultStandardSchemeFactory implements SchemeFactory {
+    public JobResultStandardScheme getScheme() {
+      return new JobResultStandardScheme();
     }
   }
 
-  private static class HpgcJobExceptionStandardScheme extends StandardScheme<HpgcJobException> {
+  private static class JobResultStandardScheme extends StandardScheme<JobResult> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, HpgcJobException struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, JobResult struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -467,26 +483,26 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
           break;
         }
         switch (schemeField.id) {
-          case 1: // APP_ID
-            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.app_id = iprot.readI32();
-              struct.setApp_idIsSet(true);
-            } else { 
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-            }
-            break;
-          case 2: // NAME
-            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
-              struct.name = iprot.readString();
-              struct.setNameIsSet(true);
-            } else { 
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-            }
-            break;
-          case 3: // MESSAGE
+          case 1: // MESSAGE
             if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
               struct.message = iprot.readString();
               struct.setMessageIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 2: // PROGRESS
+            if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
+              struct.progress = iprot.readDouble();
+              struct.setProgressIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 3: // STATUS
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.status = JobStatus.findByValue(iprot.readI32());
+              struct.setStatusIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -502,21 +518,21 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, HpgcJobException struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, JobResult struct) throws org.apache.thrift.TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      oprot.writeFieldBegin(APP_ID_FIELD_DESC);
-      oprot.writeI32(struct.app_id);
-      oprot.writeFieldEnd();
-      if (struct.name != null) {
-        oprot.writeFieldBegin(NAME_FIELD_DESC);
-        oprot.writeString(struct.name);
-        oprot.writeFieldEnd();
-      }
       if (struct.message != null) {
         oprot.writeFieldBegin(MESSAGE_FIELD_DESC);
         oprot.writeString(struct.message);
+        oprot.writeFieldEnd();
+      }
+      oprot.writeFieldBegin(PROGRESS_FIELD_DESC);
+      oprot.writeDouble(struct.progress);
+      oprot.writeFieldEnd();
+      if (struct.status != null) {
+        oprot.writeFieldBegin(STATUS_FIELD_DESC);
+        oprot.writeI32(struct.status.getValue());
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -525,54 +541,54 @@ public class HpgcJobException extends Exception implements org.apache.thrift.TBa
 
   }
 
-  private static class HpgcJobExceptionTupleSchemeFactory implements SchemeFactory {
-    public HpgcJobExceptionTupleScheme getScheme() {
-      return new HpgcJobExceptionTupleScheme();
+  private static class JobResultTupleSchemeFactory implements SchemeFactory {
+    public JobResultTupleScheme getScheme() {
+      return new JobResultTupleScheme();
     }
   }
 
-  private static class HpgcJobExceptionTupleScheme extends TupleScheme<HpgcJobException> {
+  private static class JobResultTupleScheme extends TupleScheme<JobResult> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, HpgcJobException struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, JobResult struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       BitSet optionals = new BitSet();
-      if (struct.isSetApp_id()) {
+      if (struct.isSetMessage()) {
         optionals.set(0);
       }
-      if (struct.isSetName()) {
+      if (struct.isSetProgress()) {
         optionals.set(1);
       }
-      if (struct.isSetMessage()) {
+      if (struct.isSetStatus()) {
         optionals.set(2);
       }
       oprot.writeBitSet(optionals, 3);
-      if (struct.isSetApp_id()) {
-        oprot.writeI32(struct.app_id);
-      }
-      if (struct.isSetName()) {
-        oprot.writeString(struct.name);
-      }
       if (struct.isSetMessage()) {
         oprot.writeString(struct.message);
+      }
+      if (struct.isSetProgress()) {
+        oprot.writeDouble(struct.progress);
+      }
+      if (struct.isSetStatus()) {
+        oprot.writeI32(struct.status.getValue());
       }
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, HpgcJobException struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, JobResult struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
-        struct.app_id = iprot.readI32();
-        struct.setApp_idIsSet(true);
-      }
-      if (incoming.get(1)) {
-        struct.name = iprot.readString();
-        struct.setNameIsSet(true);
-      }
-      if (incoming.get(2)) {
         struct.message = iprot.readString();
         struct.setMessageIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.progress = iprot.readDouble();
+        struct.setProgressIsSet(true);
+      }
+      if (incoming.get(2)) {
+        struct.status = JobStatus.findByValue(iprot.readI32());
+        struct.setStatusIsSet(true);
       }
     }
   }

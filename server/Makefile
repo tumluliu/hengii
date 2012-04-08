@@ -1,10 +1,10 @@
 GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp utility.cpp jobtracker.cpp session.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
 GEN_OBJ := $(patsubst %.cpp, %.o, $(GEN_SRC))
 
-THRIFT_DIR := /opt/thrift/include/thrift/
+THRIFT_DIR := /usr/local/include/thrift/
 BOOST_DIR := /usr/include/boost
 EVENT_DIR := /usr/local/include
-TORQUE_DIR :=/opt/torque/include
+TORQUE_DIR :=/usr/local/include
 
 INC := -I$(THRIFT_DIR) -I$(BOOST_DIR) -I$(EVENT_DIR) -I$(TORQUE_DIR)
 LIB := -L/usr/local/lib -L/opt/torque/lib -L/opt/thrift/lib
@@ -23,7 +23,7 @@ config.h: config.h.in
 	sed -i "s%@PBS_SERVER_HOST@%\"$(HOSTNAME)\"%g" config.h
 
 %.o: %.cpp
-	$(CXX) -Wall -Wno-return-type $(INC) -c $< -g -o $@
+	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wno-return-type $(INC) -c $< -g -o $@
 
 higine: config.h higine.o $(GEN_OBJ)
 	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque $^ -g -o $@

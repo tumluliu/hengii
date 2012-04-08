@@ -7,13 +7,11 @@
 
 namespace HPGC.HiGIS.Server
 {
-  public enum JobStatus
+  public enum Status
   {
     FINISHED = 1,
     RUNNING = 2,
-    WAITING_FOR_SUBMIT = 3,
-    QUEUING = 4,
-    FAILED = 5,
-    NOT_EXIST = 6,
+    FAILED = 3,
+    NOT_EXIST = 4,
   }
 }

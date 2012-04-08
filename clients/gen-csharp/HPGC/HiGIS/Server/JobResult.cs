@@ -17,34 +17,48 @@ namespace HPGC.HiGIS.Server
 {
 
   [Serializable]
-  public partial class JobFlow : TBase
+  public partial class JobResult : TBase
   {
-    private List<Job> _jobs;
-    private int _job_count;
+    private string _message;
+    private double _progress;
+    private JobStatus _status;
 
-    public List<Job> Jobs
+    public string Message
     {
       get
       {
-        return _jobs;
+        return _message;
       }
       set
       {
-        __isset.jobs = true;
-        this._jobs = value;
+        __isset.message = true;
+        this._message = value;
       }
     }
 
-    public int Job_count
+    public double Progress
     {
       get
       {
-        return _job_count;
+        return _progress;
       }
       set
       {
-        __isset.job_count = true;
-        this._job_count = value;
+        __isset.progress = true;
+        this._progress = value;
+      }
+    }
+
+    public JobStatus Status
+    {
+      get
+      {
+        return _status;
+      }
+      set
+      {
+        __isset.status = true;
+        this._status = value;
       }
     }
 
@@ -52,11 +66,12 @@ namespace HPGC.HiGIS.Server
     public Isset __isset;
     [Serializable]
     public struct Isset {
-      public bool jobs;
-      public bool job_count;
+      public bool message;
+      public bool progress;
+      public bool status;
     }
 
-    public JobFlow() {
+    public JobResult() {
     }
 
     public void Read (TProtocol iprot)
@@ -72,26 +87,22 @@ namespace HPGC.HiGIS.Server
         switch (field.ID)
         {
           case 1:
-            if (field.Type == TType.List) {
-              {
-                Jobs = new List<Job>();
-                TList _list22 = iprot.ReadListBegin();
-                for( int _i23 = 0; _i23 < _list22.Count; ++_i23)
-                {
-                  Job _elem24 = new Job();
-                  _elem24 = new Job();
-                  _elem24.Read(iprot);
-                  Jobs.Add(_elem24);
-                }
-                iprot.ReadListEnd();
-              }
+            if (field.Type == TType.String) {
+              Message = iprot.ReadString();
             } else { 
               TProtocolUtil.Skip(iprot, field.Type);
             }
             break;
           case 2:
+            if (field.Type == TType.Double) {
+              Progress = iprot.ReadDouble();
+            } else { 
+              TProtocolUtil.Skip(iprot, field.Type);
+            }
+            break;
+          case 3:
             if (field.Type == TType.I32) {
-              Job_count = iprot.ReadI32();
+              Status = (JobStatus)iprot.ReadI32();
             } else { 
               TProtocolUtil.Skip(iprot, field.Type);
             }
@@ -106,30 +117,31 @@ namespace HPGC.HiGIS.Server
     }
 
     public void Write(TProtocol oprot) {
-      TStruct struc = new TStruct("JobFlow");
+      TStruct struc = new TStruct("JobResult");
       oprot.WriteStructBegin(struc);
       TField field = new TField();
-      if (Jobs != null && __isset.jobs) {
-        field.Name = "jobs";
-        field.Type = TType.List;
+      if (Message != null && __isset.message) {
+        field.Name = "message";
+        field.Type = TType.String;
         field.ID = 1;
         oprot.WriteFieldBegin(field);
-        {
-          oprot.WriteListBegin(new TList(TType.Struct, Jobs.Count));
-          foreach (Job _iter25 in Jobs)
-          {
-            _iter25.Write(oprot);
-          }
-          oprot.WriteListEnd();
-        }
+        oprot.WriteString(Message);
         oprot.WriteFieldEnd();
       }
-      if (__isset.job_count) {
-        field.Name = "job_count";
-        field.Type = TType.I32;
+      if (__isset.progress) {
+        field.Name = "progress";
+        field.Type = TType.Double;
         field.ID = 2;
         oprot.WriteFieldBegin(field);
-        oprot.WriteI32(Job_count);
+        oprot.WriteDouble(Progress);
+        oprot.WriteFieldEnd();
+      }
+      if (__isset.status) {
+        field.Name = "status";
+        field.Type = TType.I32;
+        field.ID = 3;
+        oprot.WriteFieldBegin(field);
+        oprot.WriteI32((int)Status);
         oprot.WriteFieldEnd();
       }
       oprot.WriteFieldStop();
@@ -137,11 +149,13 @@ namespace HPGC.HiGIS.Server
     }
 
     public override string ToString() {
-      StringBuilder sb = new StringBuilder("JobFlow(");
-      sb.Append("Jobs: ");
-      sb.Append(Jobs);
-      sb.Append(",Job_count: ");
-      sb.Append(Job_count);
+      StringBuilder sb = new StringBuilder("JobResult(");
+      sb.Append("Message: ");
+      sb.Append(Message);
+      sb.Append(",Progress: ");
+      sb.Append(Progress);
+      sb.Append(",Status: ");
+      sb.Append(Status);
       sb.Append(")");
       return sb.ToString();
     }

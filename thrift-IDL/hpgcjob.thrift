@@ -27,12 +27,16 @@ enum JobStatus
 	RUNNING = 2,
 	WAITING_FOR_SUBMIT = 3,
 	QUEUING = 4,
-	EXIT_WITH_ERROR = 5
+	FAILED = 5,
+	NOT_EXIST = 6
 }
 
-struct JobFlowStatus
+enum Status
 {
-	1: list<JobStatus> job_status_list
+	FINISHED = 1,
+	RUNNING = 2,
+	FAILED = 3,
+	NOT_EXIST = 4
 }
 
 struct Context
@@ -54,11 +58,19 @@ struct Job
 	9: string app_uri
 }
 
+struct JobResult
+{
+	1: string message,
+	2: double progress,
+	3: JobStatus status
+}
+
 struct Result 
 {
-	1: JobFlowStatus status,
+	1: Status flow_status,
 	2: string message,
-	3: double progress
+	3: double progress,
+	4: list<JobResult> job_result_list
 }
 
 struct JobFlow
