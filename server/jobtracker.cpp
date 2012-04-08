@@ -21,6 +21,7 @@
 #include "jobtracker.h"
 #include "config.h"
 #include "utility.h"
+#include "logger.h"
 
 JobTracker::JobTracker() {
 }
@@ -141,12 +142,15 @@ void* JobTracker::jobWorker(void* threadParam)
 					cmdline += MPI_EXEC_CMD;
 					string mpiConf = ""; 
 					if (Utility::readFile(MPI_CONF_PATH, mpiConf) != 0) {
-						cout << "read mpi config file " << MPI_CONF_PATH << " error!" << endl;
+						Logger::log(STDOUT, ERROR, MPI, "unable to open mpi config file " + MPI_CONF_PATH);
 						job->setStatus(JobStatus::FAILED);
 						return NULL;
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
 				}
+				// !!!! Here the app_options["program_name"] should be changed to app_uri
+				// !!!! By Liu Lu
+				// !!!! 2012-04-08
 				string appMetaFile = APP_DIR + userJob.app_options["program_name"] + ".meta";
 				ifstream appOptionsFile(appMetaFile.c_str(), ios::in);
 				if (!appOptionsFile) { 
@@ -156,7 +160,7 @@ void* JobTracker::jobWorker(void* threadParam)
 						+ "start job error, program "
 						+ userJob.app_options["program_name"]
 						+ " not exist";
-					cout << response << endl;
+					Logger::log(STDOUT, ERROR, ENGINE, response);
 					job->setResult(response);
 					job->setStatus(JobStatus::FAILED);
 					return NULL;
@@ -167,8 +171,7 @@ void* JobTracker::jobWorker(void* threadParam)
 				while (getline(appOptionsFile, appOptionKey)) {
 					cmdline = cmdline + appOptions[appOptionKey] + " ";
 				}
-				cout << "The cmdline for PBS is: "<< endl;
-				cout << cmdline << endl;
+				Logger::log(STDOUT, INFO, TORQUE, "The cmdline for PBS is: " + cmdline);
 				break;
 			}
 		case ParallelEnv::OPENMP: break;
@@ -182,18 +185,17 @@ void* JobTracker::jobWorker(void* threadParam)
 	pthread_mutex_unlock(job->getThreadMutex());
 
 	job->setProcessCount(processCount);
-	cout << "cmdline for qJob: " << cmdline << endl;
 	job->setCmdline(cmdline);
 	if (job->submit() != 0) {
-		cout << "Torque PBS job submission met some problem." << endl;
-		cout << "The process has been terminated. See you next time!" << endl;
-		cout << "================================================" << endl;
+		Logger::log(STDOUT, ERROR, TORQUE, "Torque PBS job submission met some problem.");
+		Logger::log(STDOUT, INFO, TORQUE, "The process has been terminated. See you next time!");
+		Logger::log(STDOUT, INFO, TORQUE, "================================================");
 		job->setStatus(JobStatus::FAILED);
 	}
 	else {
 		job->setStatus(JobStatus::RUNNING);
 		job->collect();
-		cout << "Torque PBS job collects." << endl;
+		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");
 		pthread_mutex_lock(job->getThreadMutex());
 		// Tell all the children that I am done
 		for (int i = 0; i < userJob.child_count; i++) {
@@ -202,8 +204,7 @@ void* JobTracker::jobWorker(void* threadParam)
 		pthread_mutex_unlock(job->getThreadMutex());
 		pthread_cond_broadcast(job->getWaitingCond());
 		job->setStatus(JobStatus::FINISHED);
-		cout << "output by invoking JobTracker::getResult() : " << endl;
-		cout << job->getResult() << endl;
+		Logger::log(STDOUT, INFO, ENGINE, "JobTracker::getResult(): " + job->getResult());
 	}
 	return NULL;
 }

@@ -93,7 +93,6 @@ int TorqueJob::submit() {
 
 	ofstream outputFile(scriptPath.c_str(), ios::out);
 	if (!outputFile) {
-		// cout << "open file " << scriptPath << " error!" << endl;
 		Logger::log(STDOUT, ERROR, TORQUE, "unable to open torque script file " + scriptPath);
 		return -1;
 	}
@@ -102,9 +101,7 @@ int TorqueJob::submit() {
 
 	connection = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
 	if (connection < 0) {
-		//cout << "Connect to Torque PBS server failed!" << endl;
 		Logger::log(STDOUT, ERROR, TORQUE, "Connect to Torque PBS server failed!");
-		//cout << "ERROR " << pbs_errno << ": " << pbs_strerror(pbs_errno) << endl;
 		Logger::log(STDOUT, ERROR, TORQUE, pbs_strerror(pbs_errno));
 		return -1;
 	}
@@ -117,17 +114,27 @@ int TorqueJob::submit() {
 
 	struct attropl qSubAttr[3];
 	// ATTR_N is defined as "Job_Name"
-	qSubAttr[0].name = ATTR_N;
+	qSubAttr[0].name = (char *)malloc(strlen(ATTR_N) + 1);
+	if (qSubAttr[0].name == NULL) {
+		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[0].name, ATTR_N, strlen(ATTR_N) + 1);
 	qSubAttr[0].value = (char *)malloc(scriptPath.size() + 1);
 	if (qSubAttr[0].value == NULL) {
-		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
+		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
 		return -1;
 	}
 	strncpy(qSubAttr[0].value, scriptPath.c_str(), scriptPath.size() + 1);
 	qSubAttr[0].resource = (char *)NULL;
 	qSubAttr[0].next = &qSubAttr[1];
 	// ATTR_o is defined as "Output_Path"
-	qSubAttr[1].name = ATTR_o;
+	qSubAttr[1].name = (char *)malloc(strlen(ATTR_o) + 1);
+	if (qSubAttr[1].name == NULL) {
+		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[1].name, ATTR_o, strlen(ATTR_o) + 1);
 	fullloc = prefix + outputPath;
 	qSubAttr[1].value = (char *)malloc(fullloc.size() + 1);
 	if (qSubAttr[1].value == NULL) {
@@ -139,7 +146,12 @@ int TorqueJob::submit() {
 	qSubAttr[1].resource = (char *)NULL;
 	qSubAttr[1].next = &qSubAttr[2];
 	// ATTR_e is defined as "Error_Path"
-	qSubAttr[2].name = ATTR_e;
+	qSubAttr[2].name = (char *)malloc(strlen(ATTR_e) + 1);
+	if (qSubAttr[2].name == NULL) {
+		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
+		return -1;
+	}
+	strncpy(qSubAttr[2].name, ATTR_e, strlen(ATTR_e) + 1);
 	fullloc = prefix + errlogPath;
 	qSubAttr[2].value = (char *)malloc(fullloc.size() + 1);
 	if (qSubAttr[2].value == NULL) {
@@ -177,6 +189,7 @@ int TorqueJob::submit() {
 	Logger::log(STDOUT, INFO, TORQUE, msg.str());
 
 	for (int i = 0; i < 3; i++) {
+		free(qSubAttr[i].name);
 		free(qSubAttr[i].value);
 	}
 

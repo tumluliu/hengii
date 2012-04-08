@@ -27,8 +27,9 @@ using namespace std;
 enum EventSource {
 	APPLICATION = 1,
 	TORQUE = 2,
-	MPI_ENV = 3,
-	DATABASE = 4
+	MPI = 3,
+	DATABASE = 4,
+	ENGINE = 5
 };
 
 enum LogOutputType {

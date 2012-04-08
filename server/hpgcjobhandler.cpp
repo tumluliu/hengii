@@ -17,6 +17,7 @@
  * =====================================================================================
  */
 #include <sys/time.h>
+#include <sstream>
 #include "hpgcjobhandler.h"
 #include "logger.h"
 
@@ -50,7 +51,7 @@ HpgcJobHandler::HpgcJobHandler() {
 }
 
 int32_t HpgcJobHandler::start_single_job(const Job& job) {
-	cout << "start single job, which is a just a grammer candy of start job flow" << endl;
+	Logger::log(STDOUT, DEBUG, ENGINE, "start single job, which is a just a grammer candy of start job flow");
 	JobFlow flow;
 	flow.job_count = 1;
 	flow.jobs.push_back(job);
@@ -58,8 +59,10 @@ int32_t HpgcJobHandler::start_single_job(const Job& job) {
 }
 
 int32_t HpgcJobHandler::start(const JobFlow& flow) {
-	cout << "Start processing " << PROJECT_NAME << " job flow..." << endl;
-	cout << "number of jobs in this flow: " << flow.job_count << endl;
+	Logger::log(STDOUT, INFO, ENGINE, "Start processing " + PROJECT_NAME + " job flow...");
+	stringstream msg;
+	msg << "number of jobs in this flow: " << flow.job_count;
+	Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
 	int idleSessionId;
 	do {
 		idleSessionId = findEmptyPoolSlot();
@@ -68,7 +71,7 @@ int32_t HpgcJobHandler::start(const JobFlow& flow) {
 	activeSession->init(flow);
 	activeSession->setAvailable(false);
 	if (activeSession->createJobThreads() != 0) {
-		cout << "Create job thread failed. Job flow processing is terminated." << endl;
+		Logger::log(STDOUT, ERROR, ENGINE, "Create job thread failed. Job flow processing is terminated.");
 		activeSession->finalize();
 		activeSession->setAvailable(true);
 	}
@@ -83,12 +86,15 @@ void HpgcJobHandler::pause(const int32_t client_ticket) {
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
 					const_cast<char*>(sig.c_str()), 0);
-		else if (tracker.getStatus() == JobStatus::FINISHED)
-			cout << "job " << tracker.getUserJob().id<< "has done!"<<endl;
+		else if (tracker.getStatus() == JobStatus::FINISHED) {
+			stringstream msg;
+			msg << "job " << tracker.getUserJob().id << "is already done.";
+			Logger::log(STDOUT, INFO, ENGINE, msg.str());
+		}
 		else
 			pbs_holdjob(tracker.getConnection(), const_cast<char*>(tracker.getId().c_str()), 0, 0);
 	}
-	cout << "pause_flow" << endl;
+	Logger::log(STDOUT, INFO, ENGINE, "job flow paused.");
 }
 
 void HpgcJobHandler::resume(const int32_t client_ticket) {
@@ -101,10 +107,12 @@ void HpgcJobHandler::resume(const int32_t client_ticket) {
 					const_cast<char *>(sig.c_str()), 0);
 		}		
 		else {
-			cout << "job " << tracker.getUserJob().id << " hasn't been suspended!" << endl;
+			stringstream msg;
+			msg << "job " << tracker.getUserJob().id << " hasn't been suspended!";
+			Logger::log(STDOUT, WARN, ENGINE, msg.str());
 		}
 	}
-	cout << "resume_flow" << endl;
+	Logger::log(STDOUT, INFO, ENGINE, "job flow resumed.");
 }
 
 void HpgcJobHandler::cancel(const int32_t client_ticket) {
@@ -115,25 +123,28 @@ void HpgcJobHandler::cancel(const int32_t client_ticket) {
 					const_cast<char*>((tracker.getId()).c_str()), 0);
 		}
 		else {
-			cout << "job " << tracker.getUserJob().id << " has done!" << endl;
+			stringstream msg;
+			msg << "job " << tracker.getUserJob().id << "is already done.";
+			Logger::log(STDOUT, INFO, ENGINE, msg.str());
 		}
 	}
-	cout << "cancel_flow" << endl;
+	Logger::log(STDOUT, INFO, ENGINE, "job flow canceled.");
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
-	cout << "get job flow status..." << endl;
+	Logger::log(STDOUT, INFO, ENGINE, "getting job flow status...");
 	if (sessionPool.count(client_ticket) == 0) {
 		_return.flow_status = Status::NOT_EXIST;
 		_return.message = "get status error, job id not exist";
-		cout << "get status error, job id not exist" << endl;
+		Logger::log(STDOUT, ERROR, ENGINE, _return.message);
 	}
 	else {
 		_return.flow_status = Status::FINISHED;
 		_return.message = "";
-
-		cout << "the job status is: " << _return.flow_status << endl;
-		cout << "The result sent to client is:" << endl;
+		stringstream msg;
+		msg << "the job flow status is: " << _return.flow_status;
+		Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
+		Logger::log(STDOUT, INFO, ENGINE, "The result sent to client is: ");
 
 		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 			JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
@@ -149,12 +160,13 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 			_return.job_result_list.push_back(jr);
 			// log and print
 			Logger::log(LOG_FILE, INFO, APPLICATION, jr.message);	
-			cout << jr.message << endl;
+			Logger::log(STDOUT, INFO, APPLICATION, jr.message);	
 		}
 
 		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {
 			sessionPool[client_ticket].setAvailable(true);
 			sessionPool[client_ticket].finalize();
+			Logger::log(STDOUT, INFO, ENGINE, "request session resource released. ");
 		}
 
 		//	cout<<"HPGC flow finished."<<endl;

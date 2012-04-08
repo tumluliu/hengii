@@ -51,11 +51,14 @@ void Logger::log(LogOutputType output, Severity level, EventSource sender, const
 		case TORQUE:
 			eventSender = "TORQUE PBS";
 			break;
-		case MPI_ENV:
+		case MPI:
 			eventSender = "MPI";
 			break;
 		case DATABASE:
 			eventSender = "DATABASE";
+			break;
+		case ENGINE:
+			eventSender = "ENGINE";
 			break;
 		default:
 			break;

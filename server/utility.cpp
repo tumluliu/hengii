@@ -24,7 +24,7 @@
 int Utility::readFile(const string& file, string& content) {
 	ifstream infile(file.c_str(), ios::in);
 	if (!infile) {
-		cout << "open file " << file << " error!" << endl;
+		Logger::log(STDOUT, ERROR, ENGINE, "unable to open file " + file);
 		return -1;
 	}
 	content.clear();
@@ -38,19 +38,9 @@ int Utility::readFile(const string& file, string& content) {
 int Utility::deleteFile(const string& file) {
 	string cmd = "rm " + file;
 	if (system(cmd.c_str()) != 0) {
-		cout << "delete file " << file << " failed." << endl;
+		Logger::log(STDOUT, ERROR, ENGINE, "unable to delete file " + file);
 		return -1;
 	}
-	cout << "file " << file << " deleted." << endl;
-	return 0;
-}
-
-int Utility::getCurrentDir(string& path) {
-	char cpath[PARAM_SIZE];
-	if (!getcwd(cpath, sizeof(cpath))) {
-		return -1;
-	}
-	path = cpath;
-	path += "/";
+	Logger::log(STDOUT, INFO, ENGINE, "file " + file + " deleted.");
 	return 0;
 }
