@@ -140,7 +140,6 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 	else {
 		_return.flow_status = Status::FINISHED;
 		_return.message = "";
-		Logger::log(STDOUT, INFO, ENGINE, "The result sent to client is: ");
 
 		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
 			JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
@@ -154,9 +153,13 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 				_return.flow_status = Status::RUNNING;
 			}
 			_return.job_result_list.push_back(jr);
-			// log and print
-			Logger::log(LOG_FILE, INFO, APPLICATION, "message of job: " + jr.message);	
-			Logger::log(STDOUT, INFO, APPLICATION, "message of job: " + jr.message);	
+
+			if (_return.flow_status == Status::FINISHED) {
+				Severity lvl = _return.flow_status == Status::FINISHED ? INFO : ERROR;
+				Logger::log(STDOUT, lvl, ENGINE, "The result sent to client is: ");
+				Logger::log(LOG_FILE, lvl, APPLICATION, "message of job: " + jr.message);	
+				Logger::log(STDOUT, lvl, APPLICATION, "message of job: " + jr.message);	
+			}
 		}
 
 		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {

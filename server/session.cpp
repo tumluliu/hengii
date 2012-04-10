@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include "session.h"
+#include "joblog.h"
 
 Session::Session(): jobThreadIdList(MAX_JOB_COUNT), available(true) { }
 
@@ -56,6 +57,9 @@ int Session::createJobThreads() {
 }
 
 void Session::init(const JobFlow& flow) {
+	JobLog jobLog;
+	jobLog.registerJobFlow(id);
+
 	pthread_mutex_init(&threadMutex, NULL);
 	pthread_cond_init (&waitingCond, NULL);
 	pthread_attr_init(&threadAttr);
@@ -69,7 +73,7 @@ void Session::init(const JobFlow& flow) {
 	jobCount = flow.job_count;
 	for(int i = 0; i < flow.job_count; i++) {
 		busyParentCountList.push_back(flow.jobs[i].parent_count);
-		JobTracker job;
+		JobTracker job(id);
 		job.setBusyParentCountListIter(busyParentCountList.begin());
 		job.setThreadMutex(&threadMutex);
 		job.setWaitingCond(&waitingCond);

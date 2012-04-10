@@ -1,4 +1,4 @@
-GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp session.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
+GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp session.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
 GEN_OBJ := $(patsubst %.cpp, %.o, $(GEN_SRC))
 
 THRIFT_DIR := /usr/local/include/thrift/
@@ -26,7 +26,7 @@ config.h: config.h.in
 	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wno-return-type $(INC) -c $< -g -o $@
 
 higine: config.h higine.o $(GEN_OBJ)
-	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque $^ -g -o $@
+	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque -lmysql $^ -g -o $@
 
 clean:
 	$(RM) ./lib/*.o *.o higine config.h 

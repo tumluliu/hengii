@@ -62,3 +62,9 @@ int Utility::deleteFile(const string& file) {
 	Logger::log(STDOUT, INFO, ENGINE, "file " + file + " deleted.");
 	return 0;
 }
+
+string Utility::intToString(int i) {
+	stringstream ss;
+	ss << i;
+	return ss.str();
+}

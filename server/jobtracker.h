@@ -28,6 +28,7 @@ const string MPI_EXEC_CMD = "mpiexec ";
 
 class JobTracker{
 	private:
+		int flowId;
 		pthread_mutex_t* threadMutex;
 		pthread_cond_t* waitingCond;
 		JobStatus::type jobStatus;
@@ -37,8 +38,8 @@ class JobTracker{
 		vector<int>::iterator busyParentCountListIter;
 		static string constructCmdOptions( JobTracker*, map<string, string>&, ifstream& );
 	public:
-		JobTracker();
-		void setUserJob(const Job&);
+		JobTracker( int );
+		void setUserJob( const Job& );
 		Job getUserJob() const;
 		string getResult() const;
 		void setResult(const string &result);
@@ -48,6 +49,7 @@ class JobTracker{
 		int collect();
 		int setProcessCount(int);
 		void setCmdline(const string&);
+		int getFlowId() const;
 		string getId() const;
 		void setThreadMutex(pthread_mutex_t* mutex);
 		pthread_mutex_t* getThreadMutex();

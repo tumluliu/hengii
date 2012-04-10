@@ -23,8 +23,10 @@
 #include "utility.h"
 #include "logger.h"
 #include "appoption.h"
+#include "joblog.h"
 
-JobTracker::JobTracker() {
+JobTracker::JobTracker( int id ) {
+	flowId = id;
 }
 
 void JobTracker::setUserJob(const Job& job) {
@@ -73,6 +75,10 @@ void JobTracker::setStatus(JobStatus::type stat) {
 
 int JobTracker::getConnection() const {
 	return qJob.getConnection();
+}
+
+int JobTracker::getFlowId() const {
+	return flowId;
 }
 
 string JobTracker::getId() const {
@@ -244,6 +250,10 @@ void* JobTracker::jobWorker(void* threadParam)
 	}
 	else {
 		job->setStatus(JobStatus::RUNNING);
+
+		JobLog jobLog;
+		jobLog.registerJob(job->getFlowId(), userJob.id, job->getId());
+
 		job->collect();
 		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");
 		pthread_mutex_lock(job->getThreadMutex());

@@ -33,6 +33,7 @@ class Utility {
 		static int readFile(const string&, string&);
 		static int deleteFile(const string&);
 		static vector<string> splitStringBySpace ( const string& );
+		static string intToString(int);
 };
 
 
