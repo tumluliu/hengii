@@ -1,0 +1,35 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: happy_with_params
+# 
+#         USAGE: ./happy_with_params 
+# 
+#   DESCRIPTION: The server can run correctly for a flow with a job with params 
+#
+#		 INPUTS: 1:program name
+#		 		 2:process count
+#                3:program params, as "k:v+k:v..."
+#                4:program params(only value for convienence), as "v v v"
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/09/2012 09:30:00 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+PARAMS=$(echo $4 | sed "s/+/ /g")
+_prepare_server
+_prepare_program $1
+EXPECTED=$(mpiexec -np $2 $APPSHOME/$1 $PARAMS)
+
+_start_server | _contains $EXPECTED | _at server &
+sleep 0.1
+execute_program $1 $2 $3 | _contains $EXPECTED | _at client
+_kill_server
+_collect server client

@@ -1,0 +1,38 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: without_essential_option_return_error
+# 
+#         USAGE: ./without_essential_option_return_error 
+# 
+#   DESCRIPTION: A client submit a job, with a bunch of app options. 
+#                The server find one of the essential options in metadate not offered, 
+#                Then the job should be terminated and return error message, while the 
+#                server shouldn't die
+#
+#		 INPUTS: 1:the program submitted first; 2:the process number the first program used;
+#                3:the offered option pairs; 4:the offered option values; 5:the lacked opt
+#                6:the program submitted after, to verify the living of server 
+#                7:the process number this program used
+#
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/10/2012 10:28:34 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+lacked=$5
+APP_OPTION_LACKED_MESSAGE="start job error, lack option $lacked"
+_prepare_server
+_start_server | _contains $APP_OPTION_LACKED_MESSAGE | _at server &
+sleep 0.1
+_prepare_program $1 ; execute_program $1 $2 $3 $4  | _contains $APP_OPTION_LACKED_MESSAGE | _at client 
+_prepare_program $6 ; execute_program $6 $7 | _contains_$6_output $7 | _at state
+_kill_server
+_collect client server state
