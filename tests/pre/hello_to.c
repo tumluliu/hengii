@@ -30,15 +30,21 @@ int main ( int argc, char *argv[] ) {
 	int myid, numprocs;
 	char *target = argv[1];
 	char *prefix = "";
-	if (argc > 2) {
-		prefix = argv[2];
-	}
+	char *egg = "";
 
 	MPI_Init (&argc, &argv);
 	MPI_Comm_rank (MPI_COMM_WORLD, &myid);
 	MPI_Comm_size (MPI_COMM_WORLD, &numprocs);
+
+	if (argc > 2) {
+		prefix = argv[2];
+		if (argc > 4 && strcmp(argv[3], "-e") == 0) {
+			egg = argv[4];
+		}
+	}
+
 	/* Here the outputs of all processes are the same, for the convienence of result checking */
-	printf ("Hello %s %s!", prefix, target, myid, numprocs);
+	printf ("Hello %s %s!!!%s\n", prefix, target, egg);
 	MPI_Finalize ();
 
 	return 0;

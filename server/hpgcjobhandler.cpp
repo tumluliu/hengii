@@ -132,7 +132,6 @@ void HpgcJobHandler::cancel(const int32_t client_ticket) {
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
-	Logger::log(STDOUT, INFO, ENGINE, "getting job flow status...");
 	if (sessionPool.count(client_ticket) == 0) {
 		_return.flow_status = Status::NOT_EXIST;
 		_return.message = "get status error, job id not exist";
@@ -141,9 +140,6 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 	else {
 		_return.flow_status = Status::FINISHED;
 		_return.message = "";
-		stringstream msg;
-		msg << "the job flow status is: " << _return.flow_status;
-		Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
 		Logger::log(STDOUT, INFO, ENGINE, "The result sent to client is: ");
 
 		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
