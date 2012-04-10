@@ -16,11 +16,13 @@
  *
  * =====================================================================================
  */
-#ifndef _UTILITY_H_
-#define _UTILITY_H_
+#ifndef UTILITY_H_
+#define UTILITY_H_
 
 #include <string>
 #include <iostream>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -30,6 +32,8 @@ class Utility {
 	public:
 		static int readFile(const string&, string&);
 		static int deleteFile(const string&);
+		static vector<string> splitStringBySpace ( const string& );
 };
+
 
 #endif

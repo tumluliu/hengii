@@ -21,6 +21,24 @@
 #include "utility.h"
 #include "logger.h"
 
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  splitStringBySpace
+ *  Description:  RT
+ * =====================================================================================
+ */
+vector<string> Utility::splitStringBySpace ( const string &s ) {
+	vector<string> result;
+	string piece;
+	stringstream ss(s);
+	while(ss.good()) {
+		ss >> piece;
+		result.push_back(piece);
+	}
+
+	return result;
+}		/* -----  end of function splitStringBySpace  ----- */
+
 int Utility::readFile(const string& file, string& content) {
 	ifstream infile(file.c_str(), ios::in);
 	if (!infile) {

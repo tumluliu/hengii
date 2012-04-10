@@ -3,11 +3,11 @@
 # check if stdin contains specifical message
 
 result="true"
-actual=$(cat)
+ACTUAL=$(cat)
 
 for arg in "$*"
 do
-	echo $actual | grep -q "$arg"
+	echo $ACTUAL | grep -q "$arg"
 	if [ ! $? -eq 0 ]; then
 		result="false"
 		miss="$arg"

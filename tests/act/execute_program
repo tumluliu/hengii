@@ -8,7 +8,7 @@
 #   DESCRIPTION: the convenient wrapper for the standard start-block-until-return cycle,
 #   			 submitting a jobflow containing single program
 #		 INPUTS: 1:the name of the program; 2:the process number to be used
-#		 		 3:(optional)addtional option, use key:value pattern
+#		 		 3:(optional)addtional option, use "key:value:key:value:..." pattern
 #       OPTIONS: ---
 #  REQUIREMENTS: ---
 #          BUGS: ---

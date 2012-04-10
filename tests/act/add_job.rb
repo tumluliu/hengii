@@ -21,15 +21,18 @@ job1.parents      = []
 job1.parent_count = job1.parents.count
 job1.children     = []
 job1.child_count  = job1.children.count
-job1.app_options  = {
-	'program_name'   => ARGV[0],
-}	
-if ARGV[3] != nil
-	job1.app_options.merge(Hash[*ARGV[3].split(":")])
-end
+job1.app_uri = ARGV[0]
+
 job1.runtime_context              = Context.new()
 job1.runtime_context.parallel_env = ParallelEnv::MPI
 job1.runtime_context.options      = { 'process_count' => ARGV[1] || '2' }
+
+job1.app_options = {}
+if ARGV[2] != nil
+	ARGV[2].split("+").each do |arg|
+		job1.app_options = job1.app_options.merge(Hash[*arg.split(":")])
+	end
+end
 
 if(flow = YAML::load STDIN)
 	flow.jobs << job1

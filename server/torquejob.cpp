@@ -206,8 +206,11 @@ int TorqueJob::collect() {
 	qStatAttr.resource = resource;
 	qStatAttr.next = NULL;
 
-	struct batch_status *qStatus;
+	struct batch_status *qStatus = NULL;
 	do {
+		if (qStatus != NULL) {
+			pbs_statfree(qStatus);
+		}
 		do {
 			qStatus = pbs_statjob(connection, const_cast<char*>(id.c_str()), &qStatAttr, 0);
 			// sleep(1);

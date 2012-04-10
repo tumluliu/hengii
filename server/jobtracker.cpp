@@ -22,6 +22,7 @@
 #include "config.h"
 #include "utility.h"
 #include "logger.h"
+#include "appoption.h"
 
 JobTracker::JobTracker() {
 }
@@ -117,6 +118,60 @@ vector<int>::iterator JobTracker::getBusyParentCountListIter() {
 void JobTracker::setBusyParentCountListIter(vector<int>::iterator it) {
 	busyParentCountListIter = it;
 }
+
+/*-----------------------------------------------------------------------------
+ *  Codes below are the thread function and its partners
+ *-----------------------------------------------------------------------------*/
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  constructCmdOptions
+ *  Description:  RT
+ * =====================================================================================
+ */
+string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &options, ifstream &metafile ) {
+	string result = "";
+	string response;
+	string record;
+	std::vector<string> pieces;
+	std::vector<AppOption> appOptionMetas;
+	unsigned int i = 0;
+
+	while (getline(metafile, record)) {
+		pieces = Utility::splitStringBySpace(record);
+		AppOption appOptionMeta(pieces);
+		appOptionMetas.push_back(appOptionMeta);
+	}
+
+	for (i = 0; i < appOptionMetas.size(); i++) {
+		bool lackEssential = true;
+		for (map<string, string>::iterator it = options.begin(); it != options.end(); it++) {
+			if(appOptionMetas[i].name == (*it).first) {
+				result = result + " " + appOptionMetas[i].cmdSwitch + " " + (*it).second;
+				lackEssential = false;
+			}
+		}
+		if (appOptionMetas[i].isOptional == false && lackEssential == true) {
+			response = "start job error, lack option " + appOptionMetas[i].name;
+			Logger::log(STDOUT, ERROR, ENGINE, response);
+			job->setStatus(JobStatus::FAILED);
+			job->setResult(response);
+			return "";
+		}
+	}
+
+	for (map<string, string>::iterator it = options.begin(); it != options.end(); it++) {
+		if (AppOption::isUnknown(appOptionMetas, (*it).first)) {
+			response = "start job error, option " + (*it).first + " unknown";
+			Logger::log(STDOUT, ERROR, ENGINE, response);
+			job->setStatus(JobStatus::FAILED);
+			job->setResult(response);
+			return "";
+		}
+	}
+
+	return result;
+}		/* -----  end of function constructCmdOptions  ----- */
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  jobWorker
@@ -148,28 +203,23 @@ void* JobTracker::jobWorker(void* threadParam)
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
 				}
-				// !!!! Here the app_options["program_name"] should be changed to app_uri
-				// !!!! By Liu Lu
-				// !!!! 2012-04-08
-				string appMetaFile = APP_DIR + userJob.app_options["program_name"] + ".meta";
+				string appMetaFile = APP_DIR + userJob.app_uri + ".meta";
 				ifstream appOptionsFile(appMetaFile.c_str(), ios::in);
 				if (!appOptionsFile) { 
 					response = "";
 					response 
 						= response 
 						+ "start job error, program "
-						+ userJob.app_options["program_name"]
+						+ userJob.app_uri
 						+ " not exist";
 					Logger::log(STDOUT, ERROR, ENGINE, response);
 					job->setResult(response);
 					job->setStatus(JobStatus::FAILED);
 					return NULL;
 				}
-				cmdline = cmdline + APP_DIR + userJob.app_options["program_name"] + " ";
-				string appOptionKey;
-				appOptions = userJob.app_options;
-				while (getline(appOptionsFile, appOptionKey)) {
-					cmdline = cmdline + appOptions[appOptionKey] + " ";
+				cmdline = cmdline + APP_DIR + userJob.app_uri + " " + constructCmdOptions(job, userJob.app_options, appOptionsFile);
+				if (job->getStatus() == JobStatus::FAILED) {
+					return NULL;
 				}
 				Logger::log(STDOUT, INFO, TORQUE, "The cmdline for PBS is: " + cmdline);
 				break;

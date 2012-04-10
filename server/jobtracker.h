@@ -18,6 +18,7 @@
 #ifndef _JOBTRACKER_H_
 #define _JOBTRACKER_H_
 
+#include <fstream>
 #include "lib/HpgcJob.h"
 #include "torquejob.h"
 
@@ -34,6 +35,7 @@ class JobTracker{
 		Job userJob;
 		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
 		vector<int>::iterator busyParentCountListIter;
+		static string constructCmdOptions( JobTracker*, map<string, string>&, ifstream& );
 	public:
 		JobTracker();
 		void setUserJob(const Job&);

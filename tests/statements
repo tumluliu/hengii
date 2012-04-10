@@ -32,4 +32,7 @@ announce "已经提交作业的用户连接中断后，可以重新连接，并�
 announce "查询不存在的作业的状态，返回错误信息，服务正常继续" "query_for_not_existed_job_return_error_with_server_available hello 8"
 announce "作业内的程序异常中止，返回错误信息，服务正常继续" "program_error_return_it_with_server_available null_pointer 2 hello 8"
 announce "要求执行不存在的程序，返回错误信息，服务正常继续" "execute_not_existed_program_return_error_with_server_available hello 8"
-announce "提交的参数无法识别，返回错误信息，服务正常继续" "app_options_not_recognized_return_error_with_server_available hello 2 invalidopt hello 8"
+announce "提交的参数无法识别，返回错误信息，服务正常继续" "app_options_unknown_return_error_with_server_available hello_to 2 target:Liu+prefix:Mr+unknown:0 Liu+Mr+0 unknown hello 8"
+announce "含参程序构成的作业流能正常执行" "happy_with_params hello_to 8 target:Liu+prefix:Mr Liu+Mr"
+announce "缺可选参数的作业流能正常执行" "happy_with_params hello_to 8 target:Liu Liu"
+announce "缺必须参数，返回错误信息，服务正常继续" "without_essential_option_return_error hello_to 8 prefix:Mr Mr target hello 8"

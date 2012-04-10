@@ -159,8 +159,8 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 			}
 			_return.job_result_list.push_back(jr);
 			// log and print
-			Logger::log(LOG_FILE, INFO, APPLICATION, jr.message);	
-			Logger::log(STDOUT, INFO, APPLICATION, jr.message);	
+			Logger::log(LOG_FILE, INFO, APPLICATION, "message of job: " + jr.message);	
+			Logger::log(STDOUT, INFO, APPLICATION, "message of job: " + jr.message);	
 		}
 
 		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {
