@@ -5,7 +5,7 @@
  *
  *    Description:  declaration of Session class
  *
- *        Version:  0.6
+ *        Version:  0.7
  *        Created:  03/17/2012 11:02:01 AM
  *       Revision:  none
  *       Compiler:  gcc

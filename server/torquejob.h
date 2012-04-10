@@ -5,7 +5,7 @@
  *
  *    Description:  the declaration of job class submitted to Torque PBS.
  *
- *        Version:  0.6
+ *        Version:  0.7
  *        Created:  03/17/2012 03:38:14 PM
  *       Revision:  none
  *       Compiler:  gcc

@@ -5,7 +5,7 @@
  *
  *    Description:  implementation of class Logger
  *
- *        Version:  0.6
+ *        Version:  0.7
  *        Created:  04/05/2012 07:46:26 PM
  *       Revision:  none
  *       Compiler:  gcc
