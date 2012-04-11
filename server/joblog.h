@@ -26,6 +26,11 @@ using namespace std;
 
 const string JOB_TABLE_NAME = "gdos_sys_job";
 const string JOB_FLOW_TABLE_NAME = "gdos_sys_jobflow";
+const string DB_SERVER = "gdos-yanan";
+const string DB_USER = "myuser";
+const string DB_PASSWORD = "mypassword";
+const string DB_NAME = "higis";
+const int DB_PORT = 3306;
 
 class JobLog {
 	private:
@@ -38,7 +43,7 @@ class JobLog {
 		string registerJobFlowSql(int);
 		int command(const string&);
 	public:
-		JobLog(): hosts("localhost"),userName("root"),password(""),dbName("test"),port(3306){ }
+		JobLog(): hosts(DB_SERVER),userName(DB_USER),password(DB_PASSWORD),dbName(DB_NAME),port(DB_PORT){ }
 		int registerJob(int, int, const string&);
 		int registerJobFlow(int);
 };

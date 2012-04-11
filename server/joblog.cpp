@@ -31,7 +31,7 @@ int JobLog::registerJob( int flowId, int jobId, const string &pbsJobId ) {
 }
 
 string JobLog::registerJobFlowSql( int flowId ) {
-	return "insert into " + JOB_FLOW_TABLE_NAME + "(ticket) values('" + Utility::intToString(flowId) + "');";
+	return "insert into " + JOB_FLOW_TABLE_NAME + "(id) values('" + Utility::intToString(flowId) + "');";
 }
 
 int JobLog::registerJobFlow( int flowId ) {
