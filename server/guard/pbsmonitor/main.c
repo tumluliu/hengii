@@ -17,7 +17,6 @@
  */
 #include <stdlib.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -25,138 +24,18 @@
 #include <pbs_error.h>
 #include <pbs_ifl.h>
 
+#include "hg_pbsattr.h"
+#include "hg_mysql.h"
+#include "hg_utils.h"
+
 #define MAX_PBS_ID_LENGTH 256
-#define ATTR_NAME_LENGTH 256
-#define TIME_LENGTH 80
 #define HOSTNAME_SIZE 1024
+#define HOST_DOMAIN ".localhost.localdomain"
 #define PBS_ATTR_COUNT 16
 #define MAX_PBS_ATTR_VALUE_LENGTH 256
 #define MAX_PBS_RESOURCE_LENGTH 1024
 #define MAX_SQL_LENGTH 4096
-#define HOST_DOMAIN ".localhost.localdomain"
-#define DB_SERVER "gdos-yanan"
-#define DB_USER "myuser"
-#define DB_PASSWORD "mypassword"
-#define DB_NAME "higis"
-#define PORT 3306
-#define INTERVAL_MICRO_SECONDS 100
-
-void convertToMysqlTime( char *result, time_t t ) {
-	strftime( result, TIME_LENGTH, "%Y-%m-%d %X", localtime( &t ) );
-}
-
-char **makeStringArray( int count, int stringSize ) {
-	char **result;
-	int i;
-
-	result = ( char ** )calloc( count, sizeof( char * ) );
-	for ( i = 0; i < count; i++ ) {
-		result[i] = ( char * )calloc( stringSize, sizeof( char ) );
-		memset( result[i], '\0', stringSize );
-	}
-
-	return result;
-}
-
-void freeStringArray( char **a, int count ) {
-	int i;
-	for ( i = 0; i < count; i++ ) {
-		free( a[i] );
-	}
-	free( a );
-}
-
-MYSQL_RES *query( char *sql ) {
-	int sig;
-	MYSQL *conn_ptr;
-	MYSQL_RES *res;
-
-	conn_ptr = mysql_init( NULL );
-
-	if ( !conn_ptr ) {
-		printf( "MySql init failed\n" );
-	}
-
-	conn_ptr = mysql_real_connect( conn_ptr, DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME, PORT, NULL, 0 );
-
-	if ( conn_ptr ) {
-		printf( "Connection success\n" );
-	}
-	else {
-		printf( "Connection failed\n" );
-	}
-
-	sig = mysql_query( conn_ptr, sql );
-
-	if ( sig != 0 ) {
-		printf( "Error making query: %s\n", mysql_error( conn_ptr ) );
-	}
-	else {
-		printf( "Query made...\n" );
-	}
-
-	res = mysql_store_result( conn_ptr );
-	mysql_close( conn_ptr );
-
-	return res;
-}
-
-void makeAttrNames( struct attrl *attr ) {
-	struct attrl *p = attr;
-	if ( p == NULL ) {
-		return;
-	}
-
-	do {
-		p->name = ( char * )malloc( ATTR_NAME_LENGTH + 1 );
-		memset( p->name, '\0', ATTR_NAME_LENGTH + 1 );
-		p = p->next;
-	}
-	while ( p != NULL );
-}
-
-void freeAttrNames( struct attrl *attr ) {
-	struct attrl *p = attr;
-	if ( p == NULL ) {
-		return;
-	}
-
-	do {
-		free( p->name );
-		p = p->next;
-	}
-	while ( p != NULL );
-}
-
-void getAttrValue( char *result, struct attrl *attr, char *name ) {
-	struct attrl *iter = attr;
-	char t[TIME_LENGTH];
-	bool isFound = false;
-
-	do {
-		if ( strcmp( name, iter->name ) == 0 ) {
-			isFound = true;
-			if (
-					strcmp( name, ATTR_ctime ) == 0 ||
-					strcmp( name, ATTR_etime ) == 0 ||
-					strcmp( name, ATTR_qtime ) == 0 ) {
-
-				convertToMysqlTime( t, atoi( iter->value ) );
-				printf( "time is: %s\n", t );
-				strcpy( result, t );
-			}
-			else {
-				strcpy( result, iter->value );
-			}
-		}
-		iter = iter->next;
-	}
-	while ( iter != NULL );
-
-	if ( !isFound ) {
-		strcpy( result, "" );
-	}
-}
+#define INTERVAL_MILLISECONDS 100
 
 void updateStatus( char *id, int pbsConn ) {
 	struct attrl attr[PBS_ATTR_COUNT];
@@ -280,9 +159,6 @@ void updateStatus( char *id, int pbsConn ) {
 	mysql_free_result(query( sql ));
 }
 
-void freeRes( MYSQL_RES *res ) {
-	mysql_free_result( res );
-}
 
 MYSQL_RES *getPbsJobIds( int *count ) {
 	MYSQL_RES *res;
@@ -335,7 +211,7 @@ int main( int argc, char **argv ) {
 		mysql_free_result(res);
 		freeStringArray( ids, idCount );
 
-		usleep(INTERVAL_MICRO_SECONDS);
+		usleep(INTERVAL_MILLISECONDS);
 	} while(1);
 
 	pbs_disconnect( pbsConn );
