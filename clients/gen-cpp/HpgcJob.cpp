@@ -36,6 +36,14 @@ uint32_t HpgcJob_start_single_job_args::read(::apache::thrift::protocol::TProtoc
           xfer += iprot->skip(ftype);
         }
         break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->user_id);
+          this->__isset.user_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -54,6 +62,9 @@ uint32_t HpgcJob_start_single_job_args::write(::apache::thrift::protocol::TProto
   xfer += oprot->writeFieldBegin("job", ::apache::thrift::protocol::T_STRUCT, 1);
   xfer += this->job.write(oprot);
   xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->user_id);
+  xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -64,6 +75,9 @@ uint32_t HpgcJob_start_single_job_pargs::write(::apache::thrift::protocol::TProt
   xfer += oprot->writeStructBegin("HpgcJob_start_single_job_pargs");
   xfer += oprot->writeFieldBegin("job", ::apache::thrift::protocol::T_STRUCT, 1);
   xfer += (*(this->job)).write(oprot);
+  xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString((*(this->user_id)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -91,8 +105,8 @@ uint32_t HpgcJob_start_single_job_result::read(::apache::thrift::protocol::TProt
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->success);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->success);
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -125,8 +139,8 @@ uint32_t HpgcJob_start_single_job_result::write(::apache::thrift::protocol::TPro
   xfer += oprot->writeStructBegin("HpgcJob_start_single_job_result");
 
   if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
-    xfer += oprot->writeI32(this->success);
+    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I64, 0);
+    xfer += oprot->writeI64(this->success);
     xfer += oprot->writeFieldEnd();
   } else if (this->__isset.e) {
     xfer += oprot->writeFieldBegin("e", ::apache::thrift::protocol::T_STRUCT, 1);
@@ -159,8 +173,8 @@ uint32_t HpgcJob_start_single_job_presult::read(::apache::thrift::protocol::TPro
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32((*(this->success)));
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64((*(this->success)));
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -214,6 +228,14 @@ uint32_t HpgcJob_start_args::read(::apache::thrift::protocol::TProtocol* iprot) 
           xfer += iprot->skip(ftype);
         }
         break;
+      case 2:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->user_id);
+          this->__isset.user_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -232,6 +254,9 @@ uint32_t HpgcJob_start_args::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("flow", ::apache::thrift::protocol::T_STRUCT, 1);
   xfer += this->flow.write(oprot);
   xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString(this->user_id);
+  xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -242,6 +267,9 @@ uint32_t HpgcJob_start_pargs::write(::apache::thrift::protocol::TProtocol* oprot
   xfer += oprot->writeStructBegin("HpgcJob_start_pargs");
   xfer += oprot->writeFieldBegin("flow", ::apache::thrift::protocol::T_STRUCT, 1);
   xfer += (*(this->flow)).write(oprot);
+  xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 2);
+  xfer += oprot->writeString((*(this->user_id)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -269,8 +297,8 @@ uint32_t HpgcJob_start_result::read(::apache::thrift::protocol::TProtocol* iprot
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->success);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->success);
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -303,8 +331,8 @@ uint32_t HpgcJob_start_result::write(::apache::thrift::protocol::TProtocol* opro
   xfer += oprot->writeStructBegin("HpgcJob_start_result");
 
   if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
-    xfer += oprot->writeI32(this->success);
+    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I64, 0);
+    xfer += oprot->writeI64(this->success);
     xfer += oprot->writeFieldEnd();
   } else if (this->__isset.e) {
     xfer += oprot->writeFieldBegin("e", ::apache::thrift::protocol::T_STRUCT, 1);
@@ -337,8 +365,8 @@ uint32_t HpgcJob_start_presult::read(::apache::thrift::protocol::TProtocol* ipro
     switch (fid)
     {
       case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32((*(this->success)));
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64((*(this->success)));
           this->__isset.success = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -385,8 +413,8 @@ uint32_t HpgcJob_pause_args::read(::apache::thrift::protocol::TProtocol* iprot) 
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->client_ticket);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->client_ticket);
           this->__isset.client_ticket = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -407,8 +435,8 @@ uint32_t HpgcJob_pause_args::read(::apache::thrift::protocol::TProtocol* iprot) 
 uint32_t HpgcJob_pause_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_pause_args");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(this->client_ticket);
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->client_ticket);
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -418,8 +446,8 @@ uint32_t HpgcJob_pause_args::write(::apache::thrift::protocol::TProtocol* oprot)
 uint32_t HpgcJob_pause_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_pause_pargs");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32((*(this->client_ticket)));
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64((*(this->client_ticket)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -522,8 +550,8 @@ uint32_t HpgcJob_resume_args::read(::apache::thrift::protocol::TProtocol* iprot)
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->client_ticket);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->client_ticket);
           this->__isset.client_ticket = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -544,8 +572,8 @@ uint32_t HpgcJob_resume_args::read(::apache::thrift::protocol::TProtocol* iprot)
 uint32_t HpgcJob_resume_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_resume_args");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(this->client_ticket);
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->client_ticket);
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -555,8 +583,8 @@ uint32_t HpgcJob_resume_args::write(::apache::thrift::protocol::TProtocol* oprot
 uint32_t HpgcJob_resume_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_resume_pargs");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32((*(this->client_ticket)));
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64((*(this->client_ticket)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -659,8 +687,8 @@ uint32_t HpgcJob_cancel_args::read(::apache::thrift::protocol::TProtocol* iprot)
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->client_ticket);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->client_ticket);
           this->__isset.client_ticket = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -681,8 +709,8 @@ uint32_t HpgcJob_cancel_args::read(::apache::thrift::protocol::TProtocol* iprot)
 uint32_t HpgcJob_cancel_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_cancel_args");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(this->client_ticket);
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->client_ticket);
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -692,8 +720,8 @@ uint32_t HpgcJob_cancel_args::write(::apache::thrift::protocol::TProtocol* oprot
 uint32_t HpgcJob_cancel_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_cancel_pargs");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32((*(this->client_ticket)));
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64((*(this->client_ticket)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -796,8 +824,8 @@ uint32_t HpgcJob_get_status_args::read(::apache::thrift::protocol::TProtocol* ip
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->client_ticket);
+        if (ftype == ::apache::thrift::protocol::T_I64) {
+          xfer += iprot->readI64(this->client_ticket);
           this->__isset.client_ticket = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -818,8 +846,8 @@ uint32_t HpgcJob_get_status_args::read(::apache::thrift::protocol::TProtocol* ip
 uint32_t HpgcJob_get_status_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_get_status_args");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32(this->client_ticket);
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64(this->client_ticket);
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -829,8 +857,8 @@ uint32_t HpgcJob_get_status_args::write(::apache::thrift::protocol::TProtocol* o
 uint32_t HpgcJob_get_status_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("HpgcJob_get_status_pargs");
-  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I32, 1);
-  xfer += oprot->writeI32((*(this->client_ticket)));
+  xfer += oprot->writeFieldBegin("client_ticket", ::apache::thrift::protocol::T_I64, 1);
+  xfer += oprot->writeI64((*(this->client_ticket)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -933,19 +961,386 @@ uint32_t HpgcJob_get_status_presult::read(::apache::thrift::protocol::TProtocol*
   return xfer;
 }
 
-int32_t HpgcJobClient::start_single_job(const Job& job)
+uint32_t HpgcJob_get_my_requests_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 1:
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->user_id);
+          this->__isset.user_id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t HpgcJob_get_my_requests_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("HpgcJob_get_my_requests_args");
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->user_id);
+  xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_my_requests_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("HpgcJob_get_my_requests_pargs");
+  xfer += oprot->writeFieldBegin("user_id", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->user_id)));
+  xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_my_requests_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->success.clear();
+            uint32_t _size43;
+            ::apache::thrift::protocol::TType _etype46;
+            iprot->readListBegin(_etype46, _size43);
+            this->success.resize(_size43);
+            uint32_t _i47;
+            for (_i47 = 0; _i47 < _size43; ++_i47)
+            {
+              xfer += iprot->readI64(this->success[_i47]);
+            }
+            iprot->readListEnd();
+          }
+          this->__isset.success = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t HpgcJob_get_my_requests_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+
+  uint32_t xfer = 0;
+
+  xfer += oprot->writeStructBegin("HpgcJob_get_my_requests_result");
+
+  if (this->__isset.success) {
+    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
+    {
+      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->success.size()));
+      std::vector<int64_t> ::const_iterator _iter48;
+      for (_iter48 = this->success.begin(); _iter48 != this->success.end(); ++_iter48)
+      {
+        xfer += oprot->writeI64((*_iter48));
+      }
+      xfer += oprot->writeListEnd();
+    }
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_my_requests_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            (*(this->success)).clear();
+            uint32_t _size49;
+            ::apache::thrift::protocol::TType _etype52;
+            iprot->readListBegin(_etype52, _size49);
+            (*(this->success)).resize(_size49);
+            uint32_t _i53;
+            for (_i53 = 0; _i53 < _size49; ++_i53)
+            {
+              xfer += iprot->readI64((*(this->success))[_i53]);
+            }
+            iprot->readListEnd();
+          }
+          this->__isset.success = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_args::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("HpgcJob_get_all_requests_args");
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
+  uint32_t xfer = 0;
+  xfer += oprot->writeStructBegin("HpgcJob_get_all_requests_pargs");
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_result::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            this->success.clear();
+            uint32_t _size54;
+            ::apache::thrift::protocol::TType _etype57;
+            iprot->readListBegin(_etype57, _size54);
+            this->success.resize(_size54);
+            uint32_t _i58;
+            for (_i58 = 0; _i58 < _size54; ++_i58)
+            {
+              xfer += iprot->readI64(this->success[_i58]);
+            }
+            iprot->readListEnd();
+          }
+          this->__isset.success = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+
+  uint32_t xfer = 0;
+
+  xfer += oprot->writeStructBegin("HpgcJob_get_all_requests_result");
+
+  if (this->__isset.success) {
+    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_LIST, 0);
+    {
+      xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I64, static_cast<uint32_t>(this->success.size()));
+      std::vector<int64_t> ::const_iterator _iter59;
+      for (_iter59 = this->success.begin(); _iter59 != this->success.end(); ++_iter59)
+      {
+        xfer += oprot->writeI64((*_iter59));
+      }
+      xfer += oprot->writeListEnd();
+    }
+    xfer += oprot->writeFieldEnd();
+  }
+  xfer += oprot->writeFieldStop();
+  xfer += oprot->writeStructEnd();
+  return xfer;
+}
+
+uint32_t HpgcJob_get_all_requests_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+
+  uint32_t xfer = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TType ftype;
+  int16_t fid;
+
+  xfer += iprot->readStructBegin(fname);
+
+  using ::apache::thrift::protocol::TProtocolException;
+
+
+  while (true)
+  {
+    xfer += iprot->readFieldBegin(fname, ftype, fid);
+    if (ftype == ::apache::thrift::protocol::T_STOP) {
+      break;
+    }
+    switch (fid)
+    {
+      case 0:
+        if (ftype == ::apache::thrift::protocol::T_LIST) {
+          {
+            (*(this->success)).clear();
+            uint32_t _size60;
+            ::apache::thrift::protocol::TType _etype63;
+            iprot->readListBegin(_etype63, _size60);
+            (*(this->success)).resize(_size60);
+            uint32_t _i64;
+            for (_i64 = 0; _i64 < _size60; ++_i64)
+            {
+              xfer += iprot->readI64((*(this->success))[_i64]);
+            }
+            iprot->readListEnd();
+          }
+          this->__isset.success = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
+      default:
+        xfer += iprot->skip(ftype);
+        break;
+    }
+    xfer += iprot->readFieldEnd();
+  }
+
+  xfer += iprot->readStructEnd();
+
+  return xfer;
+}
+
+int64_t HpgcJobClient::start_single_job(const Job& job, const std::string& user_id)
 {
-  send_start_single_job(job);
+  send_start_single_job(job, user_id);
   return recv_start_single_job();
 }
 
-void HpgcJobClient::send_start_single_job(const Job& job)
+void HpgcJobClient::send_start_single_job(const Job& job, const std::string& user_id)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("start_single_job", ::apache::thrift::protocol::T_CALL, cseqid);
 
   HpgcJob_start_single_job_pargs args;
   args.job = &job;
+  args.user_id = &user_id;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -953,7 +1348,7 @@ void HpgcJobClient::send_start_single_job(const Job& job)
   oprot_->getTransport()->flush();
 }
 
-int32_t HpgcJobClient::recv_start_single_job()
+int64_t HpgcJobClient::recv_start_single_job()
 {
 
   int32_t rseqid = 0;
@@ -978,7 +1373,7 @@ int32_t HpgcJobClient::recv_start_single_job()
     iprot_->readMessageEnd();
     iprot_->getTransport()->readEnd();
   }
-  int32_t _return;
+  int64_t _return;
   HpgcJob_start_single_job_presult result;
   result.success = &_return;
   result.read(iprot_);
@@ -994,19 +1389,20 @@ int32_t HpgcJobClient::recv_start_single_job()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "start_single_job failed: unknown result");
 }
 
-int32_t HpgcJobClient::start(const JobFlow& flow)
+int64_t HpgcJobClient::start(const JobFlow& flow, const std::string& user_id)
 {
-  send_start(flow);
+  send_start(flow, user_id);
   return recv_start();
 }
 
-void HpgcJobClient::send_start(const JobFlow& flow)
+void HpgcJobClient::send_start(const JobFlow& flow, const std::string& user_id)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("start", ::apache::thrift::protocol::T_CALL, cseqid);
 
   HpgcJob_start_pargs args;
   args.flow = &flow;
+  args.user_id = &user_id;
   args.write(oprot_);
 
   oprot_->writeMessageEnd();
@@ -1014,7 +1410,7 @@ void HpgcJobClient::send_start(const JobFlow& flow)
   oprot_->getTransport()->flush();
 }
 
-int32_t HpgcJobClient::recv_start()
+int64_t HpgcJobClient::recv_start()
 {
 
   int32_t rseqid = 0;
@@ -1039,7 +1435,7 @@ int32_t HpgcJobClient::recv_start()
     iprot_->readMessageEnd();
     iprot_->getTransport()->readEnd();
   }
-  int32_t _return;
+  int64_t _return;
   HpgcJob_start_presult result;
   result.success = &_return;
   result.read(iprot_);
@@ -1055,13 +1451,13 @@ int32_t HpgcJobClient::recv_start()
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "start failed: unknown result");
 }
 
-void HpgcJobClient::pause(const int32_t client_ticket)
+void HpgcJobClient::pause(const int64_t client_ticket)
 {
   send_pause(client_ticket);
   recv_pause();
 }
 
-void HpgcJobClient::send_pause(const int32_t client_ticket)
+void HpgcJobClient::send_pause(const int64_t client_ticket)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("pause", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -1108,13 +1504,13 @@ void HpgcJobClient::recv_pause()
   return;
 }
 
-void HpgcJobClient::resume(const int32_t client_ticket)
+void HpgcJobClient::resume(const int64_t client_ticket)
 {
   send_resume(client_ticket);
   recv_resume();
 }
 
-void HpgcJobClient::send_resume(const int32_t client_ticket)
+void HpgcJobClient::send_resume(const int64_t client_ticket)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("resume", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -1161,13 +1557,13 @@ void HpgcJobClient::recv_resume()
   return;
 }
 
-void HpgcJobClient::cancel(const int32_t client_ticket)
+void HpgcJobClient::cancel(const int64_t client_ticket)
 {
   send_cancel(client_ticket);
   recv_cancel();
 }
 
-void HpgcJobClient::send_cancel(const int32_t client_ticket)
+void HpgcJobClient::send_cancel(const int64_t client_ticket)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("cancel", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -1214,13 +1610,13 @@ void HpgcJobClient::recv_cancel()
   return;
 }
 
-void HpgcJobClient::get_status(Result& _return, const int32_t client_ticket)
+void HpgcJobClient::get_status(Result& _return, const int64_t client_ticket)
 {
   send_get_status(client_ticket);
   recv_get_status(_return);
 }
 
-void HpgcJobClient::send_get_status(const int32_t client_ticket)
+void HpgcJobClient::send_get_status(const int64_t client_ticket)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("get_status", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -1270,6 +1666,121 @@ void HpgcJobClient::recv_get_status(Result& _return)
     return;
   }
   throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_status failed: unknown result");
+}
+
+void HpgcJobClient::get_my_requests(std::vector<int64_t> & _return, const std::string& user_id)
+{
+  send_get_my_requests(user_id);
+  recv_get_my_requests(_return);
+}
+
+void HpgcJobClient::send_get_my_requests(const std::string& user_id)
+{
+  int32_t cseqid = 0;
+  oprot_->writeMessageBegin("get_my_requests", ::apache::thrift::protocol::T_CALL, cseqid);
+
+  HpgcJob_get_my_requests_pargs args;
+  args.user_id = &user_id;
+  args.write(oprot_);
+
+  oprot_->writeMessageEnd();
+  oprot_->getTransport()->writeEnd();
+  oprot_->getTransport()->flush();
+}
+
+void HpgcJobClient::recv_get_my_requests(std::vector<int64_t> & _return)
+{
+
+  int32_t rseqid = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TMessageType mtype;
+
+  iprot_->readMessageBegin(fname, mtype, rseqid);
+  if (mtype == ::apache::thrift::protocol::T_EXCEPTION) {
+    ::apache::thrift::TApplicationException x;
+    x.read(iprot_);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+    throw x;
+  }
+  if (mtype != ::apache::thrift::protocol::T_REPLY) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  if (fname.compare("get_my_requests") != 0) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  HpgcJob_get_my_requests_presult result;
+  result.success = &_return;
+  result.read(iprot_);
+  iprot_->readMessageEnd();
+  iprot_->getTransport()->readEnd();
+
+  if (result.__isset.success) {
+    // _return pointer has now been filled
+    return;
+  }
+  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_my_requests failed: unknown result");
+}
+
+void HpgcJobClient::get_all_requests(std::vector<int64_t> & _return)
+{
+  send_get_all_requests();
+  recv_get_all_requests(_return);
+}
+
+void HpgcJobClient::send_get_all_requests()
+{
+  int32_t cseqid = 0;
+  oprot_->writeMessageBegin("get_all_requests", ::apache::thrift::protocol::T_CALL, cseqid);
+
+  HpgcJob_get_all_requests_pargs args;
+  args.write(oprot_);
+
+  oprot_->writeMessageEnd();
+  oprot_->getTransport()->writeEnd();
+  oprot_->getTransport()->flush();
+}
+
+void HpgcJobClient::recv_get_all_requests(std::vector<int64_t> & _return)
+{
+
+  int32_t rseqid = 0;
+  std::string fname;
+  ::apache::thrift::protocol::TMessageType mtype;
+
+  iprot_->readMessageBegin(fname, mtype, rseqid);
+  if (mtype == ::apache::thrift::protocol::T_EXCEPTION) {
+    ::apache::thrift::TApplicationException x;
+    x.read(iprot_);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+    throw x;
+  }
+  if (mtype != ::apache::thrift::protocol::T_REPLY) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  if (fname.compare("get_all_requests") != 0) {
+    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
+    iprot_->readMessageEnd();
+    iprot_->getTransport()->readEnd();
+  }
+  HpgcJob_get_all_requests_presult result;
+  result.success = &_return;
+  result.read(iprot_);
+  iprot_->readMessageEnd();
+  iprot_->getTransport()->readEnd();
+
+  if (result.__isset.success) {
+    // _return pointer has now been filled
+    return;
+  }
+  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "get_all_requests failed: unknown result");
 }
 
 bool HpgcJobProcessor::process(boost::shared_ptr<apache::thrift::protocol::TProtocol> piprot, boost::shared_ptr<apache::thrift::protocol::TProtocol> poprot, void* callContext) {
@@ -1340,7 +1851,7 @@ void HpgcJobProcessor::process_start_single_job(int32_t seqid, ::apache::thrift:
 
   HpgcJob_start_single_job_result result;
   try {
-    result.success = iface_->start_single_job(args.job);
+    result.success = iface_->start_single_job(args.job, args.user_id);
     result.__isset.success = true;
   } catch (HpgcJobException &e) {
     result.e = e;
@@ -1397,7 +1908,7 @@ void HpgcJobProcessor::process_start(int32_t seqid, ::apache::thrift::protocol::
 
   HpgcJob_start_result result;
   try {
-    result.success = iface_->start(args.flow);
+    result.success = iface_->start(args.flow, args.user_id);
     result.__isset.success = true;
   } catch (HpgcJobException &e) {
     result.e = e;
@@ -1641,6 +2152,114 @@ void HpgcJobProcessor::process_get_status(int32_t seqid, ::apache::thrift::proto
 
   if (this->eventHandler_.get() != NULL) {
     this->eventHandler_->postWrite(ctx, "HpgcJob.get_status", bytes);
+  }
+}
+
+void HpgcJobProcessor::process_get_my_requests(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+{
+  void* ctx = NULL;
+  if (this->eventHandler_.get() != NULL) {
+    ctx = this->eventHandler_->getContext("HpgcJob.get_my_requests", callContext);
+  }
+  apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "HpgcJob.get_my_requests");
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preRead(ctx, "HpgcJob.get_my_requests");
+  }
+
+  HpgcJob_get_my_requests_args args;
+  args.read(iprot);
+  iprot->readMessageEnd();
+  uint32_t bytes = iprot->getTransport()->readEnd();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postRead(ctx, "HpgcJob.get_my_requests", bytes);
+  }
+
+  HpgcJob_get_my_requests_result result;
+  try {
+    iface_->get_my_requests(result.success, args.user_id);
+    result.__isset.success = true;
+  } catch (const std::exception& e) {
+    if (this->eventHandler_.get() != NULL) {
+      this->eventHandler_->handlerError(ctx, "HpgcJob.get_my_requests");
+    }
+
+    apache::thrift::TApplicationException x(e.what());
+    oprot->writeMessageBegin("get_my_requests", apache::thrift::protocol::T_EXCEPTION, seqid);
+    x.write(oprot);
+    oprot->writeMessageEnd();
+    oprot->getTransport()->writeEnd();
+    oprot->getTransport()->flush();
+    return;
+  }
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preWrite(ctx, "HpgcJob.get_my_requests");
+  }
+
+  oprot->writeMessageBegin("get_my_requests", apache::thrift::protocol::T_REPLY, seqid);
+  result.write(oprot);
+  oprot->writeMessageEnd();
+  bytes = oprot->getTransport()->writeEnd();
+  oprot->getTransport()->flush();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postWrite(ctx, "HpgcJob.get_my_requests", bytes);
+  }
+}
+
+void HpgcJobProcessor::process_get_all_requests(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot, void* callContext)
+{
+  void* ctx = NULL;
+  if (this->eventHandler_.get() != NULL) {
+    ctx = this->eventHandler_->getContext("HpgcJob.get_all_requests", callContext);
+  }
+  apache::thrift::TProcessorContextFreer freer(this->eventHandler_.get(), ctx, "HpgcJob.get_all_requests");
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preRead(ctx, "HpgcJob.get_all_requests");
+  }
+
+  HpgcJob_get_all_requests_args args;
+  args.read(iprot);
+  iprot->readMessageEnd();
+  uint32_t bytes = iprot->getTransport()->readEnd();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postRead(ctx, "HpgcJob.get_all_requests", bytes);
+  }
+
+  HpgcJob_get_all_requests_result result;
+  try {
+    iface_->get_all_requests(result.success);
+    result.__isset.success = true;
+  } catch (const std::exception& e) {
+    if (this->eventHandler_.get() != NULL) {
+      this->eventHandler_->handlerError(ctx, "HpgcJob.get_all_requests");
+    }
+
+    apache::thrift::TApplicationException x(e.what());
+    oprot->writeMessageBegin("get_all_requests", apache::thrift::protocol::T_EXCEPTION, seqid);
+    x.write(oprot);
+    oprot->writeMessageEnd();
+    oprot->getTransport()->writeEnd();
+    oprot->getTransport()->flush();
+    return;
+  }
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->preWrite(ctx, "HpgcJob.get_all_requests");
+  }
+
+  oprot->writeMessageBegin("get_all_requests", apache::thrift::protocol::T_REPLY, seqid);
+  result.write(oprot);
+  oprot->writeMessageEnd();
+  bytes = oprot->getTransport()->writeEnd();
+  oprot->getTransport()->flush();
+
+  if (this->eventHandler_.get() != NULL) {
+    this->eventHandler_->postWrite(ctx, "HpgcJob.get_all_requests", bytes);
   }
 }
 

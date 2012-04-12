@@ -150,7 +150,8 @@ void updateStatus( char *id, int pbsConn ) {
 	strcat( sql, resourceUsed );
 	strcat( sql, "' where pbs_job_id='" );
 	strcat( sql, id );
-	strcat( sql, "';" );
+	strcat( sql, "' and job_state <> 'C' or job_state is null" );
+	strcat( sql, ";" );
 
 	printf( "the sql for updating mysql is: %s\n", sql );
 
@@ -180,6 +181,9 @@ void fillPbsJobIds( MYSQL_RES *res, char **ids ) {
 
 	i = 0;
 	while ( ( row = mysql_fetch_row( res ) ) ) {
+		if (row[0] == NULL) {
+			continue;
+		}
 		strcpy( ids[i], row[0] );
 		i++;
 	}

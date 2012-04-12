@@ -3,7 +3,7 @@
  *
  *       Filename:  session.h
  *
- *    Description:  declaration of Session class
+ *    Description:  declaration of Request class
  *
  *        Version:  0.7
  *        Created:  03/17/2012 11:02:01 AM
@@ -15,14 +15,14 @@
  *
  * =====================================================================================
  */
-#ifndef _SESSION_H_
-#define _SESSION_H_
+#ifndef _REQUEST_H_
+#define _REQUEST_H_
 
 #include "jobtracker.h"
 
 const int MAX_JOB_COUNT = 20;
 
-class Session{
+class Request{
 	private:
 		pthread_mutex_t threadMutex;
 		pthread_cond_t waitingCond;
@@ -33,9 +33,10 @@ class Session{
 		bool available;
 		int jobCount;
 		int id;
+		string userId;
 	public:
-		Session();
-		Session(int);
+		Request();
+		Request(int);
 		vector<JobTracker> getJobTrackers() const;
 		JobTracker getJobTrackerAt(int) const;
 		vector<int> getBusyParentCountList() const;
@@ -46,6 +47,8 @@ class Session{
 		int createJobThreads();
 		int getId() const;
 		int getJobCount() const;
+		void setUserId(const string&);
+		string getUserId() const;
 };
 
 #endif

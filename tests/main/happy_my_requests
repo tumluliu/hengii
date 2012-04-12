@@ -1,0 +1,30 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: happy_my_requests
+# 
+#         USAGE: ./happy_my_requests 
+# 
+#   DESCRIPTION: The server can return the requested client tickets that a user has 
+#                submited 
+#
+#		 INPUTS: 
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/12/2012 09:24:10 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+_prepare_server
+_start_server >/dev/null &
+_prepare_program hellooooo ; create_empty_flow.rb | add_job.rb hellooooo 2 | session.rb start.rb print_id.rb > id 
+i=$(cat id)
+session.rb get_requests.rb | _contains $i
+_kill_server
+rm id

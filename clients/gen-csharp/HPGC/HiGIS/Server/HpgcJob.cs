@@ -17,12 +17,14 @@ namespace HPGC.HiGIS.Server
 {
   public class HpgcJob {
     public interface Iface {
-      int start_single_job(Job job);
-      int start(JobFlow flow);
-      void pause(int client_ticket);
-      void resume(int client_ticket);
-      void cancel(int client_ticket);
-      Result get_status(int client_ticket);
+      long start_single_job(Job job, string user_id);
+      long start(JobFlow flow, string user_id);
+      void pause(long client_ticket);
+      void resume(long client_ticket);
+      void cancel(long client_ticket);
+      Result get_status(long client_ticket);
+      List<long> get_my_requests(string user_id);
+      List<long> get_all_requests();
     }
 
     public class Client : Iface {
@@ -50,23 +52,24 @@ namespace HPGC.HiGIS.Server
       }
 
 
-      public int start_single_job(Job job)
+      public long start_single_job(Job job, string user_id)
       {
-        send_start_single_job(job);
+        send_start_single_job(job, user_id);
         return recv_start_single_job();
       }
 
-      public void send_start_single_job(Job job)
+      public void send_start_single_job(Job job, string user_id)
       {
         oprot_.WriteMessageBegin(new TMessage("start_single_job", TMessageType.Call, seqid_));
         start_single_job_args args = new start_single_job_args();
         args.Job = job;
+        args.User_id = user_id;
         args.Write(oprot_);
         oprot_.WriteMessageEnd();
         oprot_.Transport.Flush();
       }
 
-      public int recv_start_single_job()
+      public long recv_start_single_job()
       {
         TMessage msg = iprot_.ReadMessageBegin();
         if (msg.Type == TMessageType.Exception) {
@@ -86,23 +89,24 @@ namespace HPGC.HiGIS.Server
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "start_single_job failed: unknown result");
       }
 
-      public int start(JobFlow flow)
+      public long start(JobFlow flow, string user_id)
       {
-        send_start(flow);
+        send_start(flow, user_id);
         return recv_start();
       }
 
-      public void send_start(JobFlow flow)
+      public void send_start(JobFlow flow, string user_id)
       {
         oprot_.WriteMessageBegin(new TMessage("start", TMessageType.Call, seqid_));
         start_args args = new start_args();
         args.Flow = flow;
+        args.User_id = user_id;
         args.Write(oprot_);
         oprot_.WriteMessageEnd();
         oprot_.Transport.Flush();
       }
 
-      public int recv_start()
+      public long recv_start()
       {
         TMessage msg = iprot_.ReadMessageBegin();
         if (msg.Type == TMessageType.Exception) {
@@ -122,13 +126,13 @@ namespace HPGC.HiGIS.Server
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "start failed: unknown result");
       }
 
-      public void pause(int client_ticket)
+      public void pause(long client_ticket)
       {
         send_pause(client_ticket);
         recv_pause();
       }
 
-      public void send_pause(int client_ticket)
+      public void send_pause(long client_ticket)
       {
         oprot_.WriteMessageBegin(new TMessage("pause", TMessageType.Call, seqid_));
         pause_args args = new pause_args();
@@ -152,13 +156,13 @@ namespace HPGC.HiGIS.Server
         return;
       }
 
-      public void resume(int client_ticket)
+      public void resume(long client_ticket)
       {
         send_resume(client_ticket);
         recv_resume();
       }
 
-      public void send_resume(int client_ticket)
+      public void send_resume(long client_ticket)
       {
         oprot_.WriteMessageBegin(new TMessage("resume", TMessageType.Call, seqid_));
         resume_args args = new resume_args();
@@ -182,13 +186,13 @@ namespace HPGC.HiGIS.Server
         return;
       }
 
-      public void cancel(int client_ticket)
+      public void cancel(long client_ticket)
       {
         send_cancel(client_ticket);
         recv_cancel();
       }
 
-      public void send_cancel(int client_ticket)
+      public void send_cancel(long client_ticket)
       {
         oprot_.WriteMessageBegin(new TMessage("cancel", TMessageType.Call, seqid_));
         cancel_args args = new cancel_args();
@@ -212,13 +216,13 @@ namespace HPGC.HiGIS.Server
         return;
       }
 
-      public Result get_status(int client_ticket)
+      public Result get_status(long client_ticket)
       {
         send_get_status(client_ticket);
         return recv_get_status();
       }
 
-      public void send_get_status(int client_ticket)
+      public void send_get_status(long client_ticket)
       {
         oprot_.WriteMessageBegin(new TMessage("get_status", TMessageType.Call, seqid_));
         get_status_args args = new get_status_args();
@@ -245,6 +249,71 @@ namespace HPGC.HiGIS.Server
         throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "get_status failed: unknown result");
       }
 
+      public List<long> get_my_requests(string user_id)
+      {
+        send_get_my_requests(user_id);
+        return recv_get_my_requests();
+      }
+
+      public void send_get_my_requests(string user_id)
+      {
+        oprot_.WriteMessageBegin(new TMessage("get_my_requests", TMessageType.Call, seqid_));
+        get_my_requests_args args = new get_my_requests_args();
+        args.User_id = user_id;
+        args.Write(oprot_);
+        oprot_.WriteMessageEnd();
+        oprot_.Transport.Flush();
+      }
+
+      public List<long> recv_get_my_requests()
+      {
+        TMessage msg = iprot_.ReadMessageBegin();
+        if (msg.Type == TMessageType.Exception) {
+          TApplicationException x = TApplicationException.Read(iprot_);
+          iprot_.ReadMessageEnd();
+          throw x;
+        }
+        get_my_requests_result result = new get_my_requests_result();
+        result.Read(iprot_);
+        iprot_.ReadMessageEnd();
+        if (result.__isset.success) {
+          return result.Success;
+        }
+        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "get_my_requests failed: unknown result");
+      }
+
+      public List<long> get_all_requests()
+      {
+        send_get_all_requests();
+        return recv_get_all_requests();
+      }
+
+      public void send_get_all_requests()
+      {
+        oprot_.WriteMessageBegin(new TMessage("get_all_requests", TMessageType.Call, seqid_));
+        get_all_requests_args args = new get_all_requests_args();
+        args.Write(oprot_);
+        oprot_.WriteMessageEnd();
+        oprot_.Transport.Flush();
+      }
+
+      public List<long> recv_get_all_requests()
+      {
+        TMessage msg = iprot_.ReadMessageBegin();
+        if (msg.Type == TMessageType.Exception) {
+          TApplicationException x = TApplicationException.Read(iprot_);
+          iprot_.ReadMessageEnd();
+          throw x;
+        }
+        get_all_requests_result result = new get_all_requests_result();
+        result.Read(iprot_);
+        iprot_.ReadMessageEnd();
+        if (result.__isset.success) {
+          return result.Success;
+        }
+        throw new TApplicationException(TApplicationException.ExceptionType.MissingResult, "get_all_requests failed: unknown result");
+      }
+
     }
     public class Processor : TProcessor {
       public Processor(Iface iface)
@@ -256,6 +325,8 @@ namespace HPGC.HiGIS.Server
         processMap_["resume"] = resume_Process;
         processMap_["cancel"] = cancel_Process;
         processMap_["get_status"] = get_status_Process;
+        processMap_["get_my_requests"] = get_my_requests_Process;
+        processMap_["get_all_requests"] = get_all_requests_Process;
       }
 
       protected delegate void ProcessFunction(int seqid, TProtocol iprot, TProtocol oprot);
@@ -295,7 +366,7 @@ namespace HPGC.HiGIS.Server
         iprot.ReadMessageEnd();
         start_single_job_result result = new start_single_job_result();
         try {
-          result.Success = iface_.start_single_job(args.Job);
+          result.Success = iface_.start_single_job(args.Job, args.User_id);
         } catch (HpgcJobException e) {
           result.E = e;
         }
@@ -312,7 +383,7 @@ namespace HPGC.HiGIS.Server
         iprot.ReadMessageEnd();
         start_result result = new start_result();
         try {
-          result.Success = iface_.start(args.Flow);
+          result.Success = iface_.start(args.Flow, args.User_id);
         } catch (HpgcJobException e) {
           result.E = e;
         }
@@ -374,6 +445,32 @@ namespace HPGC.HiGIS.Server
         oprot.Transport.Flush();
       }
 
+      public void get_my_requests_Process(int seqid, TProtocol iprot, TProtocol oprot)
+      {
+        get_my_requests_args args = new get_my_requests_args();
+        args.Read(iprot);
+        iprot.ReadMessageEnd();
+        get_my_requests_result result = new get_my_requests_result();
+        result.Success = iface_.get_my_requests(args.User_id);
+        oprot.WriteMessageBegin(new TMessage("get_my_requests", TMessageType.Reply, seqid)); 
+        result.Write(oprot);
+        oprot.WriteMessageEnd();
+        oprot.Transport.Flush();
+      }
+
+      public void get_all_requests_Process(int seqid, TProtocol iprot, TProtocol oprot)
+      {
+        get_all_requests_args args = new get_all_requests_args();
+        args.Read(iprot);
+        iprot.ReadMessageEnd();
+        get_all_requests_result result = new get_all_requests_result();
+        result.Success = iface_.get_all_requests();
+        oprot.WriteMessageBegin(new TMessage("get_all_requests", TMessageType.Reply, seqid)); 
+        result.Write(oprot);
+        oprot.WriteMessageEnd();
+        oprot.Transport.Flush();
+      }
+
     }
 
 
@@ -381,6 +478,7 @@ namespace HPGC.HiGIS.Server
     public partial class start_single_job_args : TBase
     {
       private Job _job;
+      private string _user_id;
 
       public Job Job
       {
@@ -395,11 +493,25 @@ namespace HPGC.HiGIS.Server
         }
       }
 
+      public string User_id
+      {
+        get
+        {
+          return _user_id;
+        }
+        set
+        {
+          __isset.user_id = true;
+          this._user_id = value;
+        }
+      }
+
 
       public Isset __isset;
       [Serializable]
       public struct Isset {
         public bool job;
+        public bool user_id;
       }
 
       public start_single_job_args() {
@@ -425,6 +537,13 @@ namespace HPGC.HiGIS.Server
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
+            case 2:
+              if (field.Type == TType.String) {
+                User_id = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
             default: 
               TProtocolUtil.Skip(iprot, field.Type);
               break;
@@ -446,6 +565,14 @@ namespace HPGC.HiGIS.Server
           Job.Write(oprot);
           oprot.WriteFieldEnd();
         }
+        if (User_id != null && __isset.user_id) {
+          field.Name = "user_id";
+          field.Type = TType.String;
+          field.ID = 2;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(User_id);
+          oprot.WriteFieldEnd();
+        }
         oprot.WriteFieldStop();
         oprot.WriteStructEnd();
       }
@@ -454,6 +581,8 @@ namespace HPGC.HiGIS.Server
         StringBuilder sb = new StringBuilder("start_single_job_args(");
         sb.Append("Job: ");
         sb.Append(Job== null ? "<null>" : Job.ToString());
+        sb.Append(",User_id: ");
+        sb.Append(User_id);
         sb.Append(")");
         return sb.ToString();
       }
@@ -464,10 +593,10 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class start_single_job_result : TBase
     {
-      private int _success;
+      private long _success;
       private HpgcJobException _e;
 
-      public int Success
+      public long Success
       {
         get
         {
@@ -517,8 +646,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 0:
-              if (field.Type == TType.I32) {
-                Success = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Success = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -547,10 +676,10 @@ namespace HPGC.HiGIS.Server
 
         if (this.__isset.success) {
           field.Name = "Success";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 0;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Success);
+          oprot.WriteI64(Success);
           oprot.WriteFieldEnd();
         } else if (this.__isset.e) {
           if (E != null) {
@@ -583,6 +712,7 @@ namespace HPGC.HiGIS.Server
     public partial class start_args : TBase
     {
       private JobFlow _flow;
+      private string _user_id;
 
       public JobFlow Flow
       {
@@ -597,11 +727,25 @@ namespace HPGC.HiGIS.Server
         }
       }
 
+      public string User_id
+      {
+        get
+        {
+          return _user_id;
+        }
+        set
+        {
+          __isset.user_id = true;
+          this._user_id = value;
+        }
+      }
+
 
       public Isset __isset;
       [Serializable]
       public struct Isset {
         public bool flow;
+        public bool user_id;
       }
 
       public start_args() {
@@ -627,6 +771,13 @@ namespace HPGC.HiGIS.Server
                 TProtocolUtil.Skip(iprot, field.Type);
               }
               break;
+            case 2:
+              if (field.Type == TType.String) {
+                User_id = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
             default: 
               TProtocolUtil.Skip(iprot, field.Type);
               break;
@@ -648,6 +799,14 @@ namespace HPGC.HiGIS.Server
           Flow.Write(oprot);
           oprot.WriteFieldEnd();
         }
+        if (User_id != null && __isset.user_id) {
+          field.Name = "user_id";
+          field.Type = TType.String;
+          field.ID = 2;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(User_id);
+          oprot.WriteFieldEnd();
+        }
         oprot.WriteFieldStop();
         oprot.WriteStructEnd();
       }
@@ -656,6 +815,8 @@ namespace HPGC.HiGIS.Server
         StringBuilder sb = new StringBuilder("start_args(");
         sb.Append("Flow: ");
         sb.Append(Flow== null ? "<null>" : Flow.ToString());
+        sb.Append(",User_id: ");
+        sb.Append(User_id);
         sb.Append(")");
         return sb.ToString();
       }
@@ -666,10 +827,10 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class start_result : TBase
     {
-      private int _success;
+      private long _success;
       private HpgcJobException _e;
 
-      public int Success
+      public long Success
       {
         get
         {
@@ -719,8 +880,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 0:
-              if (field.Type == TType.I32) {
-                Success = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Success = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -749,10 +910,10 @@ namespace HPGC.HiGIS.Server
 
         if (this.__isset.success) {
           field.Name = "Success";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 0;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Success);
+          oprot.WriteI64(Success);
           oprot.WriteFieldEnd();
         } else if (this.__isset.e) {
           if (E != null) {
@@ -784,9 +945,9 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class pause_args : TBase
     {
-      private int _client_ticket;
+      private long _client_ticket;
 
-      public int Client_ticket
+      public long Client_ticket
       {
         get
         {
@@ -822,8 +983,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.I32) {
-                Client_ticket = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Client_ticket = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -843,10 +1004,10 @@ namespace HPGC.HiGIS.Server
         TField field = new TField();
         if (__isset.client_ticket) {
           field.Name = "client_ticket";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Client_ticket);
+          oprot.WriteI64(Client_ticket);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -912,9 +1073,9 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class resume_args : TBase
     {
-      private int _client_ticket;
+      private long _client_ticket;
 
-      public int Client_ticket
+      public long Client_ticket
       {
         get
         {
@@ -950,8 +1111,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.I32) {
-                Client_ticket = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Client_ticket = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -971,10 +1132,10 @@ namespace HPGC.HiGIS.Server
         TField field = new TField();
         if (__isset.client_ticket) {
           field.Name = "client_ticket";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Client_ticket);
+          oprot.WriteI64(Client_ticket);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -1040,9 +1201,9 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class cancel_args : TBase
     {
-      private int _client_ticket;
+      private long _client_ticket;
 
-      public int Client_ticket
+      public long Client_ticket
       {
         get
         {
@@ -1078,8 +1239,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.I32) {
-                Client_ticket = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Client_ticket = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -1099,10 +1260,10 @@ namespace HPGC.HiGIS.Server
         TField field = new TField();
         if (__isset.client_ticket) {
           field.Name = "client_ticket";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Client_ticket);
+          oprot.WriteI64(Client_ticket);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -1168,9 +1329,9 @@ namespace HPGC.HiGIS.Server
     [Serializable]
     public partial class get_status_args : TBase
     {
-      private int _client_ticket;
+      private long _client_ticket;
 
-      public int Client_ticket
+      public long Client_ticket
       {
         get
         {
@@ -1206,8 +1367,8 @@ namespace HPGC.HiGIS.Server
           switch (field.ID)
           {
             case 1:
-              if (field.Type == TType.I32) {
-                Client_ticket = iprot.ReadI32();
+              if (field.Type == TType.I64) {
+                Client_ticket = iprot.ReadI64();
               } else { 
                 TProtocolUtil.Skip(iprot, field.Type);
               }
@@ -1227,10 +1388,10 @@ namespace HPGC.HiGIS.Server
         TField field = new TField();
         if (__isset.client_ticket) {
           field.Name = "client_ticket";
-          field.Type = TType.I32;
+          field.Type = TType.I64;
           field.ID = 1;
           oprot.WriteFieldBegin(field);
-          oprot.WriteI32(Client_ticket);
+          oprot.WriteI64(Client_ticket);
           oprot.WriteFieldEnd();
         }
         oprot.WriteFieldStop();
@@ -1328,6 +1489,339 @@ namespace HPGC.HiGIS.Server
         StringBuilder sb = new StringBuilder("get_status_result(");
         sb.Append("Success: ");
         sb.Append(Success== null ? "<null>" : Success.ToString());
+        sb.Append(")");
+        return sb.ToString();
+      }
+
+    }
+
+
+    [Serializable]
+    public partial class get_my_requests_args : TBase
+    {
+      private string _user_id;
+
+      public string User_id
+      {
+        get
+        {
+          return _user_id;
+        }
+        set
+        {
+          __isset.user_id = true;
+          this._user_id = value;
+        }
+      }
+
+
+      public Isset __isset;
+      [Serializable]
+      public struct Isset {
+        public bool user_id;
+      }
+
+      public get_my_requests_args() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            case 1:
+              if (field.Type == TType.String) {
+                User_id = iprot.ReadString();
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("get_my_requests_args");
+        oprot.WriteStructBegin(struc);
+        TField field = new TField();
+        if (User_id != null && __isset.user_id) {
+          field.Name = "user_id";
+          field.Type = TType.String;
+          field.ID = 1;
+          oprot.WriteFieldBegin(field);
+          oprot.WriteString(User_id);
+          oprot.WriteFieldEnd();
+        }
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder sb = new StringBuilder("get_my_requests_args(");
+        sb.Append("User_id: ");
+        sb.Append(User_id);
+        sb.Append(")");
+        return sb.ToString();
+      }
+
+    }
+
+
+    [Serializable]
+    public partial class get_my_requests_result : TBase
+    {
+      private List<long> _success;
+
+      public List<long> Success
+      {
+        get
+        {
+          return _success;
+        }
+        set
+        {
+          __isset.success = true;
+          this._success = value;
+        }
+      }
+
+
+      public Isset __isset;
+      [Serializable]
+      public struct Isset {
+        public bool success;
+      }
+
+      public get_my_requests_result() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            case 0:
+              if (field.Type == TType.List) {
+                {
+                  Success = new List<long>();
+                  TList _list26 = iprot.ReadListBegin();
+                  for( int _i27 = 0; _i27 < _list26.Count; ++_i27)
+                  {
+                    long _elem28 = 0;
+                    _elem28 = iprot.ReadI64();
+                    Success.Add(_elem28);
+                  }
+                  iprot.ReadListEnd();
+                }
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("get_my_requests_result");
+        oprot.WriteStructBegin(struc);
+        TField field = new TField();
+
+        if (this.__isset.success) {
+          if (Success != null) {
+            field.Name = "Success";
+            field.Type = TType.List;
+            field.ID = 0;
+            oprot.WriteFieldBegin(field);
+            {
+              oprot.WriteListBegin(new TList(TType.I64, Success.Count));
+              foreach (long _iter29 in Success)
+              {
+                oprot.WriteI64(_iter29);
+              }
+              oprot.WriteListEnd();
+            }
+            oprot.WriteFieldEnd();
+          }
+        }
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder sb = new StringBuilder("get_my_requests_result(");
+        sb.Append("Success: ");
+        sb.Append(Success);
+        sb.Append(")");
+        return sb.ToString();
+      }
+
+    }
+
+
+    [Serializable]
+    public partial class get_all_requests_args : TBase
+    {
+
+      public get_all_requests_args() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("get_all_requests_args");
+        oprot.WriteStructBegin(struc);
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder sb = new StringBuilder("get_all_requests_args(");
+        sb.Append(")");
+        return sb.ToString();
+      }
+
+    }
+
+
+    [Serializable]
+    public partial class get_all_requests_result : TBase
+    {
+      private List<long> _success;
+
+      public List<long> Success
+      {
+        get
+        {
+          return _success;
+        }
+        set
+        {
+          __isset.success = true;
+          this._success = value;
+        }
+      }
+
+
+      public Isset __isset;
+      [Serializable]
+      public struct Isset {
+        public bool success;
+      }
+
+      public get_all_requests_result() {
+      }
+
+      public void Read (TProtocol iprot)
+      {
+        TField field;
+        iprot.ReadStructBegin();
+        while (true)
+        {
+          field = iprot.ReadFieldBegin();
+          if (field.Type == TType.Stop) { 
+            break;
+          }
+          switch (field.ID)
+          {
+            case 0:
+              if (field.Type == TType.List) {
+                {
+                  Success = new List<long>();
+                  TList _list30 = iprot.ReadListBegin();
+                  for( int _i31 = 0; _i31 < _list30.Count; ++_i31)
+                  {
+                    long _elem32 = 0;
+                    _elem32 = iprot.ReadI64();
+                    Success.Add(_elem32);
+                  }
+                  iprot.ReadListEnd();
+                }
+              } else { 
+                TProtocolUtil.Skip(iprot, field.Type);
+              }
+              break;
+            default: 
+              TProtocolUtil.Skip(iprot, field.Type);
+              break;
+          }
+          iprot.ReadFieldEnd();
+        }
+        iprot.ReadStructEnd();
+      }
+
+      public void Write(TProtocol oprot) {
+        TStruct struc = new TStruct("get_all_requests_result");
+        oprot.WriteStructBegin(struc);
+        TField field = new TField();
+
+        if (this.__isset.success) {
+          if (Success != null) {
+            field.Name = "Success";
+            field.Type = TType.List;
+            field.ID = 0;
+            oprot.WriteFieldBegin(field);
+            {
+              oprot.WriteListBegin(new TList(TType.I64, Success.Count));
+              foreach (long _iter33 in Success)
+              {
+                oprot.WriteI64(_iter33);
+              }
+              oprot.WriteListEnd();
+            }
+            oprot.WriteFieldEnd();
+          }
+        }
+        oprot.WriteFieldStop();
+        oprot.WriteStructEnd();
+      }
+
+      public override string ToString() {
+        StringBuilder sb = new StringBuilder("get_all_requests_result(");
+        sb.Append("Success: ");
+        sb.Append(Success);
         sb.Append(")");
         return sb.ToString();
       }

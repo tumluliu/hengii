@@ -28,5 +28,6 @@ const string RUN_LOG_FILE     = @RUN_LOG_FILE@;
 const string PBS_SERVER_HOST  = @PBS_SERVER_HOST@;
 const string PBS_OUT_DIR      = @PBS_OUT_DIR@;
 const string APP_DIR          = @APP_DIR@;
+const string MONITOR_PATH     = @MONITOR_PATH@;
 
 #endif

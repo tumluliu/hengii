@@ -18,7 +18,7 @@
 #ifndef _HPGCJOBHANDLER_H_
 #define _HPGCJOBHANDLER_H_
 
-#include "session.h"
+#include "request.h"
 #include "utility.h"
 #include "config.h"
 
@@ -29,7 +29,7 @@ extern "C"
 }
 
 const string PROJECT_NAME = "HiGIS";
-const int SESSION_POOL_SIZE = 256;
+const int REQUEST_POOL_SIZE = 256;
 const int JOB_STATUS_FINISHED = 0;
 const int JOB_STATUS_UNFINISHED = 1;
 const int JOB_STATUS_FAILED= -1;
@@ -40,18 +40,20 @@ using namespace HPGC::HiGIS::Server;
 
 class HpgcJobHandler : virtual public HpgcJobIf {
 	private:
-		map<int, Session> sessionPool;
-		map<int, Session>::const_iterator sessionItr;
-		int findEmptyPoolSlot();
-		int generateSessionId();
+		map<int64_t, Request> requestPool;
+		map<int64_t, Request>::const_iterator requestItr;
+		int64_t findEmptyPoolSlot();
+		int64_t generateRequestId();
+		void addRequest();
 	public:
 		HpgcJobHandler();
-		int32_t start_single_job(const Job& job);
-		int32_t start(const JobFlow& flow);
-		void pause(const int32_t client_ticket);
-		void resume(const int32_t client_ticket);
-		void cancel(const int32_t client_ticket);
-		void get_status(Result& _return, const int32_t client_ticket);
+		int64_t start_single_job(const Job& job);
+		int64_t start(const JobFlow& flow);
+		void pause(const int64_t client_ticket);
+		void resume(const int64_t client_ticket);
+		void cancel(const int64_t client_ticket);
+		void get_status(Result& _return, const int64_t client_ticket);
+		void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id); 
 };
 
 #endif

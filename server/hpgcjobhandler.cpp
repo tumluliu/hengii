@@ -21,67 +21,73 @@
 #include "hpgcjobhandler.h"
 #include "logger.h"
 
-int HpgcJobHandler::findEmptyPoolSlot() {
-	sessionItr = sessionPool.begin();
-	while (sessionItr != sessionPool.end()) {
-		if ((sessionItr->second).isAvailable())
-			return sessionItr->first;
-		sessionItr++;
+int64_t HpgcJobHandler::findEmptyPoolSlot() {
+	requestItr = requestPool.begin();
+	while (requestItr != requestPool.end()) {
+		if ((requestItr->second).isAvailable())
+			return requestItr->first;
+		requestItr++;
 	}
 	return -1;
 }
 
-int HpgcJobHandler::generateSessionId() {
+int64_t HpgcJobHandler::generateRequestId() {
 	struct timeval now;
-	int id;
+	int64_t id;
 	do {
 		gettimeofday(&now, NULL);
 		srand(now.tv_usec);
 		id = rand();
-	} while (sessionPool.count(id));	
+	} while (requestPool.count(id));	
 	return id;
 }
 
 HpgcJobHandler::HpgcJobHandler() {
-	for (int i = 0; i < SESSION_POOL_SIZE; i++) {
-		int id = generateSessionId();
-		Session s(id);
-		sessionPool.insert(map<int, Session>::value_type(id, s));
+	for (int i = 0; i < REQUEST_POOL_SIZE; i++) {
+		addRequest();
 	}
 }
 
-int32_t HpgcJobHandler::start_single_job(const Job& job) {
+void HpgcJobHandler::addRequest() {
+	int64_t id = generateRequestId();
+	Request s(id);
+	requestPool.insert(map<int64_t, Request>::value_type(id, s));
+}
+
+int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user_id) {
 	Logger::log(STDOUT, DEBUG, ENGINE, "start single job, which is a just a grammer candy of start job flow");
 	JobFlow flow;
 	flow.job_count = 1;
 	flow.jobs.push_back(job);
-	return start(flow); 
+	return start(flow, user_id); 
 }
 
-int32_t HpgcJobHandler::start(const JobFlow& flow) {
+int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
 	Logger::log(STDOUT, INFO, ENGINE, "Start processing " + PROJECT_NAME + " job flow...");
 	stringstream msg;
 	msg << "number of jobs in this flow: " << flow.job_count;
 	Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
-	int idleSessionId;
+	int64_t idleRequestId;
 	do {
-		idleSessionId = findEmptyPoolSlot();
-	} while (idleSessionId == -1);
-	Session *activeSession =  &sessionPool[idleSessionId];
-	activeSession->init(flow);
-	activeSession->setAvailable(false);
-	if (activeSession->createJobThreads() != 0) {
+		idleRequestId = findEmptyPoolSlot();
+	} while (idleRequestId == -1);
+	Request *activeRequest =  &requestPool[idleRequestId];
+	activeRequest->setAvailable(false);
+	activeRequest->init(flow);
+	activeRequest->setUserId(user_id);
+	if (activeRequest->createJobThreads() != 0) {
 		Logger::log(STDOUT, ERROR, ENGINE, "Create job thread failed. Job flow processing is terminated.");
-		activeSession->finalize();
-		activeSession->setAvailable(true);
+		activeRequest->finalize();
+		requestPool.erase(idleRequestId);
+		addRequest();
 	}
-	return static_cast<int32_t>(idleSessionId);
+	return static_cast<int64_t>(idleRequestId);
 }
 
-void HpgcJobHandler::pause(const int32_t client_ticket) {
+void HpgcJobHandler::pause(const int64_t client_ticket, const std::string& user_id) {
 	string sig = "suspend";
-	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
-		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
+	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
+		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() == JobStatus::RUNNING)
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
@@ -97,10 +103,10 @@ void HpgcJobHandler::pause(const int32_t client_ticket) {
 	Logger::log(STDOUT, INFO, ENGINE, "job flow paused.");
 }
 
-void HpgcJobHandler::resume(const int32_t client_ticket) {
+void HpgcJobHandler::resume(const int64_t client_ticket, const std::string& user_id) {
 	string sig = "resume";
-	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
-		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
+	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
+		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() == JobStatus::PAUSED) {
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
@@ -115,9 +121,9 @@ void HpgcJobHandler::resume(const int32_t client_ticket) {
 	Logger::log(STDOUT, INFO, ENGINE, "job flow resumed.");
 }
 
-void HpgcJobHandler::cancel(const int32_t client_ticket) {
-	for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {	
-		JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
+void HpgcJobHandler::cancel(const int64_t client_ticket, const std::string& user_id) {
+	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {	
+		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() != JobStatus::RUNNING && tracker.getStatus() != JobStatus::FAILED ) {
 			pbs_deljob(tracker.getConnection(), 
 					const_cast<char*>((tracker.getId()).c_str()), 0);
@@ -131,8 +137,8 @@ void HpgcJobHandler::cancel(const int32_t client_ticket) {
 	Logger::log(STDOUT, INFO, ENGINE, "job flow canceled.");
 }
 
-void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
-	if (sessionPool.count(client_ticket) == 0) {
+void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
+	if (requestPool.count(client_ticket) == 0) {
 		_return.flow_status = Status::NOT_EXIST;
 		_return.message = "get status error, job id not exist";
 		Logger::log(STDOUT, ERROR, ENGINE, _return.message);
@@ -141,8 +147,8 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 		_return.flow_status = Status::FINISHED;
 		_return.message = "";
 
-		for (int i = 0; i < sessionPool[client_ticket].getJobCount(); i++) {
-			JobTracker tracker = sessionPool[client_ticket].getJobTrackerAt(i);
+		for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
+			JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
 			JobResult jr;
 			jr.message = tracker.getResult();
 			jr.status = tracker.getStatus();
@@ -163,13 +169,13 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 		}
 
 		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {
-			sessionPool[client_ticket].setAvailable(true);
-			sessionPool[client_ticket].finalize();
-			Logger::log(STDOUT, INFO, ENGINE, "request session resource released. ");
+			requestPool[client_ticket].setAvailable(true);
+			requestPool[client_ticket].finalize();
+			Logger::log(STDOUT, INFO, ENGINE, "request resource released. ");
 		}
 
 		//	cout<<"HPGC flow finished."<<endl;
-		//	!!!! the finalize of the current active session should not be placed only here
+		//	!!!! the finalize of the current active request should not be placed only here
 		//	it should be invoked when the job or jobflow is really finished. !!!!
 		//	by Liu Lu
 		//	2012/3/19
@@ -177,3 +183,17 @@ void HpgcJobHandler::get_status(Result& _return, const int32_t client_ticket) {
 	//  pthread_cond_destroy(&waitingCond);
 }
 
+void HpgcJobHandler::get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
+	map<int64_t, Request>::const_iterator it = requestPool.begin();
+	while(it != requestPool.end()) {
+		if ((it->second).getUserId() == user_id) {
+			_return.push_back(it->first);
+		}
+		it++;
+	} 
+}
+
+void get_all_requests(std::vector<int64_t> & _return) {
+	// warning!!!
+	// Not implemente yet. The clients now rely on database for fast implementation
+}

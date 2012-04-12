@@ -15,12 +15,14 @@ namespace HPGC { namespace HiGIS { namespace Server {
 class HpgcJobIf {
  public:
   virtual ~HpgcJobIf() {}
-  virtual int32_t start_single_job(const Job& job) = 0;
-  virtual int32_t start(const JobFlow& flow) = 0;
-  virtual void pause(const int32_t client_ticket) = 0;
-  virtual void resume(const int32_t client_ticket) = 0;
-  virtual void cancel(const int32_t client_ticket) = 0;
-  virtual void get_status(Result& _return, const int32_t client_ticket) = 0;
+  virtual int64_t start_single_job(const Job& job, const std::string& user_id) = 0;
+  virtual int64_t start(const JobFlow& flow, const std::string& user_id) = 0;
+  virtual void pause(const int64_t client_ticket) = 0;
+  virtual void resume(const int64_t client_ticket) = 0;
+  virtual void cancel(const int64_t client_ticket) = 0;
+  virtual void get_status(Result& _return, const int64_t client_ticket) = 0;
+  virtual void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) = 0;
+  virtual void get_all_requests(std::vector<int64_t> & _return) = 0;
 };
 
 class HpgcJobIfFactory {
@@ -50,42 +52,50 @@ class HpgcJobIfSingletonFactory : virtual public HpgcJobIfFactory {
 class HpgcJobNull : virtual public HpgcJobIf {
  public:
   virtual ~HpgcJobNull() {}
-  int32_t start_single_job(const Job& /* job */) {
-    int32_t _return = 0;
+  int64_t start_single_job(const Job& /* job */, const std::string& /* user_id */) {
+    int64_t _return = 0;
     return _return;
   }
-  int32_t start(const JobFlow& /* flow */) {
-    int32_t _return = 0;
+  int64_t start(const JobFlow& /* flow */, const std::string& /* user_id */) {
+    int64_t _return = 0;
     return _return;
   }
-  void pause(const int32_t /* client_ticket */) {
+  void pause(const int64_t /* client_ticket */) {
     return;
   }
-  void resume(const int32_t /* client_ticket */) {
+  void resume(const int64_t /* client_ticket */) {
     return;
   }
-  void cancel(const int32_t /* client_ticket */) {
+  void cancel(const int64_t /* client_ticket */) {
     return;
   }
-  void get_status(Result& /* _return */, const int32_t /* client_ticket */) {
+  void get_status(Result& /* _return */, const int64_t /* client_ticket */) {
+    return;
+  }
+  void get_my_requests(std::vector<int64_t> & /* _return */, const std::string& /* user_id */) {
+    return;
+  }
+  void get_all_requests(std::vector<int64_t> & /* _return */) {
     return;
   }
 };
 
 typedef struct _HpgcJob_start_single_job_args__isset {
-  _HpgcJob_start_single_job_args__isset() : job(false) {}
+  _HpgcJob_start_single_job_args__isset() : job(false), user_id(false) {}
   bool job;
+  bool user_id;
 } _HpgcJob_start_single_job_args__isset;
 
 class HpgcJob_start_single_job_args {
  public:
 
-  HpgcJob_start_single_job_args() {
+  HpgcJob_start_single_job_args() : user_id("") {
   }
 
   virtual ~HpgcJob_start_single_job_args() throw() {}
 
   Job job;
+  std::string user_id;
 
   _HpgcJob_start_single_job_args__isset __isset;
 
@@ -93,9 +103,15 @@ class HpgcJob_start_single_job_args {
     job = val;
   }
 
+  void __set_user_id(const std::string& val) {
+    user_id = val;
+  }
+
   bool operator == (const HpgcJob_start_single_job_args & rhs) const
   {
     if (!(job == rhs.job))
+      return false;
+    if (!(user_id == rhs.user_id))
       return false;
     return true;
   }
@@ -118,6 +134,7 @@ class HpgcJob_start_single_job_pargs {
   virtual ~HpgcJob_start_single_job_pargs() throw() {}
 
   const Job* job;
+  const std::string* user_id;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -137,12 +154,12 @@ class HpgcJob_start_single_job_result {
 
   virtual ~HpgcJob_start_single_job_result() throw() {}
 
-  int32_t success;
+  int64_t success;
   HpgcJobException e;
 
   _HpgcJob_start_single_job_result__isset __isset;
 
-  void __set_success(const int32_t val) {
+  void __set_success(const int64_t val) {
     success = val;
   }
 
@@ -181,7 +198,7 @@ class HpgcJob_start_single_job_presult {
 
   virtual ~HpgcJob_start_single_job_presult() throw() {}
 
-  int32_t* success;
+  int64_t* success;
   HpgcJobException e;
 
   _HpgcJob_start_single_job_presult__isset __isset;
@@ -191,19 +208,21 @@ class HpgcJob_start_single_job_presult {
 };
 
 typedef struct _HpgcJob_start_args__isset {
-  _HpgcJob_start_args__isset() : flow(false) {}
+  _HpgcJob_start_args__isset() : flow(false), user_id(false) {}
   bool flow;
+  bool user_id;
 } _HpgcJob_start_args__isset;
 
 class HpgcJob_start_args {
  public:
 
-  HpgcJob_start_args() {
+  HpgcJob_start_args() : user_id("") {
   }
 
   virtual ~HpgcJob_start_args() throw() {}
 
   JobFlow flow;
+  std::string user_id;
 
   _HpgcJob_start_args__isset __isset;
 
@@ -211,9 +230,15 @@ class HpgcJob_start_args {
     flow = val;
   }
 
+  void __set_user_id(const std::string& val) {
+    user_id = val;
+  }
+
   bool operator == (const HpgcJob_start_args & rhs) const
   {
     if (!(flow == rhs.flow))
+      return false;
+    if (!(user_id == rhs.user_id))
       return false;
     return true;
   }
@@ -236,6 +261,7 @@ class HpgcJob_start_pargs {
   virtual ~HpgcJob_start_pargs() throw() {}
 
   const JobFlow* flow;
+  const std::string* user_id;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -255,12 +281,12 @@ class HpgcJob_start_result {
 
   virtual ~HpgcJob_start_result() throw() {}
 
-  int32_t success;
+  int64_t success;
   HpgcJobException e;
 
   _HpgcJob_start_result__isset __isset;
 
-  void __set_success(const int32_t val) {
+  void __set_success(const int64_t val) {
     success = val;
   }
 
@@ -299,7 +325,7 @@ class HpgcJob_start_presult {
 
   virtual ~HpgcJob_start_presult() throw() {}
 
-  int32_t* success;
+  int64_t* success;
   HpgcJobException e;
 
   _HpgcJob_start_presult__isset __isset;
@@ -321,11 +347,11 @@ class HpgcJob_pause_args {
 
   virtual ~HpgcJob_pause_args() throw() {}
 
-  int32_t client_ticket;
+  int64_t client_ticket;
 
   _HpgcJob_pause_args__isset __isset;
 
-  void __set_client_ticket(const int32_t val) {
+  void __set_client_ticket(const int64_t val) {
     client_ticket = val;
   }
 
@@ -353,7 +379,7 @@ class HpgcJob_pause_pargs {
 
   virtual ~HpgcJob_pause_pargs() throw() {}
 
-  const int32_t* client_ticket;
+  const int64_t* client_ticket;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -409,11 +435,11 @@ class HpgcJob_resume_args {
 
   virtual ~HpgcJob_resume_args() throw() {}
 
-  int32_t client_ticket;
+  int64_t client_ticket;
 
   _HpgcJob_resume_args__isset __isset;
 
-  void __set_client_ticket(const int32_t val) {
+  void __set_client_ticket(const int64_t val) {
     client_ticket = val;
   }
 
@@ -441,7 +467,7 @@ class HpgcJob_resume_pargs {
 
   virtual ~HpgcJob_resume_pargs() throw() {}
 
-  const int32_t* client_ticket;
+  const int64_t* client_ticket;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -497,11 +523,11 @@ class HpgcJob_cancel_args {
 
   virtual ~HpgcJob_cancel_args() throw() {}
 
-  int32_t client_ticket;
+  int64_t client_ticket;
 
   _HpgcJob_cancel_args__isset __isset;
 
-  void __set_client_ticket(const int32_t val) {
+  void __set_client_ticket(const int64_t val) {
     client_ticket = val;
   }
 
@@ -529,7 +555,7 @@ class HpgcJob_cancel_pargs {
 
   virtual ~HpgcJob_cancel_pargs() throw() {}
 
-  const int32_t* client_ticket;
+  const int64_t* client_ticket;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -585,11 +611,11 @@ class HpgcJob_get_status_args {
 
   virtual ~HpgcJob_get_status_args() throw() {}
 
-  int32_t client_ticket;
+  int64_t client_ticket;
 
   _HpgcJob_get_status_args__isset __isset;
 
-  void __set_client_ticket(const int32_t val) {
+  void __set_client_ticket(const int64_t val) {
     client_ticket = val;
   }
 
@@ -617,7 +643,7 @@ class HpgcJob_get_status_pargs {
 
   virtual ~HpgcJob_get_status_pargs() throw() {}
 
-  const int32_t* client_ticket;
+  const int64_t* client_ticket;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -680,6 +706,208 @@ class HpgcJob_get_status_presult {
 
 };
 
+typedef struct _HpgcJob_get_my_requests_args__isset {
+  _HpgcJob_get_my_requests_args__isset() : user_id(false) {}
+  bool user_id;
+} _HpgcJob_get_my_requests_args__isset;
+
+class HpgcJob_get_my_requests_args {
+ public:
+
+  HpgcJob_get_my_requests_args() : user_id("") {
+  }
+
+  virtual ~HpgcJob_get_my_requests_args() throw() {}
+
+  std::string user_id;
+
+  _HpgcJob_get_my_requests_args__isset __isset;
+
+  void __set_user_id(const std::string& val) {
+    user_id = val;
+  }
+
+  bool operator == (const HpgcJob_get_my_requests_args & rhs) const
+  {
+    if (!(user_id == rhs.user_id))
+      return false;
+    return true;
+  }
+  bool operator != (const HpgcJob_get_my_requests_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const HpgcJob_get_my_requests_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class HpgcJob_get_my_requests_pargs {
+ public:
+
+
+  virtual ~HpgcJob_get_my_requests_pargs() throw() {}
+
+  const std::string* user_id;
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _HpgcJob_get_my_requests_result__isset {
+  _HpgcJob_get_my_requests_result__isset() : success(false) {}
+  bool success;
+} _HpgcJob_get_my_requests_result__isset;
+
+class HpgcJob_get_my_requests_result {
+ public:
+
+  HpgcJob_get_my_requests_result() {
+  }
+
+  virtual ~HpgcJob_get_my_requests_result() throw() {}
+
+  std::vector<int64_t>  success;
+
+  _HpgcJob_get_my_requests_result__isset __isset;
+
+  void __set_success(const std::vector<int64_t> & val) {
+    success = val;
+  }
+
+  bool operator == (const HpgcJob_get_my_requests_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const HpgcJob_get_my_requests_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const HpgcJob_get_my_requests_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _HpgcJob_get_my_requests_presult__isset {
+  _HpgcJob_get_my_requests_presult__isset() : success(false) {}
+  bool success;
+} _HpgcJob_get_my_requests_presult__isset;
+
+class HpgcJob_get_my_requests_presult {
+ public:
+
+
+  virtual ~HpgcJob_get_my_requests_presult() throw() {}
+
+  std::vector<int64_t> * success;
+
+  _HpgcJob_get_my_requests_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
+
+class HpgcJob_get_all_requests_args {
+ public:
+
+  HpgcJob_get_all_requests_args() {
+  }
+
+  virtual ~HpgcJob_get_all_requests_args() throw() {}
+
+
+  bool operator == (const HpgcJob_get_all_requests_args & /* rhs */) const
+  {
+    return true;
+  }
+  bool operator != (const HpgcJob_get_all_requests_args &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const HpgcJob_get_all_requests_args & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+
+class HpgcJob_get_all_requests_pargs {
+ public:
+
+
+  virtual ~HpgcJob_get_all_requests_pargs() throw() {}
+
+
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _HpgcJob_get_all_requests_result__isset {
+  _HpgcJob_get_all_requests_result__isset() : success(false) {}
+  bool success;
+} _HpgcJob_get_all_requests_result__isset;
+
+class HpgcJob_get_all_requests_result {
+ public:
+
+  HpgcJob_get_all_requests_result() {
+  }
+
+  virtual ~HpgcJob_get_all_requests_result() throw() {}
+
+  std::vector<int64_t>  success;
+
+  _HpgcJob_get_all_requests_result__isset __isset;
+
+  void __set_success(const std::vector<int64_t> & val) {
+    success = val;
+  }
+
+  bool operator == (const HpgcJob_get_all_requests_result & rhs) const
+  {
+    if (!(success == rhs.success))
+      return false;
+    return true;
+  }
+  bool operator != (const HpgcJob_get_all_requests_result &rhs) const {
+    return !(*this == rhs);
+  }
+
+  bool operator < (const HpgcJob_get_all_requests_result & ) const;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
+
+};
+
+typedef struct _HpgcJob_get_all_requests_presult__isset {
+  _HpgcJob_get_all_requests_presult__isset() : success(false) {}
+  bool success;
+} _HpgcJob_get_all_requests_presult__isset;
+
+class HpgcJob_get_all_requests_presult {
+ public:
+
+
+  virtual ~HpgcJob_get_all_requests_presult() throw() {}
+
+  std::vector<int64_t> * success;
+
+  _HpgcJob_get_all_requests_presult__isset __isset;
+
+  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
+
+};
+
 class HpgcJobClient : virtual public HpgcJobIf {
  public:
   HpgcJobClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
@@ -700,24 +928,30 @@ class HpgcJobClient : virtual public HpgcJobIf {
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  int32_t start_single_job(const Job& job);
-  void send_start_single_job(const Job& job);
-  int32_t recv_start_single_job();
-  int32_t start(const JobFlow& flow);
-  void send_start(const JobFlow& flow);
-  int32_t recv_start();
-  void pause(const int32_t client_ticket);
-  void send_pause(const int32_t client_ticket);
+  int64_t start_single_job(const Job& job, const std::string& user_id);
+  void send_start_single_job(const Job& job, const std::string& user_id);
+  int64_t recv_start_single_job();
+  int64_t start(const JobFlow& flow, const std::string& user_id);
+  void send_start(const JobFlow& flow, const std::string& user_id);
+  int64_t recv_start();
+  void pause(const int64_t client_ticket);
+  void send_pause(const int64_t client_ticket);
   void recv_pause();
-  void resume(const int32_t client_ticket);
-  void send_resume(const int32_t client_ticket);
+  void resume(const int64_t client_ticket);
+  void send_resume(const int64_t client_ticket);
   void recv_resume();
-  void cancel(const int32_t client_ticket);
-  void send_cancel(const int32_t client_ticket);
+  void cancel(const int64_t client_ticket);
+  void send_cancel(const int64_t client_ticket);
   void recv_cancel();
-  void get_status(Result& _return, const int32_t client_ticket);
-  void send_get_status(const int32_t client_ticket);
+  void get_status(Result& _return, const int64_t client_ticket);
+  void send_get_status(const int64_t client_ticket);
   void recv_get_status(Result& _return);
+  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id);
+  void send_get_my_requests(const std::string& user_id);
+  void recv_get_my_requests(std::vector<int64_t> & _return);
+  void get_all_requests(std::vector<int64_t> & _return);
+  void send_get_all_requests();
+  void recv_get_all_requests(std::vector<int64_t> & _return);
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -737,6 +971,8 @@ class HpgcJobProcessor : public ::apache::thrift::TProcessor {
   void process_resume(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_cancel(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_status(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_get_my_requests(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
+  void process_get_all_requests(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   HpgcJobProcessor(boost::shared_ptr<HpgcJobIf> iface) :
     iface_(iface) {
@@ -746,6 +982,8 @@ class HpgcJobProcessor : public ::apache::thrift::TProcessor {
     processMap_["resume"] = &HpgcJobProcessor::process_resume;
     processMap_["cancel"] = &HpgcJobProcessor::process_cancel;
     processMap_["get_status"] = &HpgcJobProcessor::process_get_status;
+    processMap_["get_my_requests"] = &HpgcJobProcessor::process_get_my_requests;
+    processMap_["get_all_requests"] = &HpgcJobProcessor::process_get_all_requests;
   }
 
   virtual bool process(boost::shared_ptr<apache::thrift::protocol::TProtocol> piprot, boost::shared_ptr<apache::thrift::protocol::TProtocol> poprot, void* callContext);
@@ -775,50 +1013,50 @@ class HpgcJobMultiface : virtual public HpgcJobIf {
     ifaces_.push_back(iface);
   }
  public:
-  int32_t start_single_job(const Job& job) {
+  int64_t start_single_job(const Job& job, const std::string& user_id) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       if (i == sz - 1) {
-        return ifaces_[i]->start_single_job(job);
+        return ifaces_[i]->start_single_job(job, user_id);
       } else {
-        ifaces_[i]->start_single_job(job);
+        ifaces_[i]->start_single_job(job, user_id);
       }
     }
   }
 
-  int32_t start(const JobFlow& flow) {
+  int64_t start(const JobFlow& flow, const std::string& user_id) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       if (i == sz - 1) {
-        return ifaces_[i]->start(flow);
+        return ifaces_[i]->start(flow, user_id);
       } else {
-        ifaces_[i]->start(flow);
+        ifaces_[i]->start(flow, user_id);
       }
     }
   }
 
-  void pause(const int32_t client_ticket) {
+  void pause(const int64_t client_ticket) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       ifaces_[i]->pause(client_ticket);
     }
   }
 
-  void resume(const int32_t client_ticket) {
+  void resume(const int64_t client_ticket) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       ifaces_[i]->resume(client_ticket);
     }
   }
 
-  void cancel(const int32_t client_ticket) {
+  void cancel(const int64_t client_ticket) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       ifaces_[i]->cancel(client_ticket);
     }
   }
 
-  void get_status(Result& _return, const int32_t client_ticket) {
+  void get_status(Result& _return, const int64_t client_ticket) {
     size_t sz = ifaces_.size();
     for (size_t i = 0; i < sz; ++i) {
       if (i == sz - 1) {
@@ -826,6 +1064,30 @@ class HpgcJobMultiface : virtual public HpgcJobIf {
         return;
       } else {
         ifaces_[i]->get_status(_return, client_ticket);
+      }
+    }
+  }
+
+  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
+    size_t sz = ifaces_.size();
+    for (size_t i = 0; i < sz; ++i) {
+      if (i == sz - 1) {
+        ifaces_[i]->get_my_requests(_return, user_id);
+        return;
+      } else {
+        ifaces_[i]->get_my_requests(_return, user_id);
+      }
+    }
+  }
+
+  void get_all_requests(std::vector<int64_t> & _return) {
+    size_t sz = ifaces_.size();
+    for (size_t i = 0; i < sz; ++i) {
+      if (i == sz - 1) {
+        ifaces_[i]->get_all_requests(_return);
+        return;
+      } else {
+        ifaces_[i]->get_all_requests(_return);
       }
     }
   }

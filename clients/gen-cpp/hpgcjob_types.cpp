@@ -46,15 +46,17 @@ int _kStatusValues[] = {
   Status::FINISHED,
   Status::RUNNING,
   Status::FAILED,
-  Status::NOT_EXIST
+  Status::NOT_EXIST,
+  Status::PAUSED
 };
 const char* _kStatusNames[] = {
   "FINISHED",
   "RUNNING",
   "FAILED",
-  "NOT_EXIST"
+  "NOT_EXIST",
+  "PAUSED"
 };
-const std::map<int, const char*> _Status_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(4, _kStatusValues, _kStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _Status_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(5, _kStatusValues, _kStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 const char* Context::ascii_fingerprint = "B089C846F881A6F18D64AA924E6643EF";
 const uint8_t Context::binary_fingerprint[16] = {0xB0,0x89,0xC8,0x46,0xF8,0x81,0xA6,0xF1,0x8D,0x64,0xAA,0x92,0x4E,0x66,0x43,0xEF};

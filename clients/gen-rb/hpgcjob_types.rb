@@ -31,8 +31,9 @@ module Status
   RUNNING = 2
   FAILED = 3
   NOT_EXIST = 4
-  VALUE_MAP = {1 => "FINISHED", 2 => "RUNNING", 3 => "FAILED", 4 => "NOT_EXIST"}
-  VALID_VALUES = Set.new([FINISHED, RUNNING, FAILED, NOT_EXIST]).freeze
+  PAUSED = 5
+  VALUE_MAP = {1 => "FINISHED", 2 => "RUNNING", 3 => "FAILED", 4 => "NOT_EXIST", 5 => "PAUSED"}
+  VALID_VALUES = Set.new([FINISHED, RUNNING, FAILED, NOT_EXIST, PAUSED]).freeze
 end
 
 class Context

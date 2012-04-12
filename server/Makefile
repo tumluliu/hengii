@@ -1,4 +1,4 @@
-GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp session.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
+GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp request.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
 GEN_OBJ := $(patsubst %.cpp, %.o, $(GEN_SRC))
 
 THRIFT_DIR := /usr/local/include/thrift/
@@ -12,7 +12,7 @@ HOSTNAME := $(shell hostname)
 
 .PHONY: all clean
 
-all: higine
+all: higine pbsmonitor
 
 config.h: config.h.in
 	cp -f config.h.in config.h
@@ -21,12 +21,16 @@ config.h: config.h.in
 	sed -i "s%@RUN_LOG_FILE@%\"\$(PWD)/run.log\"%g" config.h
 	sed -i "s%@PBS_OUT_DIR@%\"\$(PWD)/pbstmp/\"%g" config.h
 	sed -i "s%@PBS_SERVER_HOST@%\"$(HOSTNAME)\"%g" config.h
+	sed -i "s%@MONITOR_PATH@%\"$(PWD)/pbsmonitor\"%g" config.h
 
 %.o: %.cpp
 	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wno-return-type $(INC) -c $< -g -o $@
 
 higine: config.h higine.o $(GEN_OBJ)
 	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque -lmysql $^ -g -o $@
+
+pbsmonitor: 
+	cd guard; make;
 
 clean:
 	$(RM) ./lib/*.o *.o higine config.h 

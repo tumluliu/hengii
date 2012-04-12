@@ -11,13 +11,13 @@ module HpgcJob
   class Client
     include ::Thrift::Client
 
-    def start_single_job(job)
-      send_start_single_job(job)
+    def start_single_job(job, user_id)
+      send_start_single_job(job, user_id)
       return recv_start_single_job()
     end
 
-    def send_start_single_job(job)
-      send_message('start_single_job', Start_single_job_args, :job => job)
+    def send_start_single_job(job, user_id)
+      send_message('start_single_job', Start_single_job_args, :job => job, :user_id => user_id)
     end
 
     def recv_start_single_job()
@@ -27,13 +27,13 @@ module HpgcJob
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'start_single_job failed: unknown result')
     end
 
-    def start(flow)
-      send_start(flow)
+    def start(flow, user_id)
+      send_start(flow, user_id)
       return recv_start()
     end
 
-    def send_start(flow)
-      send_message('start', Start_args, :flow => flow)
+    def send_start(flow, user_id)
+      send_message('start', Start_args, :flow => flow, :user_id => user_id)
     end
 
     def recv_start()
@@ -100,6 +100,36 @@ module HpgcJob
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_status failed: unknown result')
     end
 
+    def get_my_requests(user_id)
+      send_get_my_requests(user_id)
+      return recv_get_my_requests()
+    end
+
+    def send_get_my_requests(user_id)
+      send_message('get_my_requests', Get_my_requests_args, :user_id => user_id)
+    end
+
+    def recv_get_my_requests()
+      result = receive_message(Get_my_requests_result)
+      return result.success unless result.success.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_my_requests failed: unknown result')
+    end
+
+    def get_all_requests()
+      send_get_all_requests()
+      return recv_get_all_requests()
+    end
+
+    def send_get_all_requests()
+      send_message('get_all_requests', Get_all_requests_args)
+    end
+
+    def recv_get_all_requests()
+      result = receive_message(Get_all_requests_result)
+      return result.success unless result.success.nil?
+      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_all_requests failed: unknown result')
+    end
+
   end
 
   class Processor
@@ -109,7 +139,7 @@ module HpgcJob
       args = read_args(iprot, Start_single_job_args)
       result = Start_single_job_result.new()
       begin
-        result.success = @handler.start_single_job(args.job)
+        result.success = @handler.start_single_job(args.job, args.user_id)
       rescue HpgcJobException => e
         result.e = e
       end
@@ -120,7 +150,7 @@ module HpgcJob
       args = read_args(iprot, Start_args)
       result = Start_result.new()
       begin
-        result.success = @handler.start(args.flow)
+        result.success = @handler.start(args.flow, args.user_id)
       rescue HpgcJobException => e
         result.e = e
       end
@@ -155,6 +185,20 @@ module HpgcJob
       write_result(result, oprot, 'get_status', seqid)
     end
 
+    def process_get_my_requests(seqid, iprot, oprot)
+      args = read_args(iprot, Get_my_requests_args)
+      result = Get_my_requests_result.new()
+      result.success = @handler.get_my_requests(args.user_id)
+      write_result(result, oprot, 'get_my_requests', seqid)
+    end
+
+    def process_get_all_requests(seqid, iprot, oprot)
+      args = read_args(iprot, Get_all_requests_args)
+      result = Get_all_requests_result.new()
+      result.success = @handler.get_all_requests()
+      write_result(result, oprot, 'get_all_requests', seqid)
+    end
+
   end
 
   # HELPER FUNCTIONS AND STRUCTURES
@@ -162,9 +206,11 @@ module HpgcJob
   class Start_single_job_args
     include ::Thrift::Struct, ::Thrift::Struct_Union
     JOB = 1
+    USER_ID = 2
 
     FIELDS = {
-      JOB => {:type => ::Thrift::Types::STRUCT, :name => 'job', :class => Job}
+      JOB => {:type => ::Thrift::Types::STRUCT, :name => 'job', :class => Job},
+      USER_ID => {:type => ::Thrift::Types::STRING, :name => 'user_id'}
     }
 
     def struct_fields; FIELDS; end
@@ -181,7 +227,7 @@ module HpgcJob
     E = 1
 
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::I32, :name => 'success'},
+      SUCCESS => {:type => ::Thrift::Types::I64, :name => 'success'},
       E => {:type => ::Thrift::Types::STRUCT, :name => 'e', :class => HpgcJobException}
     }
 
@@ -196,9 +242,11 @@ module HpgcJob
   class Start_args
     include ::Thrift::Struct, ::Thrift::Struct_Union
     FLOW = 1
+    USER_ID = 2
 
     FIELDS = {
-      FLOW => {:type => ::Thrift::Types::STRUCT, :name => 'flow', :class => JobFlow}
+      FLOW => {:type => ::Thrift::Types::STRUCT, :name => 'flow', :class => JobFlow},
+      USER_ID => {:type => ::Thrift::Types::STRING, :name => 'user_id'}
     }
 
     def struct_fields; FIELDS; end
@@ -215,7 +263,7 @@ module HpgcJob
     E = 1
 
     FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::I32, :name => 'success'},
+      SUCCESS => {:type => ::Thrift::Types::I64, :name => 'success'},
       E => {:type => ::Thrift::Types::STRUCT, :name => 'e', :class => HpgcJobException}
     }
 
@@ -232,7 +280,7 @@ module HpgcJob
     CLIENT_TICKET = 1
 
     FIELDS = {
-      CLIENT_TICKET => {:type => ::Thrift::Types::I32, :name => 'client_ticket'}
+      CLIENT_TICKET => {:type => ::Thrift::Types::I64, :name => 'client_ticket'}
     }
 
     def struct_fields; FIELDS; end
@@ -263,7 +311,7 @@ module HpgcJob
     CLIENT_TICKET = 1
 
     FIELDS = {
-      CLIENT_TICKET => {:type => ::Thrift::Types::I32, :name => 'client_ticket'}
+      CLIENT_TICKET => {:type => ::Thrift::Types::I64, :name => 'client_ticket'}
     }
 
     def struct_fields; FIELDS; end
@@ -294,7 +342,7 @@ module HpgcJob
     CLIENT_TICKET = 1
 
     FIELDS = {
-      CLIENT_TICKET => {:type => ::Thrift::Types::I32, :name => 'client_ticket'}
+      CLIENT_TICKET => {:type => ::Thrift::Types::I64, :name => 'client_ticket'}
     }
 
     def struct_fields; FIELDS; end
@@ -325,7 +373,7 @@ module HpgcJob
     CLIENT_TICKET = 1
 
     FIELDS = {
-      CLIENT_TICKET => {:type => ::Thrift::Types::I32, :name => 'client_ticket'}
+      CLIENT_TICKET => {:type => ::Thrift::Types::I64, :name => 'client_ticket'}
     }
 
     def struct_fields; FIELDS; end
@@ -342,6 +390,69 @@ module HpgcJob
 
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Result}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_my_requests_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    USER_ID = 1
+
+    FIELDS = {
+      USER_ID => {:type => ::Thrift::Types::STRING, :name => 'user_id'}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_my_requests_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::I64}}
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_requests_args
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+
+    FIELDS = {
+
+    }
+
+    def struct_fields; FIELDS; end
+
+    def validate
+    end
+
+    ::Thrift::Struct.generate_accessors self
+  end
+
+  class Get_all_requests_result
+    include ::Thrift::Struct, ::Thrift::Struct_Union
+    SUCCESS = 0
+
+    FIELDS = {
+      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::I64}}
     }
 
     def struct_fields; FIELDS; end

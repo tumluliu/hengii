@@ -22,34 +22,44 @@ class HpgcJobHandler : virtual public HpgcJobIf {
     // Your initialization goes here
   }
 
-  int32_t start_single_job(const Job& job) {
+  int64_t start_single_job(const Job& job, const std::string& user_id) {
     // Your implementation goes here
     printf("start_single_job\n");
   }
 
-  int32_t start(const JobFlow& flow) {
+  int64_t start(const JobFlow& flow, const std::string& user_id) {
     // Your implementation goes here
     printf("start\n");
   }
 
-  void pause(const int32_t client_ticket) {
+  void pause(const int64_t client_ticket) {
     // Your implementation goes here
     printf("pause\n");
   }
 
-  void resume(const int32_t client_ticket) {
+  void resume(const int64_t client_ticket) {
     // Your implementation goes here
     printf("resume\n");
   }
 
-  void cancel(const int32_t client_ticket) {
+  void cancel(const int64_t client_ticket) {
     // Your implementation goes here
     printf("cancel\n");
   }
 
-  void get_status(Result& _return, const int32_t client_ticket) {
+  void get_status(Result& _return, const int64_t client_ticket) {
     // Your implementation goes here
     printf("get_status\n");
+  }
+
+  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
+    // Your implementation goes here
+    printf("get_my_requests\n");
+  }
+
+  void get_all_requests(std::vector<int64_t> & _return) {
+    // Your implementation goes here
+    printf("get_all_requests\n");
   }
 
 };

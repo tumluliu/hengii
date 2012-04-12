@@ -1,9 +1,9 @@
 /*
  * =====================================================================================
  *
- *       Filename:  session.cpp
+ *       Filename:  request.cpp
  *
- *    Description:  implementation of Session class
+ *    Description:  implementation of Request class
  *
  *        Version:  0.7
  *        Created:  03/17/2012 11:02:39 AM
@@ -15,36 +15,44 @@
  *
  * =====================================================================================
  */
-#include "session.h"
+#include "request.h"
 #include "joblog.h"
 
-Session::Session(): jobThreadIdList(MAX_JOB_COUNT), available(true) { }
+Request::Request(): jobThreadIdList(MAX_JOB_COUNT), available(true) { }
 
-Session::Session(int sessionId): jobThreadIdList(MAX_JOB_COUNT), available(true) {
-	id = sessionId;
+Request::Request(int requestId): jobThreadIdList(MAX_JOB_COUNT), available(true) {
+	id = requestId;
 }
 
-int Session::getJobCount() const {
+void Request::setUserId(const string& uid) {
+	userId = uid;
+}
+
+string Request::getUserId() const {
+	return userId;
+}
+
+int Request::getJobCount() const {
 	return jobCount;
 }
 
-int Session::getId() const {
+int Request::getId() const {
 	return id;
 }
 
-bool Session::isAvailable() const {
+bool Request::isAvailable() const {
 	return available;
 }
 
-void Session::setAvailable(bool value) {
+void Request::setAvailable(bool value) {
 	available = value;
 }
 
-JobTracker Session::getJobTrackerAt(int index) const {
+JobTracker Request::getJobTrackerAt(int index) const {
 	return jobTrackerList[index];
 }
 
-int Session::createJobThreads() {
+int Request::createJobThreads() {
 	for (int i = 0; i < jobCount; i++) {
 		int ret;
 		if ((ret = pthread_create(&jobThreadIdList[i], 
@@ -56,7 +64,7 @@ int Session::createJobThreads() {
 	return 0;
 }
 
-void Session::init(const JobFlow& flow) {
+void Request::init(const JobFlow& flow) {
 	JobLog jobLog;
 	jobLog.registerJobFlow(id);
 
@@ -82,7 +90,7 @@ void Session::init(const JobFlow& flow) {
 	}
 }
 
-void Session::finalize() {
+void Request::finalize() {
 	pthread_attr_destroy(&threadAttr);
 	pthread_mutex_destroy(&threadMutex);
 }

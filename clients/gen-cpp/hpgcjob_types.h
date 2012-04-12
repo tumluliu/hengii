@@ -46,7 +46,8 @@ struct Status {
     FINISHED = 1,
     RUNNING = 2,
     FAILED = 3,
-    NOT_EXIST = 4
+    NOT_EXIST = 4,
+    PAUSED = 5
   };
 };
 

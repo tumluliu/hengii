@@ -37,7 +37,8 @@ enum Status
 	FINISHED = 1,
 	RUNNING = 2,
 	FAILED = 3,
-	NOT_EXIST = 4
+	NOT_EXIST = 4,
+	PAUSED = 5
 }
 
 struct Context
@@ -89,10 +90,12 @@ exception HpgcJobException
 
 service HpgcJob
 {
-	i32 start_single_job(1:Job job) throws (1:HpgcJobException e),
-	i32 start(1:JobFlow flow) throws (1:HpgcJobException e),
-	void pause(1:i32 client_ticket),
-	void resume(1:i32 client_ticket),
-	void cancel(1:i32 client_ticket),
-	Result get_status(1:i32 client_ticket),
+	i64 start_single_job(1:Job job, 2:string user_id) throws (1:HpgcJobException e),
+	i64 start(1:JobFlow flow, 2:string user_id) throws (1:HpgcJobException e),
+	void pause(1:i64 client_ticket),
+	void resume(1:i64 client_ticket),
+	void cancel(1:i64 client_ticket),
+	Result get_status(1:i64 client_ticket),
+	list<i64> get_my_requests(1:string user_id);
+	list<i64> get_all_requests();
 }
