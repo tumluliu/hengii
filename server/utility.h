@@ -19,6 +19,7 @@
 #ifndef UTILITY_H_
 #define UTILITY_H_
 
+#include <stdint.h>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -33,7 +34,7 @@ class Utility {
 		static int readFile(const string&, string&);
 		static int deleteFile(const string&);
 		static vector<string> splitStringBySpace ( const string& );
-		static string intToString(int);
+		static string intToString(int64_t);
 };
 
 

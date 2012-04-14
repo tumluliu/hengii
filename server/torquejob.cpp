@@ -197,29 +197,6 @@ int TorqueJob::submit() {
 }
 
 int TorqueJob::collect() {
-	struct attrl qStatAttr;
-	string qJobState = ATTR_state;
-	qStatAttr.name = const_cast<char*>(qJobState.c_str());
-	char value[] = "\0";
-	qStatAttr.value = value;
-	char resource[] = "\0";
-	qStatAttr.resource = resource;
-	qStatAttr.next = NULL;
-
-	struct batch_status *qStatus = NULL;
-	do {
-		if (qStatus != NULL) {
-			pbs_statfree(qStatus);
-		}
-		do {
-			qStatus = pbs_statjob(connection, const_cast<char*>(id.c_str()), &qStatAttr, 0);
-			// sleep(1);
-		} while (qStatus == NULL);
-		status = (qStatus->attribs)->value;	 
-		// !!!! I have a feeling that there must be some problems here !!!!
-		// !!!! commented by Liu Lu !!!!
-	} while (status != "C");
-
 	if (Utility::readFile(outputPath, output) != 0) {
 		return -1;
 	}
@@ -229,10 +206,6 @@ int TorqueJob::collect() {
 	if ((Utility::deleteFile(outputPath)) != 0) {
 		return -1;
 	}
-	pbs_statfree(qStatus);
-	pbs_disconnect(connection);
 
 	return 0;
 }
-
-

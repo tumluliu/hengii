@@ -20,43 +20,58 @@
 
 #include "hg_mysql.h"
 
-#define DB_SERVER "gdos-yanan"
-#define DB_USER "myuser"
-#define DB_PASSWORD "mypassword"
-#define DB_NAME "higis"
-#define DB_PORT 3306
+MYSQL *mySqlConnect() {
+	MYSQL *conn = mysql_init( NULL );
 
-MYSQL_RES *query( char *sql ) {
+	if ( !conn ) {
+		fprintf( stderr, "MySql init failed\n" );
+		return NULL;
+	}
+
+	conn = mysql_real_connect( conn, DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0 );
+
+	if ( conn ) {
+		fprintf( stderr, "Connection success\n" );
+	}
+	else {
+		fprintf( stderr, "Connection failed\n" );
+		return NULL;
+	}
+
+	return conn;
+}
+
+void mySqlClose(MYSQL *conn) {
+	mysql_close(conn);
+}
+
+MYSQL_RES *query( char *sql, MYSQL *conn ) {
 	int sig;
-	MYSQL *conn_ptr;
 	MYSQL_RES *res;
 
-	conn_ptr = mysql_init( NULL );
-
-	if ( !conn_ptr ) {
-		printf( "MySql init failed\n" );
-	}
-
-	conn_ptr = mysql_real_connect( conn_ptr, DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0 );
-
-	if ( conn_ptr ) {
-		printf( "Connection success\n" );
-	}
-	else {
-		printf( "Connection failed\n" );
-	}
-
-	sig = mysql_query( conn_ptr, sql );
+	sig = mysql_query( conn, sql );
 
 	if ( sig != 0 ) {
-		printf( "Error making query: %s\n", mysql_error( conn_ptr ) );
+		fprintf( stderr, "Error making query: %s\n", mysql_error( conn ) );
 	}
 	else {
-		printf( "Query made...\n" );
+		fprintf( stderr, "Query made...\n" );
 	}
 
-	res = mysql_store_result( conn_ptr );
-	mysql_close( conn_ptr );
+	res = mysql_store_result( conn );
 
 	return res;
+}
+
+void command( char *sql, MYSQL *conn ) {
+	int sig;
+
+	sig = mysql_query( conn, sql );
+
+	if ( sig != 0 ) {
+		fprintf( stderr, "Error making command: %s\n", mysql_error( conn ) );
+	}
+	else {
+		fprintf( stderr, "Command made...\n" );
+	}
 }

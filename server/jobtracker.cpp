@@ -18,15 +18,17 @@
 #include <string>
 #include <fstream>
 #include <iostream>
+#include <unistd.h>
 #include "jobtracker.h"
 #include "config.h"
 #include "utility.h"
 #include "logger.h"
 #include "appoption.h"
-#include "joblog.h"
 
-JobTracker::JobTracker( int id ) {
+JobTracker::JobTracker( int64_t id ) {
 	flowId = id;
+	log = JobLog::Instance();
+	jobStatus = JobStatus::NOT_EXIST;
 }
 
 void JobTracker::setUserJob(const Job& job) {
@@ -49,27 +51,43 @@ string JobTracker::getCmdline() const {
 	return qJob.getCmdline();
 }
 
-JobStatus::type JobTracker::getStatus() const {
-	JobStatus::type innerStatus;
-	string pbsStatus = qJob.getStatus();
+JobStatus::type JobTracker::getStatus() {
+	return jobStatus;
+}
 
-	if (pbsStatus == "C") {
-		innerStatus = JobStatus::FINISHED;
+JobStatus::type JobTracker::updateStatus() {
+	if (outerStatus != JobStatus::RUNNING) {
+		return jobStatus;
 	}
-	else if (pbsStatus == "R") {
-		innerStatus = JobStatus::RUNNING;
+
+	char pbsStatus = log->getPbsJobStatus(flowId, userJob.id);
+
+	if (pbsStatus == 'C') {
+		jobStatus = JobStatus::FINISHED;
+		Logger::log( STDOUT, INFO, ENGINE, 
+				"job " + Utility::intToString(userJob.id) + " in flow " + Utility::intToString(flowId) 
+				+ " is finished");
+		cout << "flow id is: " << flowId << endl;
+		cout << "flow id string is: " << Utility::intToString(flowId) << endl;
 	}
-	else if (pbsStatus == "S" || pbsStatus == "H") {
-		innerStatus = JobStatus::PAUSED;
+	else if (pbsStatus == 'Q') {
+		jobStatus = JobStatus::QUEUING;
+	}
+	else if (pbsStatus == 'R') {
+		jobStatus = JobStatus::RUNNING;
+	}
+	else if (pbsStatus == 'S' || pbsStatus == 'H') {
+		jobStatus = JobStatus::PAUSED;
 	}
 	else {
-		innerStatus = JobStatus::RUNNING;
+		jobStatus = JobStatus::NOT_EXIST;
 	}
 
-	return jobStatus == JobStatus::RUNNING ? innerStatus : jobStatus ;
+	return jobStatus;
 }
 
 void JobTracker::setStatus(JobStatus::type stat) {
+	outerStatus = stat;
 	jobStatus = stat;
 }
 
@@ -77,7 +95,7 @@ int JobTracker::getConnection() const {
 	return qJob.getConnection();
 }
 
-int JobTracker::getFlowId() const {
+int64_t JobTracker::getFlowId() const {
 	return flowId;
 }
 
@@ -98,7 +116,21 @@ int JobTracker::submit() {
 }
 
 int JobTracker::collect() {
-	return qJob.collect();
+	int ret = qJob.collect();
+	log->updateJobStatus(flowId, userJob.id, getStatus(), qJob.getOutput());
+	return ret;
+}
+
+int JobTracker::trace() {
+	JobStatus::type status = JobStatus::RUNNING;
+
+	do {
+		status = updateStatus();
+		log->updateJobStatus(flowId, userJob.id, status, "");
+		usleep(TRACE_INTERVAL_MILLI_S);
+	} while (status != JobStatus::FINISHED && status != JobStatus::FAILED);
+
+	return 0;
 }
 
 void JobTracker::setThreadMutex(pthread_mutex_t* mutex) {
@@ -251,9 +283,8 @@ void* JobTracker::jobWorker(void* threadParam)
 	else {
 		job->setStatus(JobStatus::RUNNING);
 
-		JobLog jobLog;
-		jobLog.registerJob(job->getFlowId(), userJob.id, job->getId());
-
+		JobLog::Instance()->registerJob(job->getFlowId(), userJob.id, job->getId());
+		job->trace();	
 		job->collect();
 		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");
 		pthread_mutex_lock(job->getThreadMutex());

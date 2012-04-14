@@ -18,27 +18,32 @@
 #ifndef _JOBTRACKER_H_
 #define _JOBTRACKER_H_
 
+#include <stdint.h>
 #include <fstream>
 #include "lib/HpgcJob.h"
 #include "torquejob.h"
+#include "joblog.h"
 
 using namespace HPGC::HiGIS::Server;
 
 const string MPI_EXEC_CMD = "mpiexec ";
+const int TRACE_INTERVAL_MILLI_S = 100;
 
 class JobTracker{
 	private:
-		int flowId;
+		int64_t flowId;
 		pthread_mutex_t* threadMutex;
 		pthread_cond_t* waitingCond;
 		JobStatus::type jobStatus;
+		JobStatus::type outerStatus; // the status determined by the job but not determined by TorqueJob
 		TorqueJob qJob;
 		Job userJob;
+		JobLog *log;
 		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
 		vector<int>::iterator busyParentCountListIter;
 		static string constructCmdOptions( JobTracker*, map<string, string>&, ifstream& );
 	public:
-		JobTracker( int );
+		JobTracker( int64_t );
 		void setUserJob( const Job& );
 		Job getUserJob() const;
 		string getResult() const;
@@ -47,9 +52,10 @@ class JobTracker{
 		int getConnection() const;
 		int submit();
 		int collect();
+		int trace();
 		int setProcessCount(int);
 		void setCmdline(const string&);
-		int getFlowId() const;
+		int64_t getFlowId() const;
 		string getId() const;
 		void setThreadMutex(pthread_mutex_t* mutex);
 		pthread_mutex_t* getThreadMutex();
@@ -57,7 +63,8 @@ class JobTracker{
 		vector<int>::iterator getBusyParentCountListIter();
 		void setBusyParentCountListIter(vector<int>::iterator);
 		void setWaitingCond(pthread_cond_t* cond);
-		JobStatus::type getStatus() const;
+		JobStatus::type getStatus();
+		JobStatus::type updateStatus();
 		void setStatus(JobStatus::type);
 		static void* jobWorker(void*);
 };

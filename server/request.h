@@ -32,11 +32,12 @@ class Request{
 		vector<pthread_t> jobThreadIdList;
 		bool available;
 		int jobCount;
-		int id;
+		int64_t id;
 		string userId;
 	public:
 		Request();
-		Request(int);
+		Request(int64_t);
+		~Request();
 		vector<JobTracker> getJobTrackers() const;
 		JobTracker getJobTrackerAt(int) const;
 		vector<int> getBusyParentCountList() const;

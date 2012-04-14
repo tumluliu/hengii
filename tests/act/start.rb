@@ -8,5 +8,5 @@
 job_flow = YAML::load STDIN
 
 logger.info "job flow staring"
-id = client.start(job_flow)
+id = client.start(job_flow, "test")
 logger.info "job flow started, waiting for response"

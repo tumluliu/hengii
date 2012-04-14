@@ -6,7 +6,7 @@
 
 ret = client.get_status(id)
 while(ret.flow_status == Status::RUNNING)
-	sleep(0.2)
+	sleep(5)
 	ret = client.get_status(id)
 end
 

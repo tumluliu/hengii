@@ -63,7 +63,7 @@ int Utility::deleteFile(const string& file) {
 	return 0;
 }
 
-string Utility::intToString(int i) {
+string Utility::intToString(int64_t i) {
 	stringstream ss;
 	ss << i;
 	return ss.str();

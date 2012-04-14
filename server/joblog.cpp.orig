@@ -1,0 +1,144 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  joblog.cpp
+ *
+ *    Description:  
+ *
+ *        Version:  0.7
+ *        Created:  04/08/2012 03:11:58 PM
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  WU Jiani()
+ *         Updator: LIU Lu() YANG Anran() 
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
+#include <stdio.h>
+#include <string>
+#include "joblog.h"
+#include "utility.h"
+#include "logger.h"
+
+string JobLog::registerJobSql( int64_t flowId, int jobId ) {
+	return "insert into " + JOB_TABLE_NAME 
+		+ "(fid, id) values('" + Utility::intToString(flowId) 
+		+ "', '" + Utility::intToString(jobId) + "');";
+}
+
+string JobLog::registerPbsJobSql( int64_t flowId, int jobId, const string &pbsJobId ) {
+	return "insert into " + PBS_JOB_TABLE_NAME 
+		+ "(fid, jobid, id) values('" + Utility::intToString(flowId) 
+		+ "', '" + Utility::intToString(jobId) + "', '" + pbsJobId + "');";
+}
+
+int JobLog::registerJob( int64_t flowId, int jobId, const string &pbsJobId ) {
+	if(command(registerJobSql(flowId, jobId)) == 0) {
+		return command(registerPbsJobSql(flowId, jobId, pbsJobId));
+	}
+	else {
+		return -1;
+	}
+}
+
+string JobLog::registerJobFlowSql( int64_t flowId ) {
+	return "insert into " + JOB_FLOW_TABLE_NAME + "(id) values('" + Utility::intToString(flowId) + "');";
+}
+
+int JobLog::registerJobFlow( int64_t flowId ) {
+	return command(registerJobFlowSql(flowId));
+}
+
+string JobLog::updateJobStatusSql(int64_t flowId, int jobId, int status, const string& output) {
+	return "update " + JOB_TABLE_NAME + " set status=" + Utility::intToString(status) + ", message='" + output 
+		+ "' where fid='" + Utility::intToString(flowId) + "' and id='" + Utility::intToString(jobId) + "';";
+}
+
+int JobLog::updateJobStatus( int64_t flowId, int jobId, int status, const string& output ) {
+	return command(updateJobStatusSql(flowId, jobId, status, output));
+}
+
+string JobLog::getPbsJobStatusSql( int64_t flowId, int jobId ) {
+	return "select job_state from " + PBS_JOB_TABLE_NAME 
+		+ " where fid='" + Utility::intToString(flowId) 
+		+ "' and jobid='" + Utility::intToString(jobId) + "';";
+}
+
+char JobLog::getPbsJobStatus( int64_t flowId, int jobId ) {
+	MYSQL_RES* res;
+	MYSQL_ROW r;
+	char status;
+
+	res = query(getPbsJobStatusSql(flowId, jobId));
+	if (res != NULL) {
+		r = mysql_fetch_row(res);
+	}
+
+	if (r == NULL || r[0] == NULL) {
+		return 'N';
+	}
+
+	status = r[0][0];
+	mysql_free_result(res);
+
+	return status;
+}
+
+int JobLog::command( const string &command ) {
+	int ret;
+	MYSQL *conn;
+	conn = mysql_init(NULL);  
+	if (!conn) {  
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql init failed.");
+	}
+
+	conn = mysql_real_connect(conn, hosts.c_str(), userName.c_str(), password.c_str(),dbName.c_str(), port, NULL, 0);  
+	if (conn)  
+		Logger::log(STDOUT, INFO, DATABASE, "mysql connection successful.");
+	else { 
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql connection failed.");
+		return -1;
+	}
+
+	ret = mysql_query(conn, command.c_str()); 
+	if (ret != 0) {
+		string errMsg(mysql_error(conn));
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql command error: " + errMsg);
+	} else
+		Logger::log(STDOUT, INFO, DATABASE, "mysql command executed successfully.");
+
+	mysql_close(conn);  
+	return 0;
+}
+
+MYSQL_RES* JobLog::query( const string &query ) {
+	int ret;
+	MYSQL *conn;
+	MYSQL_RES *res;
+	conn = mysql_init(NULL);  
+	if (!conn) {  
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql init failed.");
+	}
+
+	conn = mysql_real_connect(conn, hosts.c_str(), userName.c_str(), password.c_str(),dbName.c_str(), port, NULL, 0);  
+	if (conn)  
+		Logger::log(STDOUT, INFO, DATABASE, "mysql connection successful.");
+	else { 
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql connection failed.");
+		return NULL;
+	}
+
+	ret = mysql_query(conn, query.c_str()); 
+	res = mysql_store_result(conn);
+	if (ret != 0) {
+		string errMsg(mysql_error(conn));
+		Logger::log(STDOUT, ERROR, DATABASE, "mysql query error: " + errMsg);
+	} 
+	//else
+		//Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully.");
+
+	mysql_close(conn);  
+	return res;
+}

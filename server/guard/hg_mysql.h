@@ -21,6 +21,15 @@
 #ifndef MONITOR_HG_MYSQL_H_
 #define MONITOR_HG_MYSQL_H_
 
-MYSQL_RES *query( char *sql ); 
+#define DB_SERVER "127.0.0.1"
+#define DB_USER "myuser"
+#define DB_PASSWORD "mypassword"
+#define DB_NAME "higis"
+#define DB_PORT 3306
+
+MYSQL *mySqlConnect();
+void mySqlClose(MYSQL *conn);
+MYSQL_RES *query( char *sql, MYSQL *conn ); 
+void command( char *sql, MYSQL *conn ); 
 
 #endif

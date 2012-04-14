@@ -20,9 +20,11 @@
 
 Request::Request(): jobThreadIdList(MAX_JOB_COUNT), available(true) { }
 
-Request::Request(int requestId): jobThreadIdList(MAX_JOB_COUNT), available(true) {
+Request::Request(int64_t requestId): jobThreadIdList(MAX_JOB_COUNT), available(true) {
 	id = requestId;
 }
+
+Request::~Request() { }
 
 void Request::setUserId(const string& uid) {
 	userId = uid;
@@ -65,8 +67,7 @@ int Request::createJobThreads() {
 }
 
 void Request::init(const JobFlow& flow) {
-	JobLog jobLog;
-	jobLog.registerJobFlow(id);
+	JobLog::Instance()->registerJobFlow(id);
 
 	pthread_mutex_init(&threadMutex, NULL);
 	pthread_cond_init (&waitingCond, NULL);

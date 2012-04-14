@@ -47,13 +47,14 @@ class HpgcJobHandler : virtual public HpgcJobIf {
 		void addRequest();
 	public:
 		HpgcJobHandler();
-		int64_t start_single_job(const Job& job);
-		int64_t start(const JobFlow& flow);
+		int64_t start_single_job(const Job& job, const std::string& user_id);
+		int64_t start(const JobFlow& flow, const std::string& user_id);
 		void pause(const int64_t client_ticket);
 		void resume(const int64_t client_ticket);
 		void cancel(const int64_t client_ticket);
 		void get_status(Result& _return, const int64_t client_ticket);
 		void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id); 
+		void get_all_requests(std::vector<int64_t> & _return);
 };
 
 #endif
