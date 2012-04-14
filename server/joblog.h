@@ -16,11 +16,12 @@
  *
  * =====================================================================================
  */
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 #include <mysql/mysql.h>  
 
 
@@ -37,6 +38,7 @@ const string DB_USER = "myuser";
 const string DB_PASSWORD = "mypassword";
 const string DB_NAME = "higis";
 const int DB_PORT = 3306;
+const int MAX_DB_CONN_NUM = 1; // remember to ensure the db max_connections settings is higher than this
 
 class JobLog {
 	private:
@@ -44,7 +46,8 @@ class JobLog {
 		string userName;
 		string password;
 		string dbName;
-		MYSQL *conn;
+		vector<MYSQL*> connPool;
+		vector<pthread_mutex_t*> connLock; // true if free
 		static JobLog *m_instance;
 		int port;
 
@@ -53,7 +56,8 @@ class JobLog {
 		JobLog(JobLog const&);
 		void operator=(JobLog const&);
 
-		int initDb();
+
+		MYSQL *createConn();
 		string registerPbsJobSql( int64_t, int, const string&);
 		string registerJobSql(int64_t, int);
 		string registerJobFlowSql(int64_t);
@@ -61,6 +65,8 @@ class JobLog {
 		string getPbsJobStatusSql( int64_t, int);
 		int command(const string&);
 		MYSQL_RES* query( const string & );
+		MYSQL* borrowConnection();
+		int returnConnection(MYSQL *);
 	public:
 		int registerJob(int64_t, int, const string&);
 		int registerJobFlow(int64_t);

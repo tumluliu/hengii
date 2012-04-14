@@ -16,6 +16,7 @@
  *
  * =====================================================================================
  */
+#include <stdlib.h>
 #include <stdio.h>
 #include <string>
 #include "joblog.h"
@@ -28,12 +29,62 @@ JobLog *JobLog::Instance() {
 	if (!m_instance) {
 		// !!! it is some(although not very bad) memory leak here!!! by YANG Anran at 20120413
 		m_instance = new JobLog();
-		m_instance->initDb();
 	}
 	return m_instance;
 }
 
-JobLog::JobLog(): hosts(DB_SERVER),userName(DB_USER),password(DB_PASSWORD),dbName(DB_NAME),port(DB_PORT){ }
+JobLog::JobLog(): hosts(DB_SERVER),userName(DB_USER),password(DB_PASSWORD),dbName(DB_NAME),port(DB_PORT){ 
+	int i;
+	MYSQL *conn;
+
+	for (i = 0; i < MAX_DB_CONN_NUM; i++) {
+		if ((conn = createConn())) {
+			pthread_mutex_t* lock = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+			pthread_mutex_init(lock, NULL);
+			connLock.push_back(lock);
+
+			connPool.push_back(conn);
+		}
+		else {
+			break;
+		}
+	}
+}
+
+MYSQL *JobLog::borrowConnection() {
+	unsigned int i;
+
+	do {
+		for (i = 0; i < connPool.size(); i++) {
+			cout << "trying locking " << i << "th conn" << endl;
+			if(pthread_mutex_trylock(connLock[i])) {
+				cout << i << "th conn locked" << endl;
+				return connPool[i];
+			}
+		}
+	} while(true);
+}
+
+int JobLog::returnConnection(MYSQL *conn) {
+	unsigned int i;
+	bool known = false;
+
+	for (i = 0; i < connPool.size(); i++) {
+		if (conn == connPool[i]) {
+			cout << "unlocking " << i << "th conn" << endl;
+			pthread_mutex_unlock(connLock[i]);
+			cout << i << "th conn unlocked" << endl;
+			known = true;
+		}
+	}
+
+	if (known) {
+		return 0;
+	}
+	else {
+		return -1;
+	}
+}
 
 JobLog::~JobLog() {
 	//cout << conn << endl;
@@ -43,8 +94,8 @@ JobLog::~JobLog() {
 	//}
 }
 
-int JobLog::initDb() {
-	conn = mysql_init( NULL );
+MYSQL *JobLog::createConn() {
+	MYSQL *conn = mysql_init( NULL );
 	if ( !conn ) {
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql init failed." );
 	}
@@ -54,50 +105,29 @@ int JobLog::initDb() {
 
 	conn = mysql_real_connect( conn, hosts.c_str(), userName.c_str(), password.c_str(), dbName.c_str(), port, NULL, 0 );
 	if ( conn ) {
-		Logger::log( STDOUT, INFO, DATABASE, "mysql connection successful." );
-		return 0;
+		//Logger::log( STDOUT, INFO, DATABASE, "mysql connection successful." );
 	}
 	else {
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql connection failed." );
-		return -1;
+		return NULL;
 	}
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in initDb" );
-		return -1;
-	}
+
+	return conn;
 }
 
 string JobLog::registerJobSql( int64_t flowId, int jobId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in registerJobSql" );
-	}
 	return "insert into " + JOB_TABLE_NAME
 		+ "(fid, id) values('" + Utility::intToString( flowId )
 		+ "', '" + Utility::intToString( jobId ) + "');";
 }
 
 string JobLog::registerPbsJobSql( int64_t flowId, int jobId, const string &pbsJobId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in registerPbsJobSql" );
-	}
 	return "insert into " + PBS_JOB_TABLE_NAME
 		+ "(fid, jobid, id) values('" + Utility::intToString( flowId )
 		+ "', '" + Utility::intToString( jobId ) + "', '" + pbsJobId + "');";
 }
 
 int JobLog::registerJob( int64_t flowId, int jobId, const string &pbsJobId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in registerJob" );
-		return -1;
-	}
 	if ( command( registerJobSql( flowId, jobId ) ) == 0 ) {
 		return command( registerPbsJobSql( flowId, jobId, pbsJobId ) );
 	}
@@ -107,50 +137,23 @@ int JobLog::registerJob( int64_t flowId, int jobId, const string &pbsJobId ) {
 }
 
 string JobLog::registerJobFlowSql( int64_t flowId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in registerJobFlowSql" );
-	}
 	return "insert into " + JOB_FLOW_TABLE_NAME + "(id) values('" + Utility::intToString( flowId ) + "');";
 }
 
 int JobLog::registerJobFlow( int64_t flowId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in registerJobFlow" );
-		return -1;
-	}
 	return command( registerJobFlowSql( flowId ) );
 }
 
 string JobLog::updateJobStatusSql( int64_t flowId, int jobId, int status, const string &output ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in updateJobStatusSql" );
-	}
 	return "update " + JOB_TABLE_NAME + " set status=" + Utility::intToString( status ) + ", message='" + output
 		+ "' where fid='" + Utility::intToString( flowId ) + "' and id='" + Utility::intToString( jobId ) + "';";
 }
 
 int JobLog::updateJobStatus( int64_t flowId, int jobId, int status, const string &output ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in updateJobStatus" );
-		return -1;
-	}
 	return command( updateJobStatusSql( flowId, jobId, status, output ) );
 }
 
 string JobLog::getPbsJobStatusSql( int64_t flowId, int jobId ) {
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in getPbsJobStatusSql" );
-	}
 	return "select job_state from " + PBS_JOB_TABLE_NAME
 		+ " where fid='" + Utility::intToString( flowId )
 		+ "' and jobid='" + Utility::intToString( jobId ) + "';";
@@ -160,12 +163,6 @@ char JobLog::getPbsJobStatus( int64_t flowId, int jobId ) {
 	MYSQL_RES *res;
 	MYSQL_ROW r = NULL;
 	char status;
-
-	int ping;
-	ping = mysql_ping( conn );
-	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in getPbsJobStatus" );
-	}
 
 	res = query( getPbsJobStatusSql( flowId, jobId ) );
 	if ( res != NULL ) {
@@ -185,6 +182,9 @@ char JobLog::getPbsJobStatus( int64_t flowId, int jobId ) {
 int JobLog::command( const string &command ) {
 	int ret;
 	int ping;
+	MYSQL *conn;
+
+	conn = borrowConnection();
 	ping = mysql_ping( conn );
 	if ( ping != 0 ) {
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in command" );
@@ -204,17 +204,22 @@ int JobLog::command( const string &command ) {
 	else {
 		Logger::log( STDOUT, INFO, DATABASE, "mysql command executed successfully." );
 	}
+	returnConnection( conn );
 
 	return 0;
 }
 
 MYSQL_RES *JobLog::query( const string &query ) {
 	int ret;
+	MYSQL *conn;
 	MYSQL_RES *res;
 	int ping;
 
+
 	//if ( !conn ) {
 	//Logger::log( STDOUT, ERROR, DATABASE, "mysql connection lost" );
+	conn = borrowConnection();
+
 	ping = mysql_ping( conn );
 	if ( ping != 0 ) {
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error" );
@@ -230,6 +235,8 @@ MYSQL_RES *JobLog::query( const string &query ) {
 	}
 	else
 		Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully.");
+
+	returnConnection( conn );
 
 	return res;
 }

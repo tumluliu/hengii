@@ -22,11 +22,14 @@
 
 MYSQL *mySqlConnect() {
 	MYSQL *conn = mysql_init( NULL );
+	my_bool reconnect = 1;
 
 	if ( !conn ) {
 		fprintf( stderr, "MySql init failed\n" );
 		return NULL;
 	}
+
+	mysql_options( conn, MYSQL_OPT_RECONNECT, &reconnect );
 
 	conn = mysql_real_connect( conn, DB_SERVER, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0 );
 
@@ -48,6 +51,13 @@ void mySqlClose(MYSQL *conn) {
 MYSQL_RES *query( char *sql, MYSQL *conn ) {
 	int sig;
 	MYSQL_RES *res;
+	int ping;
+
+	ping = mysql_ping( conn );
+	if ( ping != 0 ) {
+		fprintf( stderr, "mysql ping error in query\n" );
+		return NULL;
+	}
 
 	sig = mysql_query( conn, sql );
 
@@ -65,6 +75,13 @@ MYSQL_RES *query( char *sql, MYSQL *conn ) {
 
 void command( char *sql, MYSQL *conn ) {
 	int sig;
+	int ping;
+
+	ping = mysql_ping( conn );
+	if ( ping != 0 ) {
+		fprintf( stderr, "mysql ping error in command\n" );
+		return;
+	}
 
 	sig = mysql_query( conn, sql );
 

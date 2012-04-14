@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <fstream>
+#include <pthread.h>
 #include "lib/HpgcJob.h"
 #include "torquejob.h"
 #include "joblog.h"
