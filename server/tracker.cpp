@@ -5,7 +5,7 @@
  *
  *    Description:  implementation of Tracker class
  *
- *        Version:  0.7
+ *        Version:  0.8
  *        Created:  03/17/2012 11:02:39 AM
  *       Revision:  none
  *       Compiler:  gcc
@@ -136,7 +136,9 @@ void* Tracker::flowWorker(void* threadParam)
 	flow->init();
 
 	if (flow->createJobThreads() != 0) {
-		Logger::log(STDOUT, ERROR, ENGINE, "Create job thread failed. Job flow processing is terminated.");
+		string message = "Create job thread failed. Job flow processing is terminated.";
+		Logger::log(STDOUT, ERROR, ENGINE, message);
+		JobLog::Instance()->updateJobFlowStatus(flow->getId(), JobStatus::FAILED, message);
 	}
 	else {
 		flow->trace();

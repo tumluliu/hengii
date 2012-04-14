@@ -5,7 +5,7 @@
  *
  *    Description:  
  *
- *        Version:  0.7
+ *        Version:  0.8
  *        Created:  04/08/2012 03:13:05 PM
  *       Revision:  none
  *       Compiler:  gcc
@@ -71,7 +71,8 @@ class JobLog {
 		MYSQL* borrowConnection();
 		int returnConnection(MYSQL *);
 	public:
-		int registerJob(int64_t, int, const string&);
+		int registerPbsJob(int64_t, int, const string&);
+		int registerJob(int64_t, int);
 		int registerJobFlow(int64_t);
 		int updateJobStatus(int64_t, int, int, const string&);
 		int updateJobFlowStatus(int64_t, int, const string&);

@@ -5,7 +5,7 @@
  *
  *    Description:  implementation of JobTracker class
  *
- *        Version:  0.7
+ *        Version:  0.8
  *        Created:  03/17/2012 11:00:50 AM
  *       Revision:  none
  *       Compiler:  gcc
@@ -194,6 +194,8 @@ string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &o
 			Logger::log(STDOUT, ERROR, ENGINE, response);
 			job->setStatus(JobStatus::FAILED);
 			job->setResult(response);
+			cout << "error, flow id " << job->getFlowId() << " id " << job->getUserJob().id;
+			JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
 			return "";
 		}
 	}
@@ -204,6 +206,7 @@ string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &o
 			Logger::log(STDOUT, ERROR, ENGINE, response);
 			job->setStatus(JobStatus::FAILED);
 			job->setResult(response);
+			JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
 			return "";
 		}
 	}
@@ -227,6 +230,10 @@ void* JobTracker::jobWorker(void* threadParam)
 	ParallelEnv::type parallel_env = userJob.runtime_context.parallel_env;
 	map<string, string> envOptions = userJob.runtime_context.options;
 	map<string, string> appOptions;
+
+	JobLog::Instance()->registerJob(job->getFlowId(), userJob.id);
+	Logger::log(STDOUT, INFO, TORQUE, "job registered.");
+
 	switch (parallel_env) {
 		case ParallelEnv::MPI: 
 			{
@@ -235,8 +242,10 @@ void* JobTracker::jobWorker(void* threadParam)
 					cmdline += MPI_EXEC_CMD;
 					string mpiConf = ""; 
 					if (Utility::readFile(MPI_CONF_PATH, mpiConf) != 0) {
-						Logger::log(STDOUT, ERROR, MPI, "unable to open mpi config file " + MPI_CONF_PATH);
+						response = "unable to open mpi config file " + MPI_CONF_PATH;
+						Logger::log(STDOUT, ERROR, MPI, response);
 						job->setStatus(JobStatus::FAILED);
+						JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
 						return NULL;
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
@@ -253,6 +262,7 @@ void* JobTracker::jobWorker(void* threadParam)
 					Logger::log(STDOUT, ERROR, ENGINE, response);
 					job->setResult(response);
 					job->setStatus(JobStatus::FAILED);
+					JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
 					return NULL;
 				}
 				cmdline = cmdline + APP_DIR + userJob.app_uri + " " + constructCmdOptions(job, userJob.app_options, appOptionsFile);
@@ -281,10 +291,10 @@ void* JobTracker::jobWorker(void* threadParam)
 		job->setStatus(JobStatus::FAILED);
 	}
 	else {
+		JobLog::Instance()->registerPbsJob(job->getFlowId(), userJob.id, job->getId());
+		Logger::log(STDOUT, INFO, TORQUE, "pbs job registered.");
 		job->setStatus(JobStatus::RUNNING);
 		Logger::log(STDOUT, ERROR, TORQUE, "job start.");
-		JobLog::Instance()->registerJob(job->getFlowId(), userJob.id, job->getId());
-		Logger::log(STDOUT, ERROR, TORQUE, "job registered.");
 		job->trace();	
 		job->collect();
 		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");

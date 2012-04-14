@@ -5,7 +5,7 @@
  *
  *    Description:  Declaration of JobTracker class
  *
- *        Version:  0.7 
+ *        Version:  0.8 
  *        Created:  03/17/2012 10:59:18 AM
  *       Revision:  none
  *       Compiler:  gcc

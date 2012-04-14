@@ -5,7 +5,7 @@
  *
  *    Description:
  *
- *        Version:  0.7
+ *        Version:  0.8
  *        Created:  04/08/2012 03:11:58 PM
  *       Revision:  none
  *       Compiler:  gcc
@@ -127,13 +127,12 @@ string JobLog::registerPbsJobSql( int64_t flowId, int jobId, const string &pbsJo
 		+ "', '" + Utility::intToString( jobId ) + "', '" + pbsJobId + "');";
 }
 
-int JobLog::registerJob( int64_t flowId, int jobId, const string &pbsJobId ) {
-	if ( command( registerJobSql( flowId, jobId ) ) == 0 ) {
-		return command( registerPbsJobSql( flowId, jobId, pbsJobId ) );
-	}
-	else {
-		return -1;
-	}
+int JobLog::registerPbsJob( int64_t flowId, int jobId, const string &pbsJobId ) {
+	return command( registerPbsJobSql( flowId, jobId, pbsJobId ) );
+}
+
+int JobLog::registerJob(int64_t flowId, int jobId) {
+	return command( registerJobSql( flowId, jobId ) );
 }
 
 string JobLog::registerJobFlowSql( int64_t flowId ) {
