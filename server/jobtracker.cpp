@@ -127,7 +127,7 @@ int JobTracker::trace() {
 	do {
 		status = updateStatus();
 		log->updateJobStatus(flowId, userJob.id, status, "");
-		usleep(TRACE_INTERVAL_MILLI_S);
+		usleep(TRACE_JOB_INTERVAL_MILLI_S);
 	} while (status != JobStatus::FINISHED && status != JobStatus::FAILED);
 
 	return 0;
@@ -282,8 +282,9 @@ void* JobTracker::jobWorker(void* threadParam)
 	}
 	else {
 		job->setStatus(JobStatus::RUNNING);
-
+		Logger::log(STDOUT, ERROR, TORQUE, "job start.");
 		JobLog::Instance()->registerJob(job->getFlowId(), userJob.id, job->getId());
+		Logger::log(STDOUT, ERROR, TORQUE, "job registered.");
 		job->trace();	
 		job->collect();
 		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");

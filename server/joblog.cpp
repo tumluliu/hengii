@@ -56,9 +56,9 @@ MYSQL *JobLog::borrowConnection() {
 
 	do {
 		for (i = 0; i < connPool.size(); i++) {
-			cout << "trying locking " << i << "th conn" << endl;
-			if(pthread_mutex_trylock(connLock[i])) {
-				cout << i << "th conn locked" << endl;
+			//cout << "trying locking " << i << "th conn" << endl; // checking
+			if(pthread_mutex_trylock(connLock[i]) == 0) {
+				//cout << i << "th conn locked" << endl;
 				return connPool[i];
 			}
 		}
@@ -71,9 +71,9 @@ int JobLog::returnConnection(MYSQL *conn) {
 
 	for (i = 0; i < connPool.size(); i++) {
 		if (conn == connPool[i]) {
-			cout << "unlocking " << i << "th conn" << endl;
+			//cout << "unlocking " << i << "th conn" << endl;
 			pthread_mutex_unlock(connLock[i]);
-			cout << i << "th conn unlocked" << endl;
+			//cout << i << "th conn unlocked" << endl;
 			known = true;
 		}
 	}
@@ -153,6 +153,33 @@ int JobLog::updateJobStatus( int64_t flowId, int jobId, int status, const string
 	return command( updateJobStatusSql( flowId, jobId, status, output ) );
 }
 
+
+string JobLog::updateJobFlowStatusSql(int64_t flowId, int status, const string &message) {
+	return "update " + JOB_FLOW_TABLE_NAME + " set status=" + Utility::intToString( status ) + ", message='" + message 
+		+ "' where id='" + Utility::intToString(flowId) + "'";
+}
+
+int JobLog::updateJobFlowStatus(int64_t flowId, int status, const string &message) {
+	return command( updateJobFlowStatusSql(flowId, status, message) );
+}
+
+string JobLog::getJobStatusSql( int64_t flowId, int jobId ) {
+	return "select status, message from " + JOB_TABLE_NAME
+		+ " where fid='" + Utility::intToString( flowId )
+		+ "' and id='" + Utility::intToString( jobId ) + "';";
+}
+
+string JobLog::getJobCountSql( int64_t flowId ) {
+	return "select count(*) as job_count from " + JOB_TABLE_NAME
+		+ " where fid='" + Utility::intToString( flowId )
+		+ "';";
+}
+
+string JobLog::getFlowStatusSql( int64_t flowId ) {
+	return "select status, message from " + JOB_FLOW_TABLE_NAME
+		+ " where id='" + Utility::intToString( flowId ) + "';";
+}
+
 string JobLog::getPbsJobStatusSql( int64_t flowId, int jobId ) {
 	return "select job_state from " + PBS_JOB_TABLE_NAME
 		+ " where fid='" + Utility::intToString( flowId )
@@ -174,6 +201,73 @@ char JobLog::getPbsJobStatus( int64_t flowId, int jobId ) {
 	}
 
 	status = r[0][0];
+	mysql_free_result( res );
+
+	return status;
+}
+
+int JobLog::getJobStatus( int64_t flowId, int jobId, string &message ) {
+	MYSQL_RES *res;
+	MYSQL_ROW r = NULL;
+	int status;
+
+	res = query( getJobStatusSql( flowId, jobId ) );
+	if ( res != NULL ) {
+		r = mysql_fetch_row( res );
+	}
+
+	if ( r == NULL  || r[0] == NULL ) {
+		return -1;
+	}
+
+	status = atoi(r[0]);
+
+	message = r[1] ? string(r[1]) : "";
+
+	mysql_free_result( res );
+
+	return status;
+}
+
+int JobLog::getJobCount( int64_t flowId ) {
+	MYSQL_RES *res;
+	MYSQL_ROW r = NULL;
+	int jobCount = 0;
+
+	res = query( getJobCountSql( flowId ) );
+	if ( res != NULL ) {
+		r = mysql_fetch_row( res );
+	}
+
+	if ( r == NULL || r[0] == NULL ) {
+		return -1;
+	}
+
+	jobCount = atoi(r[0]);
+
+	mysql_free_result( res );
+
+	return jobCount;
+}
+
+int JobLog::getFlowStatus( int64_t flowId, string &message ) {
+	MYSQL_RES *res;
+	MYSQL_ROW r = NULL;
+	int status;
+
+	res = query( getFlowStatusSql( flowId ) );
+	if ( res != NULL ) {
+		r = mysql_fetch_row( res );
+	}
+
+	if ( r == NULL || r[0] == NULL ) {
+		return -1;
+	}
+
+	status = atoi(r[0]);
+
+	message = r[1] ? string(r[1]) : "";
+
 	mysql_free_result( res );
 
 	return status;
@@ -202,7 +296,7 @@ int JobLog::command( const string &command ) {
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql command error: " + errMsg );
 	}
 	else {
-		Logger::log( STDOUT, INFO, DATABASE, "mysql command executed successfully." );
+		//Logger::log( STDOUT, INFO, DATABASE, "mysql command executed successfully. sql is: " + command );
 	}
 	returnConnection( conn );
 
@@ -222,7 +316,7 @@ MYSQL_RES *JobLog::query( const string &query ) {
 
 	ping = mysql_ping( conn );
 	if ( ping != 0 ) {
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error" );
+		Logger::log( STDOUT, ERROR, DATABASE, "mysql ping error in query." );
 		return NULL;
 	}
 	//return NULL;
@@ -233,9 +327,9 @@ MYSQL_RES *JobLog::query( const string &query ) {
 		string errMsg( mysql_error( conn ) );
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql query error: " + errMsg );
 	}
-	else
-		Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully.");
-
+	else {
+		//Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully. sql is: " + query);
+	}
 	returnConnection( conn );
 
 	return res;

@@ -28,7 +28,7 @@
 using namespace HPGC::HiGIS::Server;
 
 const string MPI_EXEC_CMD = "mpiexec ";
-const int TRACE_INTERVAL_MILLI_S = 100;
+const int TRACE_JOB_INTERVAL_MILLI_S = 100;
 
 class JobTracker{
 	private:

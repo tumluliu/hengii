@@ -38,7 +38,7 @@ const string DB_USER = "myuser";
 const string DB_PASSWORD = "mypassword";
 const string DB_NAME = "higis";
 const int DB_PORT = 3306;
-const int MAX_DB_CONN_NUM = 1; // remember to ensure the db max_connections settings is higher than this
+const int MAX_DB_CONN_NUM = 10; // remember to ensure the db max_connections settings is higher than this
 
 class JobLog {
 	private:
@@ -56,13 +56,16 @@ class JobLog {
 		JobLog(JobLog const&);
 		void operator=(JobLog const&);
 
-
 		MYSQL *createConn();
 		string registerPbsJobSql( int64_t, int, const string&);
 		string registerJobSql(int64_t, int);
 		string registerJobFlowSql(int64_t);
 		string updateJobStatusSql(int64_t, int, int, const string&);
 		string getPbsJobStatusSql( int64_t, int);
+		string getFlowStatusSql( int64_t );
+		string getJobStatusSql( int64_t, int );
+		string getJobCountSql( int64_t flowId );
+		string updateJobFlowStatusSql(int64_t, int, const string&);
 		int command(const string&);
 		MYSQL_RES* query( const string & );
 		MYSQL* borrowConnection();
@@ -71,7 +74,11 @@ class JobLog {
 		int registerJob(int64_t, int, const string&);
 		int registerJobFlow(int64_t);
 		int updateJobStatus(int64_t, int, int, const string&);
+		int updateJobFlowStatus(int64_t, int, const string&);
+		int getJobCount( int64_t flowId );
 		char getPbsJobStatus( int64_t, int );
+		int getFlowStatus( int64_t, string& );
+		int getJobStatus( int64_t, int, string& );
 		static JobLog *Instance();
 };
 

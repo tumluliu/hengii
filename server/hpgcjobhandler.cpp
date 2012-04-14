@@ -21,17 +21,25 @@
 #include "hpgcjobhandler.h"
 #include "logger.h"
 
+HpgcJobHandler::HpgcJobHandler() {
+	for (int i = 0; i < TRACKER_POOL_SIZE; i++) {
+		addTracker();
+	}
+	log = JobLog::Instance();
+}
+
+
 int64_t HpgcJobHandler::findEmptyPoolSlot() {
-	requestItr = requestPool.begin();
-	while (requestItr != requestPool.end()) {
-		if ((requestItr->second).isAvailable())
-			return requestItr->first;
-		requestItr++;
+	trackerItr = trackerPool.begin();
+	while (trackerItr != trackerPool.end()) {
+		if ((trackerItr->second).isAvailable())
+			return trackerItr->first;
+		trackerItr++;
 	}
 	return -1;
 }
 
-int64_t HpgcJobHandler::generateRequestId() {
+int64_t HpgcJobHandler::generateTrackerId() {
 	int64_t id;
 	int64_t prefix;
 
@@ -39,20 +47,14 @@ int64_t HpgcJobHandler::generateRequestId() {
 	do {
 		prefix = time(0) * 1000;
 		id = prefix + rand() % 1000;
-	} while(requestPool.count(id) > 0);
+	} while(trackerPool.count(id) > 0);
 	return id;
 }
 
-HpgcJobHandler::HpgcJobHandler() {
-	for (int i = 0; i < REQUEST_POOL_SIZE; i++) {
-		addRequest();
-	}
-}
-
-void HpgcJobHandler::addRequest() {
-	int64_t id = generateRequestId();
-	Request s(id);
-	requestPool.insert(map<int64_t, Request>::value_type(id, s));
+void HpgcJobHandler::addTracker() {
+	int64_t id = generateTrackerId();
+	Tracker s(id);
+	trackerPool.insert(map<int64_t, Tracker>::value_type(id, s));
 }
 
 int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user_id) {
@@ -68,25 +70,25 @@ int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
 	stringstream msg;
 	msg << "number of jobs in this flow: " << flow.job_count;
 	Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
-	int64_t idleRequestId;
+	int64_t idleTrackerId;
 	do {
-		idleRequestId = findEmptyPoolSlot();
-	} while (idleRequestId == -1);
-	Request *activeRequest =  &requestPool[idleRequestId];
-	activeRequest->setAvailable(false);
-	activeRequest->init(flow);
-	activeRequest->setUserId(user_id);
-	if (activeRequest->createJobThreads() != 0) {
-		Logger::log(STDOUT, ERROR, ENGINE, "Create job thread failed. Job flow processing is terminated.");
-		activeRequest->finalize();
+		idleTrackerId = findEmptyPoolSlot();
+	} while (idleTrackerId == -1);
+	Tracker *activeTracker =  &trackerPool[idleTrackerId];
+	activeTracker->setAvailable(false);
+	activeTracker->setUserJobFlow(flow);
+	activeTracker->setUserId(user_id);
+	if (createFlowThread(activeTracker) != 0) {
+		Logger::log(STDOUT, ERROR, ENGINE, "Create job flow thread failed. Job flow processing is terminated.");
+		activeTracker->finalize();
 	}
-	return static_cast<int64_t>(idleRequestId);
+	return static_cast<int64_t>(idleTrackerId);
 }
 
 void HpgcJobHandler::pause(const int64_t client_ticket) {
 	string sig = "suspend";
-	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
-		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
+	for (int i = 0; i < trackerPool[client_ticket].getJobCount(); i++) {
+		JobTracker tracker = trackerPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() == JobStatus::RUNNING)
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
@@ -104,8 +106,8 @@ void HpgcJobHandler::pause(const int64_t client_ticket) {
 
 void HpgcJobHandler::resume(const int64_t client_ticket) {
 	string sig = "resume";
-	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
-		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
+	for (int i = 0; i < trackerPool[client_ticket].getJobCount(); i++) {
+		JobTracker tracker = trackerPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() == JobStatus::PAUSED) {
 			pbs_sigjob(tracker.getConnection(), 
 					const_cast<char*>(tracker.getId().c_str()), 
@@ -121,8 +123,8 @@ void HpgcJobHandler::resume(const int64_t client_ticket) {
 }
 
 void HpgcJobHandler::cancel(const int64_t client_ticket) {
-	for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {	
-		JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
+	for (int i = 0; i < trackerPool[client_ticket].getJobCount(); i++) {	
+		JobTracker tracker = trackerPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() != JobStatus::RUNNING && tracker.getStatus() != JobStatus::FAILED ) {
 			pbs_deljob(tracker.getConnection(), 
 					const_cast<char*>((tracker.getId()).c_str()), 0);
@@ -137,52 +139,61 @@ void HpgcJobHandler::cancel(const int64_t client_ticket) {
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
-	if (requestPool.count(client_ticket) == 0) {
-		_return.flow_status = Status::NOT_EXIST;
-		_return.message = "get status error, job id not exist";
-		Logger::log(STDOUT, ERROR, ENGINE, _return.message);
-	}
-	else {
-		_return.flow_status = Status::FINISHED;
-		_return.message = "";
-
-		for (int i = 0; i < requestPool[client_ticket].getJobCount(); i++) {
-			JobTracker tracker = requestPool[client_ticket].getJobTrackerAt(i);
-			JobResult jr;
-			jr.message = tracker.getResult();
-			jr.status = tracker.getStatus();
-			if (jr.status == JobStatus::FAILED) {
-				_return.flow_status = Status::FAILED;
-			}	
-			if (jr.status != JobStatus::FAILED && jr.status != JobStatus::FINISHED) {
-				_return.flow_status = Status::RUNNING;
-			}
-			_return.job_result_list.push_back(jr);
-
-			if (_return.flow_status == Status::FINISHED) {
-				Severity lvl = _return.flow_status == Status::FINISHED ? INFO : ERROR;
-				Logger::log(STDOUT, lvl, ENGINE, "The result sent to client is: ");
-				Logger::log(LOG_FILE, lvl, APPLICATION, "message of job: " + jr.message);	
-				Logger::log(STDOUT, lvl, APPLICATION, "message of job: " + jr.message);	
-			}
+	int status = log->getFlowStatus(client_ticket, _return.message);
+	while (status < 0) {
+		status = log->getFlowStatus(client_ticket, _return.message);
+		if (trackerPool.count(client_ticket) == 0) {
+			_return.flow_status = Status::NOT_EXIST;
+			_return.message = "get status error, job flow id not exist";
+			Logger::log(STDOUT, ERROR, ENGINE, _return.message);
+			return;
 		}
-
-		if (_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED ) {
-			requestPool[client_ticket].setAvailable(true);
-			requestPool[client_ticket].finalize();
-			// !!!! There are some big problems here!!!!!!
-			requestPool.erase(client_ticket);
-			addRequest();
-			Logger::log(STDOUT, INFO, ENGINE, "request resource released. ");
-		}
-
-		//	cout<<"HPGC flow finished."<<endl;
-		//	!!!! the finalize of the current active request should not be placed only here
-		//	it should be invoked when the job or jobflow is really finished. !!!!
-		//	by Liu Lu
-		//	2012/3/19
 	}
-	//  pthread_cond_destroy(&waitingCond);
+
+	_return.flow_status = (Status::type)status;
+	Logger::log(STDOUT, ERROR, ENGINE, "flow status returned is: " + Utility::intToString(_return.flow_status));
+	_return.message = "";
+
+	for (int i = 0; i < log->getJobCount(client_ticket); i++) {
+		// !!!! The logistics here implicit that the index of Job in the list is identical to the Job ID !!!!
+		JobResult jr;
+
+		string msg = "";
+		int jobStatus = log->getJobStatus( client_ticket, i, msg ); 
+		if (jobStatus < 0) {
+			jr.message = "get status error, job id not exist";
+			jr.status = JobStatus::NOT_EXIST;
+			Logger::log(STDOUT, ERROR, ENGINE, jr.message);
+			continue;
+		}
+		jr.message = msg;
+		jr.status = (JobStatus::type)jobStatus; 
+
+		_return.job_result_list.push_back(jr);
+
+		if (_return.flow_status == Status::FINISHED) {
+			Severity lvl = _return.flow_status == Status::FINISHED ? INFO : ERROR;
+			Logger::log(STDOUT, lvl, ENGINE, "The result sent to client is: ");
+			Logger::log(LOG_FILE, lvl, APPLICATION, "message of job: " + jr.message);	
+			Logger::log(STDOUT, lvl, APPLICATION, "message of job: " + jr.message);	
+		}
+	}
+
+	if ( trackerPool.count(client_ticket) != 0 && 
+			(_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED) ) {
+		trackerPool[client_ticket].setAvailable(true);
+		trackerPool[client_ticket].finalize();
+		// !!!! There are some big problems here!!!!!!
+		trackerPool.erase(client_ticket);
+		addTracker();
+		Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
+	}
+
+	//	cout<<"HPGC flow finished."<<endl;
+	//	!!!! the finalize of the current active tracker should not be placed only here
+	//	it should be invoked when the job or jobflow is really finished. !!!!
+	//	by Liu Lu
+	//	2012/3/19
 }
 
 void HpgcJobHandler::get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
@@ -193,4 +204,16 @@ void HpgcJobHandler::get_my_requests(std::vector<int64_t> & _return, const std::
 void HpgcJobHandler::get_all_requests(std::vector<int64_t> & _return) {
 	// warning!!!
 	// Not implemente yet. The clients now rely on database for fast implementation
+}
+
+int HpgcJobHandler::createFlowThread( Tracker *tracker ) {
+	int ret;
+	pthread_t tid;
+	if ((ret = pthread_create(&tid, 
+					NULL,
+					&Tracker::flowWorker, 
+					tracker)) != 0) {
+		return ret;
+	}
+	return 0;
 }

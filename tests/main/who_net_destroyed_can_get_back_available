@@ -1,6 +1,5 @@
 #!/bin/bash
 
-#!!!!!The scripts must be run under super user!!!!!!
 # test for the following senario:
 # Client starts a job, but suddenly his network connection to server is destroyed
 # (by some walls, e.g). Luckily, if he remember the session id he get after job started,

@@ -18,7 +18,7 @@
 #ifndef _HPGCJOBHANDLER_H_
 #define _HPGCJOBHANDLER_H_
 
-#include "request.h"
+#include "tracker.h"
 #include "utility.h"
 #include "config.h"
 
@@ -29,7 +29,7 @@ extern "C"
 }
 
 const string PROJECT_NAME = "HiGIS";
-const int REQUEST_POOL_SIZE = 256;
+const int TRACKER_POOL_SIZE = 256;
 const int JOB_STATUS_FINISHED = 0;
 const int JOB_STATUS_UNFINISHED = 1;
 const int JOB_STATUS_FAILED= -1;
@@ -40,11 +40,13 @@ using namespace HPGC::HiGIS::Server;
 
 class HpgcJobHandler : virtual public HpgcJobIf {
 	private:
-		map<int64_t, Request> requestPool;
-		map<int64_t, Request>::const_iterator requestItr;
+		map<int64_t, Tracker> trackerPool;
+		map<int64_t, Tracker>::const_iterator trackerItr;
+		JobLog *log;
 		int64_t findEmptyPoolSlot();
-		int64_t generateRequestId();
-		void addRequest();
+		int64_t generateTrackerId();
+		void addTracker();
+		int createFlowThread( Tracker* );
 	public:
 		HpgcJobHandler();
 		int64_t start_single_job(const Job& job, const std::string& user_id);

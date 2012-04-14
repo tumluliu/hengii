@@ -1,4 +1,4 @@
-GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp request.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
+GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp tracker.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
 GEN_OBJ := $(patsubst %.cpp, %.o, $(GEN_SRC))
 
 THRIFT_DIR := /usr/local/include/thrift/
