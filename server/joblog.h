@@ -59,7 +59,7 @@ class JobLog {
 		MYSQL *createConn();
 		string registerPbsJobSql( int64_t, int, const string&);
 		string registerJobSql(int64_t, int);
-		string registerJobFlowSql(int64_t);
+		string registerJobFlowSql(int64_t, const string&);
 		string updateJobStatusSql(int64_t, int, int, const string&);
 		string getPbsJobStatusSql( int64_t, int);
 		string getFlowStatusSql( int64_t );
@@ -70,10 +70,11 @@ class JobLog {
 		MYSQL_RES* query( const string & );
 		MYSQL* borrowConnection();
 		int returnConnection(MYSQL *);
+		string getCurrentTime();
 	public:
 		int registerPbsJob(int64_t, int, const string&);
 		int registerJob(int64_t, int);
-		int registerJobFlow(int64_t);
+		int registerJobFlow(int64_t, const string&);
 		int updateJobStatus(int64_t, int, int, const string&);
 		int updateJobFlowStatus(int64_t, int, const string&);
 		int getJobCount( int64_t flowId );

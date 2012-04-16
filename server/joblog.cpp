@@ -135,17 +135,24 @@ int JobLog::registerJob(int64_t flowId, int jobId) {
 	return command( registerJobSql( flowId, jobId ) );
 }
 
-string JobLog::registerJobFlowSql( int64_t flowId ) {
-	return "insert into " + JOB_FLOW_TABLE_NAME + "(id) values('" + Utility::intToString( flowId ) + "');";
+string JobLog::registerJobFlowSql( int64_t flowId, const string &userId ) {
+	return "insert into " + JOB_FLOW_TABLE_NAME 
+		+ "(id, user, ctime, utime) values('" 
+		+ Utility::intToString( flowId ) + "', '" 
+		+ userId + "', '" 
+		+ getCurrentTime() + "', '" 
+		+ getCurrentTime() + "');";
 }
 
-int JobLog::registerJobFlow( int64_t flowId ) {
-	return command( registerJobFlowSql( flowId ) );
+int JobLog::registerJobFlow( int64_t flowId, const string &userId ) {
+	return command( registerJobFlowSql( flowId, userId ) );
 }
 
-string JobLog::updateJobStatusSql( int64_t flowId, int jobId, int status, const string &output ) {
-	return "update " + JOB_TABLE_NAME + " set status=" + Utility::intToString( status ) + ", message='" + output
-		+ "' where fid='" + Utility::intToString( flowId ) + "' and id='" + Utility::intToString( jobId ) + "';";
+string JobLog::updateJobStatusSql( int64_t flowId, int jobId, int status, const string &message ) {
+	return "update " + JOB_TABLE_NAME + " set status=" + Utility::intToString( status ) 
+		+ ", message='" + message
+		+ "' where fid='" + Utility::intToString( flowId ) 
+		+ "' and id='" + Utility::intToString( jobId ) + "';";
 }
 
 int JobLog::updateJobStatus( int64_t flowId, int jobId, int status, const string &output ) {
@@ -154,7 +161,10 @@ int JobLog::updateJobStatus( int64_t flowId, int jobId, int status, const string
 
 
 string JobLog::updateJobFlowStatusSql(int64_t flowId, int status, const string &message) {
-	return "update " + JOB_FLOW_TABLE_NAME + " set status=" + Utility::intToString( status ) + ", message='" + message 
+	return "update " + JOB_FLOW_TABLE_NAME 
+		+ " set status=" + Utility::intToString( status ) 
+		+ ", message='" + message 
+		+ "', utime='" + getCurrentTime()
 		+ "' where id='" + Utility::intToString(flowId) + "'";
 }
 
@@ -292,7 +302,8 @@ int JobLog::command( const string &command ) {
 	ret = mysql_query( conn, command.c_str() );
 	if ( ret != 0 ) {
 		string errMsg( mysql_error( conn ) );
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql command error: " + errMsg );
+		Logger::log( STDOUT, ERROR, DATABASE, "mysql command error: " + errMsg 
+				+ ", sql is: " + command );
 	}
 	else {
 		//Logger::log( STDOUT, INFO, DATABASE, "mysql command executed successfully. sql is: " + command );
@@ -324,7 +335,8 @@ MYSQL_RES *JobLog::query( const string &query ) {
 	res = mysql_store_result( conn );
 	if ( ret != 0 ) {
 		string errMsg( mysql_error( conn ) );
-		Logger::log( STDOUT, ERROR, DATABASE, "mysql query error: " + errMsg );
+		Logger::log( STDOUT, ERROR, DATABASE, "mysql query error: " + errMsg
+			   + ", sql is: " + query	);
 	}
 	else {
 		//Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully. sql is: " + query);
@@ -332,4 +344,14 @@ MYSQL_RES *JobLog::query( const string &query ) {
 	returnConnection( conn );
 
 	return res;
+}
+
+string JobLog::getCurrentTime() {
+	const int TIME_LENGTH = 80;
+	char result[TIME_LENGTH];
+	time_t t = time(0);
+
+	strftime( result, TIME_LENGTH, "%Y-%m-%d %X", localtime( &t ) );
+
+	return string(result);
 }

@@ -9,6 +9,7 @@
 
 _prepare_program $1
 PROGRAM_ERROR_MESSAGE=$(mpiexec -np $2 $APPSHOME/$1)
+#PROGRAM_ERROR_MESSAGE="Try getting member values from null pointer"
 _prepare_server
 _start_server | _contains "$PROGRAM_ERROR_MESSAGE" | _at server &
 sleep 0.1

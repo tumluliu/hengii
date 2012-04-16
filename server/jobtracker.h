@@ -35,7 +35,7 @@ class JobTracker{
 		int64_t flowId;
 		pthread_mutex_t* threadMutex;
 		pthread_cond_t* waitingCond;
-		JobStatus::type jobStatus;
+		JobStatus::type innerStatus;
 		JobStatus::type outerStatus; // the status determined by the job but not determined by TorqueJob
 		TorqueJob qJob;
 		Job userJob;
@@ -65,7 +65,7 @@ class JobTracker{
 		void setBusyParentCountListIter(vector<int>::iterator);
 		void setWaitingCond(pthread_cond_t* cond);
 		JobStatus::type getStatus();
-		JobStatus::type updateStatus();
+		JobStatus::type updateInnerStatus();
 		void setStatus(JobStatus::type);
 		static void* jobWorker(void*);
 };

@@ -5,8 +5,7 @@
 # at last, print the result's message to std
 
 ret = client.get_status(id)
-while(ret.flow_status == Status::RUNNING)
-	sleep(5)
+while(ret.flow_status != Status::FINISHED && ret.flow_status != Status::FAILED && ret.flow_status != Status::NOT_EXIST)
 	ret = client.get_status(id)
 end
 

@@ -38,7 +38,6 @@ class Tracker{
 		string userId;
 		JobFlow flow;
 		JobLog *log;
-		Status::type getStatus();
 	public:
 		Tracker();
 		Tracker(int64_t);
@@ -57,6 +56,7 @@ class Tracker{
 		void setUserId(const string&);
 		string getUserId() const;
 		int trace();
+		Status::type getStatus() const;
 
 		static void* flowWorker(void* threadParam);
 };

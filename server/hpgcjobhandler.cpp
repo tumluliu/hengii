@@ -26,6 +26,11 @@ HpgcJobHandler::HpgcJobHandler() {
 		addTracker();
 	}
 	log = JobLog::Instance();
+	pthread_mutex_init(&poolLock, NULL);
+}
+
+HpgcJobHandler::~HpgcJobHandler() {
+	pthread_mutex_destroy(&poolLock);
 }
 
 
@@ -123,6 +128,7 @@ void HpgcJobHandler::resume(const int64_t client_ticket) {
 }
 
 void HpgcJobHandler::cancel(const int64_t client_ticket) {
+	// need ticket validation!!! by YANG Anran at 20120415
 	for (int i = 0; i < trackerPool[client_ticket].getJobCount(); i++) {	
 		JobTracker tracker = trackerPool[client_ticket].getJobTrackerAt(i);
 		if (tracker.getStatus() != JobStatus::RUNNING && tracker.getStatus() != JobStatus::FAILED ) {
@@ -151,6 +157,7 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 	}
 
 	_return.flow_status = (Status::type)status;
+	Logger::log(STDOUT, DEBUG, ENGINE, "return status is: " + Utility::intToString(_return.flow_status));
 	_return.message = "";
 
 	for (int i = 0; i < log->getJobCount(client_ticket); i++) {
@@ -168,23 +175,27 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 
 		_return.job_result_list.push_back(jr);
 
-		if (_return.flow_status == Status::FINISHED) {
-			Severity lvl = _return.flow_status == Status::FINISHED ? INFO : ERROR;
+		if (_return.flow_status == Status::FINISHED 
+				|| _return.flow_status == Status::FAILED ) {
+			Severity lvl = INFO;
 			Logger::log(STDOUT, lvl, ENGINE, "The result sent to client is: ");
 			Logger::log(LOG_FILE, lvl, APPLICATION, "message of job: " + jr.message);	
 			Logger::log(STDOUT, lvl, APPLICATION, "message of job: " + jr.message);	
 		}
 	}
 
-	if ( trackerPool.count(client_ticket) != 0 && 
-			(_return.flow_status == Status::FAILED || _return.flow_status == Status::FINISHED) ) {
-		trackerPool[client_ticket].setAvailable(true);
-		trackerPool[client_ticket].finalize();
-		// !!!! There are some big problems here!!!!!!
-		trackerPool.erase(client_ticket);
-		addTracker();
-		Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
-	}
+	//if ( _return.flow_status == Status::FAILED 
+	//|| _return.flow_status == Status::FINISHED) {
+	//pthread_mutex_lock(&poolLock);
+	//if (trackerPool.count(client_ticket) != 0 ) {
+	//trackerPool[client_ticket].setAvailable(true);
+	//trackerPool[client_ticket].finalize();
+	//trackerPool.erase(client_ticket);
+	//addTracker();
+	//Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
+	//}
+	//pthread_mutex_unlock(&poolLock);
+	//}
 
 	//	cout<<"HPGC flow finished."<<endl;
 	//	!!!! the finalize of the current active tracker should not be placed only here
@@ -213,4 +224,23 @@ int HpgcJobHandler::createFlowThread( Tracker *tracker ) {
 		return ret;
 	}
 	return 0;
+}
+
+void *HpgcJobHandler::cleanWorker( void *handler ) {
+	HpgcJobHandler* master = (HpgcJobHandler*)handler;
+	map<int64_t, Tracker>::iterator it = master->trackerPool.begin();
+
+	while(it != master->trackerPool.end()) {
+		if ( (it->second).getStatus() == Status::FAILED 
+				|| (it->second).getStatus() == Status::FINISHED) {
+			pthread_mutex_lock(&(master->poolLock));
+			(it->second).setAvailable(true);
+			(it->second).finalize();
+			master->trackerPool.erase(it->first);
+			master->addTracker();
+			Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
+			pthread_mutex_unlock(&(master->poolLock));
+		}
+		it++;
+	}
 }

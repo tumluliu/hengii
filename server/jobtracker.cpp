@@ -28,7 +28,7 @@
 JobTracker::JobTracker( int64_t id ) {
 	flowId = id;
 	log = JobLog::Instance();
-	jobStatus = JobStatus::NOT_EXIST;
+	outerStatus = JobStatus::NOT_EXIST;
 }
 
 void JobTracker::setUserJob(const Job& job) {
@@ -52,18 +52,21 @@ string JobTracker::getCmdline() const {
 }
 
 JobStatus::type JobTracker::getStatus() {
-	return jobStatus;
+	// The inner(pbs) status overwrite outer status when pbsjob is running,
+	// but the outer status overwrite the finish state of inner status to
+	// do some posting works
+	if (outerStatus != JobStatus::RUNNING 
+			&& innerStatus != JobStatus::FINISHED) {
+		return innerStatus;
+	}
+	return outerStatus;
 }
 
-JobStatus::type JobTracker::updateStatus() {
-	if (outerStatus != JobStatus::RUNNING) {
-		return jobStatus;
-	}
-
+JobStatus::type JobTracker::updateInnerStatus() {
 	char pbsStatus = log->getPbsJobStatus(flowId, userJob.id);
 
 	if (pbsStatus == 'C') {
-		jobStatus = JobStatus::FINISHED;
+		innerStatus = JobStatus::FINISHED;
 		Logger::log( STDOUT, INFO, ENGINE, 
 				"job " + Utility::intToString(userJob.id) + " in flow " + Utility::intToString(flowId) 
 				+ " is finished");
@@ -71,24 +74,24 @@ JobStatus::type JobTracker::updateStatus() {
 		cout << "flow id string is: " << Utility::intToString(flowId) << endl;
 	}
 	else if (pbsStatus == 'Q') {
-		jobStatus = JobStatus::QUEUING;
+		innerStatus = JobStatus::QUEUING;
 	}
 	else if (pbsStatus == 'R') {
-		jobStatus = JobStatus::RUNNING;
+		innerStatus = JobStatus::RUNNING;
 	}
 	else if (pbsStatus == 'S' || pbsStatus == 'H') {
-		jobStatus = JobStatus::PAUSED;
+		innerStatus = JobStatus::PAUSED;
 	}
 	else {
-		jobStatus = JobStatus::NOT_EXIST;
+		innerStatus = JobStatus::NOT_EXIST;
 	}
 
-	return jobStatus;
+	return getStatus();
 }
 
 void JobTracker::setStatus(JobStatus::type stat) {
 	outerStatus = stat;
-	jobStatus = stat;
+	log->updateJobStatus(flowId, userJob.id, stat, qJob.getOutput());
 }
 
 int JobTracker::getConnection() const {
@@ -118,17 +121,18 @@ int JobTracker::submit() {
 int JobTracker::collect() {
 	int ret = qJob.collect();
 	log->updateJobStatus(flowId, userJob.id, getStatus(), qJob.getOutput());
+	Logger::log(STDOUT, DEBUG, ENGINE, "message updated is:" + qJob.getOutput());
 	return ret;
 }
 
 int JobTracker::trace() {
-	JobStatus::type status = JobStatus::RUNNING;
+	innerStatus = JobStatus::RUNNING;
 
 	do {
-		status = updateStatus();
-		log->updateJobStatus(flowId, userJob.id, status, "");
+		updateInnerStatus();
+		log->updateJobStatus(flowId, userJob.id, getStatus(), "");
 		usleep(TRACE_JOB_INTERVAL_MILLI_S);
-	} while (status != JobStatus::FINISHED && status != JobStatus::FAILED);
+	} while (innerStatus != JobStatus::FINISHED && innerStatus != JobStatus::FAILED);
 
 	return 0;
 }
@@ -294,7 +298,7 @@ void* JobTracker::jobWorker(void* threadParam)
 		JobLog::Instance()->registerPbsJob(job->getFlowId(), userJob.id, job->getId());
 		Logger::log(STDOUT, INFO, TORQUE, "pbs job registered.");
 		job->setStatus(JobStatus::RUNNING);
-		Logger::log(STDOUT, ERROR, TORQUE, "job start.");
+		Logger::log(STDOUT, INFO, TORQUE, "job start.");
 		job->trace();	
 		job->collect();
 		Logger::log(STDOUT, INFO, TORQUE, "Torque PBS job collects.");
@@ -305,8 +309,8 @@ void* JobTracker::jobWorker(void* threadParam)
 		}
 		pthread_mutex_unlock(job->getThreadMutex());
 		pthread_cond_broadcast(job->getWaitingCond());
-		job->setStatus(JobStatus::FINISHED);
 		Logger::log(STDOUT, INFO, ENGINE, "JobTracker::getResult(): " + job->getResult());
+		job->setStatus(JobStatus::FINISHED);
 	}
 	return NULL;
 }

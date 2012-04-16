@@ -18,6 +18,7 @@
 #ifndef _HPGCJOBHANDLER_H_
 #define _HPGCJOBHANDLER_H_
 
+#include <pthread.h>
 #include "tracker.h"
 #include "utility.h"
 #include "config.h"
@@ -42,13 +43,16 @@ class HpgcJobHandler : virtual public HpgcJobIf {
 	private:
 		map<int64_t, Tracker> trackerPool;
 		map<int64_t, Tracker>::const_iterator trackerItr;
+		pthread_mutex_t poolLock;
 		JobLog *log;
 		int64_t findEmptyPoolSlot();
 		int64_t generateTrackerId();
 		void addTracker();
 		int createFlowThread( Tracker* );
+		static void *cleanWorker(void*);
 	public:
 		HpgcJobHandler();
+		~HpgcJobHandler();
 		int64_t start_single_job(const Job& job, const std::string& user_id);
 		int64_t start(const JobFlow& flow, const std::string& user_id);
 		void pause(const int64_t client_ticket);

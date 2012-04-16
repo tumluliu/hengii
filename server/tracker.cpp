@@ -69,7 +69,7 @@ int Tracker::createJobThreads() {
 	return 0;
 }
 
-Status::type Tracker::getStatus() {
+Status::type Tracker::getStatus() const {
 	Status::type status = Status::FINISHED;
 	for (int i = 0; i < getJobCount(); i++) {
 		JobTracker job = getJobTrackerAt(i);
@@ -91,8 +91,6 @@ int Tracker::trace() {
 		log->updateJobFlowStatus(id, status, "");
 		usleep(TRACE_INTERVAL_MILLI_S);
 	} while (status != Status::FINISHED && status != Status::FAILED);
-
-	status = Status::FINISHED;
 }
 
 void Tracker::setUserJobFlow( const JobFlow &jobFlow ) {
@@ -132,7 +130,7 @@ void* Tracker::flowWorker(void* threadParam)
 {
 	Tracker* flow = (Tracker*) threadParam;
 
-	JobLog::Instance()->registerJobFlow(flow->getId());
+	JobLog::Instance()->registerJobFlow(flow->getId(), flow->userId);
 	flow->init();
 
 	if (flow->createJobThreads() != 0) {
