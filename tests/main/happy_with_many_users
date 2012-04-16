@@ -1,0 +1,34 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: happ_with_many_users
+# 
+#         USAGE: ./happ_with_many_users 
+# 
+#   DESCRIPTION: test for concurrent user works
+#		 INPUTS: 1:program 1 name
+#		         2:np of 1
+#                3:program 2 name
+#                4:np of 2
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/16/2012 08:04:38 PM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+_prepare_server
+_start_server | _contains_$1_output $2 | _at server &
+sleep 0.1
+_prepare_program $1 ; 
+execute_program $1 $2 | _contains_$1_output $2 | _at 1 &
+execute_program $1 $2 | _contains_$1_output $2 | _at 2 &
+_prepare_program $3 ; execute_program $3 $4 | _contains "$(mpiexec -np $4 $APPSHOME/$3)" | _at 3
+_collect 1 2 3 | _at client
+_kill_server
+_collect server client

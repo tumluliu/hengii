@@ -56,7 +56,7 @@ JobStatus::type JobTracker::getStatus() {
 	// The inner(pbs) status overwrite outer status when pbsjob is running,
 	// but the outer status overwrite the finish state of inner status to
 	// do some posting works
-	if (outerStatus != JobStatus::RUNNING 
+	if (outerStatus == JobStatus::RUNNING 
 			&& innerStatus != JobStatus::FINISHED) {
 		return innerStatus;
 	}
@@ -92,7 +92,12 @@ JobStatus::type JobTracker::updateInnerStatus() {
 
 void JobTracker::setStatus(JobStatus::type stat) {
 	outerStatus = stat;
-	log->updateJobStatus(flowId, userJob.id, stat, qJob.getOutput());
+	log->updateJobStatus(flowId, userJob.id, stat, getResult());
+}
+
+void JobTracker::setStatus(JobStatus::type stat, const string &msg) {
+	outerStatus = stat;
+	log->updateJobStatus(flowId, userJob.id, stat, msg);
 }
 
 int JobTracker::getConnection() const {
@@ -121,7 +126,7 @@ int JobTracker::submit() {
 
 int JobTracker::collect() {
 	int ret = qJob.collect();
-	log->updateJobStatus(flowId, userJob.id, getStatus(), qJob.getOutput());
+	setStatus(getStatus(), qJob.getOutput());
 	return ret;
 }
 
@@ -130,7 +135,7 @@ int JobTracker::trace() {
 
 	do {
 		updateInnerStatus();
-		log->updateJobStatus(flowId, userJob.id, getStatus(), "");
+		setStatus(getStatus(), getResult());
 		usleep(TRACE_JOB_INTERVAL_MILLI_S);
 	} while (innerStatus != JobStatus::FINISHED && innerStatus != JobStatus::FAILED);
 
@@ -196,10 +201,8 @@ string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &o
 		if (appOptionMetas[i].isOptional == false && lackEssential == true) {
 			response = "start job error, lack option " + appOptionMetas[i].name;
 			Logger::log(STDOUT, ERROR, ENGINE, response);
-			job->setStatus(JobStatus::FAILED);
-			job->setResult(response);
+			job->setStatus(JobStatus::FAILED, response);
 			cout << "error, flow id " << job->getFlowId() << " id " << job->getUserJob().id;
-			JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
 			return "";
 		}
 	}
@@ -208,9 +211,7 @@ string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &o
 		if (AppOption::isUnknown(appOptionMetas, (*it).first)) {
 			response = "start job error, option " + (*it).first + " unknown";
 			Logger::log(STDOUT, ERROR, ENGINE, response);
-			job->setStatus(JobStatus::FAILED);
-			job->setResult(response);
-			JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
+			job->setStatus(JobStatus::FAILED, response);
 			return "";
 		}
 	}
@@ -248,8 +249,7 @@ void* JobTracker::jobWorker(void* threadParam)
 					if (Utility::readFile(MPI_CONF_PATH, mpiConf) != 0) {
 						response = "unable to open mpi config file " + MPI_CONF_PATH;
 						Logger::log(STDOUT, ERROR, MPI, response);
-						job->setStatus(JobStatus::FAILED);
-						JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
+						job->setStatus(JobStatus::FAILED, response);
 						return NULL;
 					}
 					cmdline = cmdline + "-n " + envOptions["process_count"] + " " + mpiConf + " ";
@@ -265,8 +265,7 @@ void* JobTracker::jobWorker(void* threadParam)
 						+ " not exist";
 					Logger::log(STDOUT, ERROR, ENGINE, response);
 					job->setResult(response);
-					job->setStatus(JobStatus::FAILED);
-					JobLog::Instance()->updateJobStatus(job->getFlowId(), job->getUserJob().id, JobStatus::FAILED, response);
+					job->setStatus(JobStatus::FAILED, response);
 					return NULL;
 				}
 				cmdline = cmdline + APP_DIR + userJob.app_uri + " " + constructCmdOptions(job, userJob.app_options, appOptionsFile);

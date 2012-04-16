@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 	threadManager->start();
 	TNonblockingServer server(processor, protocolFactory, PORT, threadManager);
 	cout << "================================================" << endl;
-	cout << "higis engine v" << VERSION << " working on port " << PORT << endl;
+	cout << PROJECT_NAME << " engine v" << VERSION << " working on port " << PORT << endl;
 	cout << "Press Ctrl+C to exit" << endl;
 	cout << "================================================" << endl;
 	server.serve();

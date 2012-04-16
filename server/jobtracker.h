@@ -66,6 +66,7 @@ class JobTracker{
 		void setWaitingCond(pthread_cond_t* cond);
 		JobStatus::type getStatus();
 		JobStatus::type updateInnerStatus();
+		void setStatus(JobStatus::type, const string &);
 		void setStatus(JobStatus::type);
 		static void* jobWorker(void*);
 };
