@@ -65,7 +65,7 @@ MYSQL_RES *query( char *sql, MYSQL *conn ) {
 		fprintf( stderr, "Error making query: %s\n", mysql_error( conn ) );
 	}
 	else {
-		fprintf( stderr, "Query made...\n" );
+		/*fprintf( stderr, "Query made...\n" );*/
 	}
 
 	res = mysql_store_result( conn );
@@ -89,6 +89,6 @@ void command( char *sql, MYSQL *conn ) {
 		fprintf( stderr, "Error making command: %s\n", mysql_error( conn ) );
 	}
 	else {
-		fprintf( stderr, "Command made...\n" );
+		/*fprintf( stderr, "Command made...\n" );*/
 	}
 }

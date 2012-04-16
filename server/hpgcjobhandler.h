@@ -36,6 +36,7 @@ const int JOB_STATUS_UNFINISHED = 1;
 const int JOB_STATUS_FAILED= -1;
 const int JOB_NOT_EXIST = -2;
 const int JOB_STATUS_UNKNOWN = -999;
+const int TRACKER_GC_INTERVAL_S = 1;
 
 using namespace HPGC::HiGIS::Server;
 
@@ -45,6 +46,7 @@ class HpgcJobHandler : virtual public HpgcJobIf {
 		map<int64_t, Tracker>::const_iterator trackerItr;
 		pthread_mutex_t poolLock;
 		JobLog *log;
+		pthread_t gctId;
 		int64_t findEmptyPoolSlot();
 		int64_t generateTrackerId();
 		void addTracker();

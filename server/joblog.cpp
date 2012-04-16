@@ -226,6 +226,7 @@ int JobLog::getJobStatus( int64_t flowId, int jobId, string &message ) {
 	}
 
 	if ( r == NULL  || r[0] == NULL ) {
+		mysql_free_result( res );
 		return -1;
 	}
 
@@ -270,6 +271,7 @@ int JobLog::getFlowStatus( int64_t flowId, string &message ) {
 	}
 
 	if ( r == NULL || r[0] == NULL ) {
+		mysql_free_result( res );
 		return -1;
 	}
 
@@ -336,7 +338,7 @@ MYSQL_RES *JobLog::query( const string &query ) {
 	if ( ret != 0 ) {
 		string errMsg( mysql_error( conn ) );
 		Logger::log( STDOUT, ERROR, DATABASE, "mysql query error: " + errMsg
-			   + ", sql is: " + query	);
+				+ ", sql is: " + query	);
 	}
 	else {
 		//Logger::log(STDOUT, DEBUG, DATABASE, "mysql query executed successfully. sql is: " + query);

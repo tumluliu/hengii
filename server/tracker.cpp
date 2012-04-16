@@ -142,14 +142,6 @@ void* Tracker::flowWorker(void* threadParam)
 		flow->trace();
 		Logger::log(STDOUT, INFO, TORQUE, "flow " + Utility::intToString(flow->getId()) + " finished.");
 	}
-	// !!!! finalize !!!! unfinished 2
-	//trackerPool[client_ticket].setAvailable(true);
-	//trackerPool[client_ticket].finalize();
-	//// !!!! There are some big problems here!!!!!!
-	//trackerPool.erase(client_ticket);
-	//addTracker();
-	//Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
-
 	return NULL;
 }
 

@@ -27,9 +27,13 @@ HpgcJobHandler::HpgcJobHandler() {
 	}
 	log = JobLog::Instance();
 	pthread_mutex_init(&poolLock, NULL);
+
+	pthread_create(&gctId, NULL, cleanWorker, this);
 }
 
 HpgcJobHandler::~HpgcJobHandler() {
+	void *tret;
+	pthread_join(gctId, &tret);
 	pthread_mutex_destroy(&poolLock);
 }
 
@@ -58,8 +62,9 @@ int64_t HpgcJobHandler::generateTrackerId() {
 
 void HpgcJobHandler::addTracker() {
 	int64_t id = generateTrackerId();
-	Tracker s(id);
-	trackerPool.insert(map<int64_t, Tracker>::value_type(id, s));
+	Tracker t(id);
+	t.setAvailable(true);
+	trackerPool.insert(map<int64_t, Tracker>::value_type(id, t));
 }
 
 int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user_id) {
@@ -76,11 +81,16 @@ int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
 	msg << "number of jobs in this flow: " << flow.job_count;
 	Logger::log(STDOUT, DEBUG, ENGINE, msg.str());
 	int64_t idleTrackerId;
+
+	pthread_mutex_lock(&poolLock);
 	do {
 		idleTrackerId = findEmptyPoolSlot();
 	} while (idleTrackerId == -1);
+
 	Tracker *activeTracker =  &trackerPool[idleTrackerId];
 	activeTracker->setAvailable(false);
+	pthread_mutex_unlock(&poolLock);
+
 	activeTracker->setUserJobFlow(flow);
 	activeTracker->setUserId(user_id);
 	if (createFlowThread(activeTracker) != 0) {
@@ -157,7 +167,7 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 	}
 
 	_return.flow_status = (Status::type)status;
-	Logger::log(STDOUT, DEBUG, ENGINE, "return status is: " + Utility::intToString(_return.flow_status));
+	//Logger::log(STDOUT, DEBUG, ENGINE, "return status is: " + Utility::intToString(_return.flow_status));
 	_return.message = "";
 
 	for (int i = 0; i < log->getJobCount(client_ticket); i++) {
@@ -183,25 +193,6 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 			Logger::log(STDOUT, lvl, APPLICATION, "message of job: " + jr.message);	
 		}
 	}
-
-	//if ( _return.flow_status == Status::FAILED 
-	//|| _return.flow_status == Status::FINISHED) {
-	//pthread_mutex_lock(&poolLock);
-	//if (trackerPool.count(client_ticket) != 0 ) {
-	//trackerPool[client_ticket].setAvailable(true);
-	//trackerPool[client_ticket].finalize();
-	//trackerPool.erase(client_ticket);
-	//addTracker();
-	//Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
-	//}
-	//pthread_mutex_unlock(&poolLock);
-	//}
-
-	//	cout<<"HPGC flow finished."<<endl;
-	//	!!!! the finalize of the current active tracker should not be placed only here
-	//	it should be invoked when the job or jobflow is really finished. !!!!
-	//	by Liu Lu
-	//	2012/3/19
 }
 
 void HpgcJobHandler::get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
@@ -229,18 +220,39 @@ int HpgcJobHandler::createFlowThread( Tracker *tracker ) {
 void *HpgcJobHandler::cleanWorker( void *handler ) {
 	HpgcJobHandler* master = (HpgcJobHandler*)handler;
 	map<int64_t, Tracker>::iterator it = master->trackerPool.begin();
+	vector<int64_t> garbageIds;
+	unsigned int i;
 
-	while(it != master->trackerPool.end()) {
-		if ( (it->second).getStatus() == Status::FAILED 
-				|| (it->second).getStatus() == Status::FINISHED) {
-			pthread_mutex_lock(&(master->poolLock));
-			(it->second).setAvailable(true);
-			(it->second).finalize();
-			master->trackerPool.erase(it->first);
-			master->addTracker();
-			Logger::log(STDOUT, INFO, ENGINE, "tracker resource released. ");
-			pthread_mutex_unlock(&(master->poolLock));
+	do {
+		// scan
+		while(it != master->trackerPool.end()) {
+			if (!(it->second).isAvailable()) {
+				if ( (it->second).getStatus() == Status::FAILED 
+						|| (it->second).getStatus() == Status::FINISHED) {
+					garbageIds.push_back(it->first);
+				}
+			}
+			it++;
 		}
-		it++;
-	}
+
+		// clean
+		for (i = 0; i < garbageIds.size(); i++) {
+			master->trackerPool[garbageIds[i]].finalize();
+			master->trackerPool.erase(garbageIds[i]);
+			Logger::log(STDOUT, DEBUG, ENGINE, 
+					"garbage cleaned, now there are " 
+					+ Utility::intToString(master->trackerPool.size()) 
+					+ " trackers in pool");
+			master->addTracker();
+			Logger::log(STDOUT, DEBUG, ENGINE, 
+					"new resource added, now there are " 
+					+ Utility::intToString(master->trackerPool.size()) 
+					+ " trackers in pool");
+		}
+
+		garbageIds.clear();
+		sleep(TRACKER_GC_INTERVAL_S);
+		it = master->trackerPool.begin();
+
+	} while(true);
 }

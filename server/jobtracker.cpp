@@ -29,6 +29,7 @@ JobTracker::JobTracker( int64_t id ) {
 	flowId = id;
 	log = JobLog::Instance();
 	outerStatus = JobStatus::NOT_EXIST;
+	innerStatus = outerStatus;
 }
 
 void JobTracker::setUserJob(const Job& job) {
@@ -121,7 +122,6 @@ int JobTracker::submit() {
 int JobTracker::collect() {
 	int ret = qJob.collect();
 	log->updateJobStatus(flowId, userJob.id, getStatus(), qJob.getOutput());
-	Logger::log(STDOUT, DEBUG, ENGINE, "message updated is:" + qJob.getOutput());
 	return ret;
 }
 

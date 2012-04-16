@@ -18,6 +18,7 @@
 #ifndef _TRACKER_H_
 #define _TRACKER_H_
 
+#include <stdbool.h>
 #include "joblog.h"
 #include "jobtracker.h"
 

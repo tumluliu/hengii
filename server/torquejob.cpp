@@ -184,6 +184,7 @@ int TorqueJob::submit() {
 		return -1;
 	}
 	id = string(ret);
+	free(ret);
 	stringstream msg;
 	msg << "Torque PBS job has been submitted successfully, job ID is: " << id << endl;
 	Logger::log(STDOUT, INFO, TORQUE, msg.str());
