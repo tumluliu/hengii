@@ -20,9 +20,9 @@
 #include "logger.h"
 #include "utility.h"
 
-Tracker::Tracker(): jobThreadIdList(MAX_JOB_COUNT), available(true) { } // not sure why needed by YANG Anran at 20120414
+Tracker::Tracker(): jobThreadIdList(MAX_JOB_COUNT), available(true), isBusy(false) { } // not sure why needed by YANG Anran at 20120414
 
-Tracker::Tracker(int64_t trackerId): jobThreadIdList(MAX_JOB_COUNT), available(true) {
+Tracker::Tracker(int64_t trackerId): jobThreadIdList(MAX_JOB_COUNT), available(true), isBusy(false) {
 	id = trackerId;
 	log = JobLog::Instance();
 }
@@ -51,6 +51,9 @@ bool Tracker::isAvailable() const {
 
 void Tracker::setAvailable(bool value) {
 	available = value;
+	if (!available) {
+		isBusy = true;
+	}
 }
 
 JobTracker Tracker::getJobTrackerAt(int index) const {
@@ -70,6 +73,19 @@ int Tracker::createJobThreads() {
 }
 
 Status::type Tracker::getStatus() const {
+	Status::type status = getInnerStatus();
+
+	/* isBusy means the flow needs to do some of his own work despite its jobs */
+	if(status == Status::FINISHED || status == Status::FAILED) {
+		if (isBusy) {
+			status = Status::RUNNING;
+		}
+	}
+
+	return status;
+}
+
+Status::type Tracker::getInnerStatus() const {
 	Status::type status = Status::FINISHED;
 	for (int i = 0; i < getJobCount(); i++) {
 		JobTracker job = getJobTrackerAt(i);
@@ -86,11 +102,11 @@ Status::type Tracker::getStatus() const {
 int Tracker::trace() {
 	Status::type status = Status::RUNNING;
 
-	do {
-		status = getStatus();
+	while (getInnerStatus() != Status::FINISHED && getInnerStatus() != Status::FAILED) {
+		status = getInnerStatus();
 		log->updateJobFlowStatus(id, status, "");
 		usleep(TRACE_INTERVAL_MILLI_S);
-	} while (status != Status::FINISHED && status != Status::FAILED);
+	}
 }
 
 void Tracker::setUserJobFlow( const JobFlow &jobFlow ) {
@@ -142,6 +158,8 @@ void* Tracker::flowWorker(void* threadParam)
 		flow->trace();
 		Logger::log(STDOUT, INFO, TORQUE, "flow " + Utility::intToString(flow->getId()) + " finished.");
 	}
+	flow->isBusy = false;
+	JobLog::Instance()->updateJobFlowStatus(flow->id, flow->getStatus(), "");
 	return NULL;
 }
 

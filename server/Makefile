@@ -24,7 +24,7 @@ config.h: config.h.in
 	sed -i "s%@MONITOR_PATH@%\"$(PWD)/pbsmonitor\"%g" config.h
 
 %.o: %.cpp
-	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wno-return-type $(INC) -c $< -g -o $@
+	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wextra -Wno-return-type $(INC) -c $< -g -o $@
 
 higine: config.h higine.o $(GEN_OBJ)
 	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque -lmysql $^ -g -o $@
@@ -34,3 +34,4 @@ pbsmonitor:
 
 clean:
 	$(RM) ./lib/*.o *.o higine config.h 
+	cd guard; make clean;

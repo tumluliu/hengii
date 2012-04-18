@@ -238,6 +238,7 @@ void *HpgcJobHandler::cleanWorker( void *handler ) {
 		// clean
 		for (i = 0; i < garbageIds.size(); i++) {
 			master->trackerPool[garbageIds[i]].finalize();
+			pthread_mutex_lock(&(master->poolLock));
 			master->trackerPool.erase(garbageIds[i]);
 			Logger::log(STDOUT, DEBUG, ENGINE, 
 					"garbage cleaned, now there are " 
@@ -248,6 +249,7 @@ void *HpgcJobHandler::cleanWorker( void *handler ) {
 					"new resource added, now there are " 
 					+ Utility::intToString(master->trackerPool.size()) 
 					+ " trackers in pool");
+			pthread_mutex_unlock(&(master->poolLock));
 		}
 
 		garbageIds.clear();

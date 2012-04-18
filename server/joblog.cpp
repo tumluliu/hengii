@@ -115,10 +115,10 @@ MYSQL *JobLog::createConn() {
 	return conn;
 }
 
-string JobLog::registerJobSql( int64_t flowId, int jobId ) {
+string JobLog::registerJobSql( int64_t flowId, int jobId, const string &appUri ) {
 	return "insert into " + JOB_TABLE_NAME
-		+ "(fid, id) values('" + Utility::intToString( flowId )
-		+ "', '" + Utility::intToString( jobId ) + "');";
+		+ "(fid, id, appuri) values('" + Utility::intToString( flowId )
+		+ "', '" + Utility::intToString( jobId ) + "', '" + appUri + "');";
 }
 
 string JobLog::registerPbsJobSql( int64_t flowId, int jobId, const string &pbsJobId ) {
@@ -131,8 +131,8 @@ int JobLog::registerPbsJob( int64_t flowId, int jobId, const string &pbsJobId ) 
 	return command( registerPbsJobSql( flowId, jobId, pbsJobId ) );
 }
 
-int JobLog::registerJob(int64_t flowId, int jobId) {
-	return command( registerJobSql( flowId, jobId ) );
+int JobLog::registerJob(int64_t flowId, int jobId, const string &appUri) {
+	return command( registerJobSql( flowId, jobId, appUri ) );
 }
 
 string JobLog::registerJobFlowSql( int64_t flowId, const string &userId ) {
@@ -206,6 +206,7 @@ char JobLog::getPbsJobStatus( int64_t flowId, int jobId ) {
 	}
 
 	if ( r == NULL || r[0] == NULL ) {
+		mysql_free_result( res );
 		return 'N';
 	}
 
@@ -250,6 +251,7 @@ int JobLog::getJobCount( int64_t flowId ) {
 	}
 
 	if ( r == NULL || r[0] == NULL ) {
+		mysql_free_result( res );
 		return -1;
 	}
 

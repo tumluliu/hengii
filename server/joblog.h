@@ -58,7 +58,7 @@ class JobLog {
 
 		MYSQL *createConn();
 		string registerPbsJobSql( int64_t, int, const string&);
-		string registerJobSql(int64_t, int);
+		string registerJobSql(int64_t, int, const string&);
 		string registerJobFlowSql(int64_t, const string&);
 		string updateJobStatusSql(int64_t, int, int, const string&);
 		string getPbsJobStatusSql( int64_t, int);
@@ -73,7 +73,7 @@ class JobLog {
 		string getCurrentTime();
 	public:
 		int registerPbsJob(int64_t, int, const string&);
-		int registerJob(int64_t, int);
+		int registerJob(int64_t, int, const string&);
 		int registerJobFlow(int64_t, const string&);
 		int updateJobStatus(int64_t, int, int, const string&);
 		int updateJobFlowStatus(int64_t, int, const string&);

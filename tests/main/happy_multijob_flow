@@ -1,0 +1,26 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: happy_multijob_flow
+# 
+#         USAGE: ./happy_multijob_flow 
+# 
+#   DESCRIPTION: Jobflow which contains multi jobs with precedence between them
+#                work well 
+#
+#		 INPUTS: <+INPUTS+>
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 04/17/2012 08:42:53 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+<+content+>
+
+

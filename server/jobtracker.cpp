@@ -236,7 +236,7 @@ void* JobTracker::jobWorker(void* threadParam)
 	map<string, string> envOptions = userJob.runtime_context.options;
 	map<string, string> appOptions;
 
-	JobLog::Instance()->registerJob(job->getFlowId(), userJob.id);
+	JobLog::Instance()->registerJob(job->getFlowId(), userJob.id, job->getUserJob().app_uri);
 	Logger::log(STDOUT, INFO, TORQUE, "job registered.");
 
 	switch (parallel_env) {
