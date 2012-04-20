@@ -5,7 +5,7 @@
  *
  *    Description:  class declaration of HpgcJobHander
  *
- *        Version:  0.8
+ *        Version:  0.9
  *        Created:  2012年03月23日 11时54分54秒
  *       Revision:  none
  *       Compiler:  gcc

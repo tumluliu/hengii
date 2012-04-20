@@ -5,7 +5,7 @@
  *
  *    Description:  Declaration of class Logger
  *
- *        Version:  0.8
+ *        Version:  0.9
  *        Created:  04/05/2012 04:07:03 PM
  *       Revision:  none
  *       Compiler:  gcc

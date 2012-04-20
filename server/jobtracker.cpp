@@ -5,7 +5,7 @@
  *
  *    Description:  implementation of JobTracker class
  *
- *        Version:  0.8
+ *        Version:  0.9
  *        Created:  03/17/2012 11:00:50 AM
  *       Revision:  none
  *       Compiler:  gcc
