@@ -76,6 +76,10 @@ int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user
 }
 
 int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
+	for (int i = 0; i < flow.job_count; i++) {
+		cout << "parent count of job " << flow.jobs[i].id << ": " << flow.jobs[i].parent_count << endl;
+	}
+
 	Logger::log(STDOUT, INFO, ENGINE, "Start processing " + PROJECT_NAME + " job flow...");
 	stringstream msg;
 	msg << "number of jobs in this flow: " << flow.job_count;

@@ -25,7 +25,7 @@
 #include "logger.h"
 #include "appoption.h"
 
-JobTracker::JobTracker( int64_t id ) {
+JobTracker::JobTracker( int64_t id, vector<int32_t> &parentList ):m_busyParentCountList(parentList) {
 	flowId = id;
 	log = JobLog::Instance();
 	outerStatus = JobStatus::NOT_EXIST;
@@ -158,14 +158,6 @@ pthread_cond_t* JobTracker::getWaitingCond() {
 	return waitingCond;
 }
 
-vector<int>::iterator JobTracker::getBusyParentCountListIter() {
-	return busyParentCountListIter;
-}
-
-void JobTracker::setBusyParentCountListIter(vector<int>::iterator it) {
-	busyParentCountListIter = it;
-}
-
 /*-----------------------------------------------------------------------------
  *  Codes below are the thread function and its partners
  *-----------------------------------------------------------------------------*/
@@ -218,6 +210,11 @@ string JobTracker::constructCmdOptions ( JobTracker *job, map<string, string> &o
 
 	return result;
 }		/* -----  end of function constructCmdOptions  ----- */
+
+JobTracker & JobTracker::operator=(const JobTracker & jr) {
+	return (*this = JobTracker(jr.flowId, jr.m_busyParentCountList));
+}
+
 /* 
  * ===  FUNCTION  ======================================================================
  *         Name:  jobWorker
@@ -279,10 +276,14 @@ void* JobTracker::jobWorker(void* threadParam)
 		case ParallelEnv::CUDA: break;
 		case ParallelEnv::MAPREDUCE: break;
 	}
-	pthread_mutex_lock(job->threadMutex);
+
+	cout << "I'm " << userJob.id << ", my parent count: " << job->m_busyParentCountList[userJob.id] << endl;
 	// Waiting for all the busy parents
-	while (*(job->getBusyParentCountListIter() + userJob.id) != 0)
+	pthread_mutex_lock(job->getThreadMutex());
+	while (job->m_busyParentCountList[userJob.id] != 0) {
+		cout << "I'm " << userJob.id << ", NOW, my parent count: " << job->m_busyParentCountList[userJob.id] << endl;
 		pthread_cond_wait(job->getWaitingCond(), job->getThreadMutex());
+	}
 	pthread_mutex_unlock(job->getThreadMutex());
 
 	job->setProcessCount(processCount);
@@ -304,7 +305,7 @@ void* JobTracker::jobWorker(void* threadParam)
 		pthread_mutex_lock(job->getThreadMutex());
 		// Tell all the children that I am done
 		for (int i = 0; i < userJob.child_count; i++) {
-			(*(job->getBusyParentCountListIter() + userJob.children[i]))--;
+			(job->m_busyParentCountList[userJob.children[i]])--;
 		}
 		pthread_mutex_unlock(job->getThreadMutex());
 		pthread_cond_broadcast(job->getWaitingCond());

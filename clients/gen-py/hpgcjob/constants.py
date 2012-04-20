@@ -4,5 +4,6 @@
 # DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
 #
 
-require 'hpgcjob_types'
+from thrift.Thrift import *
+from ttypes import *
 

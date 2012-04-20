@@ -11,16 +11,14 @@ $:.push("#{File.dirname(__FILE__)}/lib/")
 require "hpgc_job"
 require "yaml"
 require "pathname"
-require "yaml"
 
 #
 # initialize a job flow
 job1              = Job.new()
-job1.id           = 0
 job1.parents      = []
-job1.parent_count = job1.parents.count
+job1.parent_count = 0
 job1.children     = []
-job1.child_count  = job1.children.count
+job1.child_count  = 0
 job1.app_uri = ARGV[0]
 
 job1.runtime_context              = Context.new()
@@ -35,9 +33,11 @@ if ARGV[2] != nil
 end
 
 if(flow = YAML::load STDIN)
+	job1.id = flow.jobs.count
 	flow.jobs << job1
 	flow.job_count += 1
 	print flow.to_yaml
 else 
+	job1.id = 0
 	print job1.to_yaml
 end

@@ -36,8 +36,8 @@ set -o nounset                              # Treat unset variables as an error
 #announce "含参程序构成的作业流能正常执行" "happy_with_params hello_to 8 target:Liu+prefix:Mr+coloredegg:O Liu+Mr+-e+O"
 #announce "缺可选参数的作业流能正常执行" "happy_with_params hello_to 8 target:Liu Liu"
 #announce "缺必须参数，返回错误信息，服务正常继续" "without_essential_option_return_error hello_to 8 prefix:Mr Mr target hello 8"
-announce "多用户可以正常处理" "happy_with_many_users hello 2 hellooooo 2"
-#announce "多作业流程可以正常执行" "happy_multijob_flow hello hello"
+#announce "多用户可以正常处理" "happy_with_many_users hello 2 hellooooo 2"
+announce "多作业流程可以正常执行" "happy_multijob_flow outchar 1 inchar 1 x X"
 
 #======= backup area ===================
 #announce "能得到自己的请求id" "happy_my_requests"

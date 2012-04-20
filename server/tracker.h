@@ -31,7 +31,7 @@ class Tracker{
 		pthread_cond_t waitingCond;
 		pthread_attr_t threadAttr;
 		vector<JobTracker> jobTrackerList;
-		vector<int> busyParentCountList;
+		vector<int32_t> busyParentCountList;
 		vector<pthread_t> jobThreadIdList;
 		bool available;
 		int jobCount;
@@ -47,7 +47,7 @@ class Tracker{
 		~Tracker();
 		vector<JobTracker> getJobTrackers() const;
 		JobTracker getJobTrackerAt(int) const;
-		vector<int> getBusyParentCountList() const;
+		vector<int32_t> getBusyParentCountList() const;
 		void init();
 		void setUserJobFlow(const JobFlow&);
 		void finalize();

@@ -4,6 +4,7 @@ thrift --gen cpp hpgcjob.thrift
 thrift --gen rb hpgcjob.thrift
 thrift --gen java hpgcjob.thrift
 thrift --gen csharp hpgcjob.thrift
+thrift --gen py hpgcjob.thrift
 
 cp -r gen-cpp/* ../server/lib/
 cp -r gen-rb/* ../tests/act/lib/
@@ -11,8 +12,10 @@ cp -r gen-rb ../clients/
 cp -r gen-cpp ../clients/
 cp -r gen-java ../clients/
 cp -r gen-csharp ../clients/
+cp -r gen-py ../clients/
 rm -rf gen-rb
 rm -rf gen-cpp
 rm -rf gen-java
 rm -rf gen-csharp
+rm -rf gen-py
 

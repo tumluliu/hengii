@@ -127,11 +127,12 @@ void Tracker::init() {
 	jobCount = flow.job_count;
 	for(int i = 0; i < flow.job_count; i++) {
 		busyParentCountList.push_back(flow.jobs[i].parent_count);
-		JobTracker job(id);
-		job.setBusyParentCountListIter(busyParentCountList.begin());
+		cout << "parent count of " << i << ": " << flow.jobs[i].parent_count << endl;
+		cout << "in busyParentCountList, parent count of " << i << ": " << busyParentCountList[i] << endl;
+		JobTracker job(id, busyParentCountList);
+		job.setUserJob(flow.jobs[i]);
 		job.setThreadMutex(&threadMutex);
 		job.setWaitingCond(&waitingCond);
-		job.setUserJob(flow.jobs[i]);
 		jobTrackerList.push_back(job);
 	}
 }

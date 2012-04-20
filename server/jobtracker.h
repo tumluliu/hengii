@@ -41,10 +41,10 @@ class JobTracker{
 		Job userJob;
 		JobLog *log;
 		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
-		vector<int>::iterator busyParentCountListIter;
+		vector<int32_t> &m_busyParentCountList;
 		static string constructCmdOptions( JobTracker*, map<string, string>&, ifstream& );
 	public:
-		JobTracker( int64_t );
+		JobTracker( int64_t, vector<int32_t>& );
 		void setUserJob( const Job& );
 		Job getUserJob() const;
 		string getResult() const;
@@ -61,13 +61,14 @@ class JobTracker{
 		void setThreadMutex(pthread_mutex_t* mutex);
 		pthread_mutex_t* getThreadMutex();
 		pthread_cond_t* getWaitingCond();
-		vector<int>::iterator getBusyParentCountListIter();
-		void setBusyParentCountListIter(vector<int>::iterator);
 		void setWaitingCond(pthread_cond_t* cond);
 		JobStatus::type getStatus();
 		JobStatus::type updateInnerStatus();
 		void setStatus(JobStatus::type, const string &);
 		void setStatus(JobStatus::type);
+
+		JobTracker & operator=(JobTracker const &);
+
 		static void* jobWorker(void*);
 };
 
