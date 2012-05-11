@@ -93,7 +93,7 @@ try:
   	ret = client.get_status(id)
   
   # print result, first the message of jobflow, then the messages of each job
-  print "The flow has reached: " + ret.flow_status.to_s 
+  print "The flow has reached: " + str(ret.flow_status)
   print "result is: "
   print ret.message
   

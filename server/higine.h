@@ -5,7 +5,7 @@
  *
  *    Description:  define the necessary dependencies of higisen main program 
  *
- *        Version:  0.9
+ *        Version:  1.0
  *        Created:  03/12/2012 09:47:27 AM
  *       Revision:  none
  *       Compiler:  gcc
@@ -31,10 +31,6 @@
 #include <server/TNonblockingServer.h>
 #include <transport/TServerSocket.h>
 #include <transport/TBufferTransports.h>
-#include "hpgcjobhandler.h"
-
-const string VERSION = "0.9";
-const int PORT = 9990;
 
 using namespace ::apache::thrift;
 using namespace ::apache::thrift::protocol;
@@ -43,8 +39,5 @@ using namespace ::apache::thrift::server;
 using namespace ::apache::thrift::concurrency;
 
 using boost::shared_ptr;
-
-using namespace HPGC::HiGIS::Server;
-using namespace std;
 
 #endif

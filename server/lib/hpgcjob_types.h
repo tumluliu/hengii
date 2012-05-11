@@ -14,7 +14,7 @@
 
 
 
-namespace HPGC { namespace HiGIS { namespace Server {
+namespace hpgc { namespace higis { namespace interface {
 
 struct ParallelEnv {
   enum type {
@@ -208,19 +208,20 @@ class Job {
 };
 
 typedef struct _JobResult__isset {
-  _JobResult__isset() : message(false), progress(false), status(false) {}
+  _JobResult__isset() : message(false), progress(false), status(false), id(false) {}
   bool message;
   bool progress;
   bool status;
+  bool id;
 } _JobResult__isset;
 
 class JobResult {
  public:
 
-  static const char* ascii_fingerprint; // = "51553B00ECD9218B9C31C1EAEC5BD7E5";
-  static const uint8_t binary_fingerprint[16]; // = {0x51,0x55,0x3B,0x00,0xEC,0xD9,0x21,0x8B,0x9C,0x31,0xC1,0xEA,0xEC,0x5B,0xD7,0xE5};
+  static const char* ascii_fingerprint; // = "C515C8A5540DD1063BE4C1D3EA0FAD48";
+  static const uint8_t binary_fingerprint[16]; // = {0xC5,0x15,0xC8,0xA5,0x54,0x0D,0xD1,0x06,0x3B,0xE4,0xC1,0xD3,0xEA,0x0F,0xAD,0x48};
 
-  JobResult() : message(""), progress(0), status((JobStatus::type)0) {
+  JobResult() : message(""), progress(0), status((JobStatus::type)0), id(0) {
   }
 
   virtual ~JobResult() throw() {}
@@ -228,6 +229,7 @@ class JobResult {
   std::string message;
   double progress;
   JobStatus::type status;
+  int32_t id;
 
   _JobResult__isset __isset;
 
@@ -243,6 +245,10 @@ class JobResult {
     status = val;
   }
 
+  void __set_id(const int32_t val) {
+    id = val;
+  }
+
   bool operator == (const JobResult & rhs) const
   {
     if (!(message == rhs.message))
@@ -250,6 +256,8 @@ class JobResult {
     if (!(progress == rhs.progress))
       return false;
     if (!(status == rhs.status))
+      return false;
+    if (!(id == rhs.id))
       return false;
     return true;
   }
@@ -275,8 +283,8 @@ typedef struct _Result__isset {
 class Result {
  public:
 
-  static const char* ascii_fingerprint; // = "83883B3EB12F9C025FF62E89D0830807";
-  static const uint8_t binary_fingerprint[16]; // = {0x83,0x88,0x3B,0x3E,0xB1,0x2F,0x9C,0x02,0x5F,0xF6,0x2E,0x89,0xD0,0x83,0x08,0x07};
+  static const char* ascii_fingerprint; // = "D0136CBDBC37395CEF1F6B7B9059ED2A";
+  static const uint8_t binary_fingerprint[16]; // = {0xD0,0x13,0x6C,0xBD,0xBC,0x37,0x39,0x5C,0xEF,0x1F,0x6B,0x7B,0x90,0x59,0xED,0x2A};
 
   Result() : flow_status((Status::type)0), message(""), progress(0) {
   }

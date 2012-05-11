@@ -82,6 +82,7 @@ begin
 	ret = client.get_status(id)
 	while(ret.flow_status != Status::FINISHED && ret.flow_status != Status::FAILED && ret.flow_status != Status::NOT_EXIST)
 		ret = client.get_status(id)
+		sleep 1
 	end
 
 	# print result, first the message of jobflow, then the messages of each job

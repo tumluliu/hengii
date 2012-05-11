@@ -1,37 +1,47 @@
-GEN_SRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp ./lib/hpgcjob_types.cpp joblog.cpp appoption.cpp logger.cpp utility.cpp jobtracker.cpp tracker.cpp torquejob.cpp hpgcjobhandler.cpp higine.cpp
-GEN_OBJ := $(patsubst %.cpp, %.o, $(GEN_SRC))
+# Tested on gcc version 4.6.0
+#
 
-THRIFT_DIR := /usr/local/include/thrift/
-BOOST_DIR := /usr/include/boost
-EVENT_DIR := /usr/local/include
-TORQUE_DIR :=/usr/local/include
+LIBSRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp \
+	./lib/hpgcjob_types.cpp
+LIBOBJ := $(patsubst %.cpp, %.o, $(LIBSRC))
+SRC := conjunctionexp.cpp \
+	irecorder.cpp \
+	player.cpp \
+	recorder.cpp chainplayer.cpp \
+	jobruntime.cpp flowruntime.cpp \
+	sqldb.cpp mysqldb.cpp \
+	jobrepo.cpp dbjobrepo.cpp jobrepoentry.cpp \
+	jobtracker.cpp tracker.cpp trackerowner.cpp \
+	appoption.cpp cmdlinebuilder.cpp \
+	pbsattr.cpp resources.cpp torquejob.cpp \
+	utility.cpp log.cpp \
+    hpgcjobhandler.cpp higine.cpp
+OBJ := $(patsubst %.cpp, %.o, $(SRC))
+THRIFTDIR := /usr/local/include/thrift
 
-INC := -I$(THRIFT_DIR) -I$(BOOST_DIR) -I$(EVENT_DIR) -I$(TORQUE_DIR)
-LIB := -L/usr/local/lib -L/opt/torque/lib -L/opt/thrift/lib
-HOSTNAME := $(shell hostname)
+INC := -isystem $(THRIFTDIR) -isystem ./lib/
+LIB := -L/usr/local/lib/
+OPT := -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H
+SHARED := -lpthread -lthrift -lthriftnb -levent -lmysqlclient -ltorque
 
-.PHONY: all clean
-
-all: higine pbsmonitor
+all: higine
 
 config.h: config.h.in
-	cp -f config.h.in config.h
-	sed -i "s%@MPI_CONF_PATH@%\"\$(PWD)/mpienv.conf\"%g" config.h
-	sed -i "s%@APP_DIR@%\"\$(PWD)/apps/\"%g" config.h
-	sed -i "s%@RUN_LOG_FILE@%\"\$(PWD)/run.log\"%g" config.h
-	sed -i "s%@PBS_OUT_DIR@%\"\$(PWD)/pbstmp/\"%g" config.h
-	sed -i "s%@PBS_SERVER_HOST@%\"$(HOSTNAME)\"%g" config.h
-	sed -i "s%@MONITOR_PATH@%\"$(PWD)/pbsmonitor\"%g" config.h
+	./makeconf.sh
 
-%.o: %.cpp
-	$(CXX) -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H -Wall -Wextra -Wno-return-type $(INC) -c $< -g -o $@
+$(LIBOBJ): %.o: %.cpp
+	$(CXX) \
+		-DHAVE_INTYPES_H -DHAVE_NETINET_IN_H \
+		-Wall \
+		-Wno-return-type \
+		-isystem $(THRIFTDIR) $(OPT) -c $< -o $@
 
-higine: config.h higine.o $(GEN_OBJ)
-	$(CXX) $(LIB) -lthrift -lthriftnb -levent -ltorque -lmysql $^ -g -o $@
+$(OBJ): %.o: %.cpp
+	$(CXX) $(INC) $(OPT) -Wall -Wextra -Weffc++ -g -o $@ -c $^
 
-pbsmonitor: 
-	cd guard; make;
+higine : config.h $(LIBOBJ) $(OBJ)
+	$(CXX) $(LIB) -Wall -Wextra -Weffc++ -o higine $(SHARED) $^
 
+.PHONY: clean
 clean:
-	$(RM) ./lib/*.o *.o higine config.h 
-	cd guard; make clean;
+	$(RM) $(LIBOBJ) $(OBJ) config.h higine

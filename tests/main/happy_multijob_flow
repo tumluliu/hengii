@@ -29,6 +29,7 @@ set -o nounset                              # Treat unset variables as an error
 _prepare_server
 _start_server | _contains $6 | _at server &
 _prepare_program $1 ; _prepare_program $3
+sleep 0.5
 create_empty_flow.rb | add_job.rb $1 $2 output:$5.exc | add_job.rb $3 $4 input:$5.exc | add_job.rb $3 $4 input:$5.exc | add_order.rb 0 1 | add_order.rb 1 2 | session.rb start.rb block_till_result.rb | _contains $6 | _at client 
 _kill_server
 _collect server client

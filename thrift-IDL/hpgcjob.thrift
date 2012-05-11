@@ -9,7 +9,7 @@
  *				It consists of a Job struct and a JobFlow struct.
  */
 
-namespace cpp HPGC.HiGIS.Server 
+namespace cpp hpgc.higis.interface 
 namespace csharp HPGC.HiGIS.Server
 namespace java HPGC.HiGIS.Server
 
@@ -65,6 +65,7 @@ struct JobResult
 	1: string message,
 	2: double progress,
 	3: JobStatus status
+    4: i32 id
 }
 
 struct Result 
@@ -96,6 +97,4 @@ service HpgcJob
 	void resume(1:i64 client_ticket),
 	void cancel(1:i64 client_ticket),
 	Result get_status(1:i64 client_ticket),
-	list<i64> get_my_requests(1:string user_id);
-	list<i64> get_all_requests();
 }

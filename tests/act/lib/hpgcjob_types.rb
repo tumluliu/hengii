@@ -94,11 +94,13 @@ class JobResult
   MESSAGE = 1
   PROGRESS = 2
   STATUS = 3
+  ID = 4
 
   FIELDS = {
     MESSAGE => {:type => ::Thrift::Types::STRING, :name => 'message'},
     PROGRESS => {:type => ::Thrift::Types::DOUBLE, :name => 'progress'},
-    STATUS => {:type => ::Thrift::Types::I32, :name => 'status', :enum_class => JobStatus}
+    STATUS => {:type => ::Thrift::Types::I32, :name => 'status', :enum_class => JobStatus},
+    ID => {:type => ::Thrift::Types::I32, :name => 'id'}
   }
 
   def struct_fields; FIELDS; end

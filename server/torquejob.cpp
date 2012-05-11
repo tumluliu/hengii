@@ -3,29 +3,33 @@
  *
  *       Filename:  torquejob.cpp
  *
- *    Description:  implementation codes of invoking Torque PBS to execute HPC jobs.
+ *    Description:  the declaration of job class submitted to Torque PBS.
  *
- *        Version:  0.9
- *        Created:  03/17/2012 11:46:46 AM
+ *        Version:  1.0
+ *        Created:  03/17/2012 03:38:14 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
  *         Author:  LIU Lu (), luliu@nudt.edu.cn
+ *                  YANG Anran (), 08to09@gmail.com
  *   Organization:  
  *
  * =====================================================================================
  */
+
 #include <stdlib.h>
 #include <sys/time.h>
 #include <cstring>
 #include <fstream>
 #include <vector>
-#include <iostream>
 #include <sstream>
+#include <unistd.h>
+
 #include "torquejob.h"
 #include "utility.h"
-#include "logger.h"
+#include "log.h"
 #include "config.h"
+#include "resources.h"
 
 extern "C"
 {
@@ -33,43 +37,22 @@ extern "C"
 #include <pbs_ifl.h>
 }
 
-string TorqueJob::getOutput() const {
-	return output;
+using std::string;
+
+TorqueJob::TorqueJob(int processcount, const string &cmdline) 
+	: Player(-1), pbsid_(""), processcount_(processcount), cmdline_(cmdline), connection_(-1),
+	scriptpath_(""), outputpath_(""), errlogpath_(""),
+	output_("") { 
+	}
+
+string TorqueJob::get_output() const {
+	return output_;
 }
 
-string TorqueJob::getStatus() const {
-	return status;
-}
-
-int TorqueJob::getConnection() const {
-	return connection;
-}
-
-string TorqueJob::getId() const {
-	return id;
-}
-
-int TorqueJob::setProcessCount(int value) {
-	if (value > 0) {
-		processCount = value;
-	} 
-	else
-		return -1;
-	return 0;
-}
-
-void TorqueJob::setCmdline(const string& value) {
-	cmdline = value;
-}
-
-string TorqueJob::getCmdline() const {
-	return cmdline;
-}
-
-string TorqueJob::generateNameByTime() {
+string TorqueJob::GenerateNameByTime() const {
 	time_t t = time(0);
 	struct tm* now = localtime(&t);
-	stringstream year, month, day, hour, minute, second;
+	std::stringstream year, month, day, hour, minute, second;
 	year << now->tm_year + 1900;
 	month << now->tm_mon + 1;
 	day << now->tm_mday;
@@ -79,134 +62,196 @@ string TorqueJob::generateNameByTime() {
 	return year.str() + month.str() + day.str() + hour.str() + minute.str() + second.str();
 }
 
-int TorqueJob::submit() {
-	string scriptFileName = generateNameByTime();
-
+string TorqueJob::GenerateScriptName() const {
+	string name;
 	int exist;
-	while ((exist = access((PBS_OUT_DIR + scriptFileName).c_str(), F_OK)) == 0) {
-		scriptFileName = generateNameByTime();
-	}
+	do {
+		name = GenerateNameByTime();
+	} while ((exist = access((PBS_OUT_DIR + name).c_str(), F_OK)) == 0);
+	return name;
+}
 
-	scriptPath = PBS_OUT_DIR + scriptFileName;
-	outputPath = scriptPath + PBS_OUTPUT_FILE_EXT;
-	errlogPath = scriptPath + PBS_ERRLOG_FILE_EXT;
+int TorqueJob::CreateScript() {
+	scriptpath_ = PBS_OUT_DIR + GenerateScriptName();
 
-	ofstream outputFile(scriptPath.c_str(), ios::out);
-	if (!outputFile) {
-		Logger::log(STDOUT, ERROR, TORQUE, "unable to open torque script file " + scriptPath);
+	std::ofstream outputFile(scriptpath_.c_str(), std::ios::out);
+	if (outputFile.fail()) {
+		Log().Error() << "unable to open torque script file " + scriptpath_;
+		/* need error handling */
 		return -1;
 	}
-	outputFile << cmdline << endl;
+
+	outputFile << cmdline_ << std::endl;
 	outputFile.close();
+	return 0;
+}
 
-	connection = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
-	if (connection < 0) {
-		Logger::log(STDOUT, ERROR, TORQUE, "Connect to Torque PBS server failed!");
-		Logger::log(STDOUT, ERROR, TORQUE, pbs_strerror(pbs_errno));
+int TorqueJob::Connect() {
+	connection_ = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
+	if (connection_ < 0) {
+		Log().Get(TORQUE, ERROR) 
+			<< "Connect to Torque PBS server failed! Error number is "
+			<<  pbs_strerror(pbs_errno);
 		return -1;
 	}
+	return 0;
+}
 
-	char hostPrefix[PARAM_SIZE];
-	gethostname(hostPrefix, PARAM_SIZE);
-	strncat(hostPrefix, ":", 1);
-	const string prefix(hostPrefix);
-	string fullloc;
+const string TorqueJob::LocWithHost(const string &partial) const {
+	const int HOSTNAME_SIZE = 1024;
+	char prefix[HOSTNAME_SIZE + 1]; /* contains a ':' */
 
-	struct attropl qSubAttr[3];
-	// ATTR_N is defined as "Job_Name"
-	qSubAttr[0].name = (char *)malloc(strlen(ATTR_N) + 1);
-	if (qSubAttr[0].name == NULL) {
-		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[0].name, ATTR_N, strlen(ATTR_N) + 1);
-	qSubAttr[0].value = (char *)malloc(scriptPath.size() + 1);
-	if (qSubAttr[0].value == NULL) {
-		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[0].value, scriptPath.c_str(), scriptPath.size() + 1);
-	qSubAttr[0].resource = (char *)NULL;
-	qSubAttr[0].next = &qSubAttr[1];
-	// ATTR_o is defined as "Output_Path"
-	qSubAttr[1].name = (char *)malloc(strlen(ATTR_o) + 1);
-	if (qSubAttr[1].name == NULL) {
-		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[1].name, ATTR_o, strlen(ATTR_o) + 1);
-	fullloc = prefix + outputPath;
-	qSubAttr[1].value = (char *)malloc(fullloc.size() + 1);
-	if (qSubAttr[1].value == NULL) {
-		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[1].value, fullloc.c_str(), fullloc.size() + 1);
-	Logger::log(STDOUT, DEBUG, TORQUE, "output location: " + fullloc);
-	qSubAttr[1].resource = (char *)NULL;
-	qSubAttr[1].next = &qSubAttr[2];
-	// ATTR_e is defined as "Error_Path"
-	qSubAttr[2].name = (char *)malloc(strlen(ATTR_e) + 1);
-	if (qSubAttr[2].name == NULL) {
-		Logger::log(STDOUT, FATAL, ENGINE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[2].name, ATTR_e, strlen(ATTR_e) + 1);
-	fullloc = prefix + errlogPath;
-	qSubAttr[2].value = (char *)malloc(fullloc.size() + 1);
-	if (qSubAttr[2].value == NULL) {
-		Logger::log(STDOUT, FATAL, TORQUE, "out of memory");
-		return -1;
-	}
-	strncpy(qSubAttr[2].value, fullloc.c_str(), fullloc.size() + 1);
-	Logger::log(STDOUT, DEBUG, TORQUE, "error location: " + fullloc);
-	qSubAttr[2].resource = (char *)NULL;
-	qSubAttr[2].next = NULL;
-	// !!!! The commented codes below may cause some unpredictable PBS error.
-	// !!!! But the reason is not clear yet.
-	// by Liu Lu
-	//2012/3/17
-	//qSubAttr[2].next = &qSubAttr[3];
-	//string qResourceList = ATTR_l;
-	//qSubAttr[3].name = const_cast<char*>(qResourceList.c_str());
-	//stringstream pcs;
-	//pcs << processCount;
-	//qSubAttr[3].value = const_cast<char*>(pcs.str().c_str());
-	//string qResource = "procs";
-	//qSubAttr[3].resource = const_cast<char*>(qResource.c_str());
-	//qSubAttr[3].next = NULL;
+	/* fill in host name */
+	prefix[HOSTNAME_SIZE - 1] = '\0';
+	gethostname(prefix, HOSTNAME_SIZE - 1);
 
-	char *ret = pbs_submit(connection, qSubAttr, const_cast<char*>(scriptPath.c_str()), 0, 0);
+	/* add ':' */
+	strncat(prefix, ":", 1);
+	return string(prefix) + partial;
+}
+
+const string TorqueJob::ReqResourceStr(int processes) const {
+	Resources rsrc;
+	rsrc.Request(processes);
+
+	std::stringstream ss;
+	ss << rsrc.get_nodes() << ":ppn=" << rsrc.get_ppn();
+	return ss.str();
+}
+
+void TorqueJob::FillAttr(PbsAttr &attr) {
+	outputpath_ = scriptpath_ + PBS_OUTPUT_FILE_EXT;
+	errlogpath_ = scriptpath_ + PBS_ERRLOG_FILE_EXT;
+
+	attr.Add(ATTR_o, LocWithHost(outputpath_));
+	attr.Add(ATTR_e, LocWithHost(errlogpath_));
+	attr.AddResource("nodes", ReqResourceStr(processcount_));
+
+	Log().Debug() << "pbs job " << pbsid_ << "output in: " << outputpath_;
+	Log().Debug() << "pbs job " << pbsid_ << "errlog in: " << errlogpath_;
+}
+
+int TorqueJob::Submit() {
+	PbsAttr attr;
+	FillAttr(attr);
+
+	Log().Get(TORQUE, DEBUG) << "Submitting job, outpath is "
+		<< scriptpath_.c_str();
+	char *ret = pbs_submit(connection_, attr.MakeCAttrl(), 
+			const_cast<char*>(scriptpath_.c_str()), 0, 0);
+
 	if (!ret)
 	{
-		Logger::log(STDOUT, ERROR, TORQUE, "Torque PBS job submission failed!");
-		Logger::log(STDOUT, ERROR, TORQUE, pbs_strerror(pbs_errno));
+		Log().Get(TORQUE, ERROR) 
+			<< "Torque PBS job submission failed! Error no. is: "
+			<< pbs_strerror(pbs_errno);
 		return -1;
 	}
-	id = string(ret);
+	pbsid_ = string(ret);
 	free(ret);
-	stringstream msg;
-	msg << "Torque PBS job has been submitted successfully, job ID is: " << id << endl;
-	Logger::log(STDOUT, INFO, TORQUE, msg.str());
 
-	for (int i = 0; i < 3; i++) {
-		free(qSubAttr[i].name);
-		free(qSubAttr[i].value);
-	}
+	Log().Get(TORQUE, INFO) 
+		<< "Torque PBS job has been submitted successfully, job ID is: "
+		<< pbsid_
+		<< ", cmdline is: "
+		<< cmdline_;
 
 	return 0;
 }
 
-int TorqueJob::collect() {
-	if (Utility::readFile(outputPath, output) != 0) {
-		return -1;
+void TorqueJob::Fail() {
+	/* do some error handling here */
+}
+
+void TorqueJob::Play() {
+	/* A trick that using short-circuit.
+	 * The following actions will be taken one by one,
+	 * and if one fails(return value is not 0), the flow
+	 * will terminate immediately and do some error handling work */
+	if (
+			CreateScript() != 0 ||
+			Connect() != 0 ||
+			Submit() != 0 ||
+			Trace() != 0 ||
+			Collect() != 0) {
+		Fail();
 	}
-	if ((Utility::deleteFile(scriptPath)) != 0) {
-		return -1;
+	Exit();
+}
+
+char TorqueJob::GetStatus() const {
+	char result = 0;
+
+	/* WARNING: These rather ugly code is due to the strange distinction
+	 * between attropl and attrl. In future a conversion method
+	 * may be implemented if needed. by YANG Anran @ 2012.5.8 */
+	PbsAttr attr;
+	attr.Add(ATTR_state, "");
+	struct attropl *popl = attr.MakeCAttrl();
+	struct attrl l; 
+	l.name = popl->name;
+	l.resource = NULL;
+	l.value = NULL;
+	l.next = NULL;
+
+	char *cid = (char *)malloc(pbsid_.size() + 1);
+	memset(cid, '\0', pbsid_.size() + 1);
+	strncpy(cid, pbsid_.c_str(), pbsid_.size());
+	struct batch_status *stat = pbs_statjob(connection_, cid, &l, 0);
+	free(cid);
+
+	if (stat == NULL) {
+		Log().Get(TORQUE, ERROR) << "Unable to query pbs status";
+		return 0;
 	}
-	if ((Utility::deleteFile(outputPath)) != 0) {
+
+	/* WARNING: These some ugly code can be digest by PbsAttr, using 
+	 * a constructor from attrl. But currently there's 
+	 * no need to bother. by YANG Anran @ 2012.5.8 */
+	struct attrl *iter = stat->attribs;
+	do {
+		if(strcmp(iter->name, ATTR_state) == 0) {
+			result = iter->value[0];
+		}
+	} while(iter->next != NULL);
+
+	pbs_statfree(stat);
+
+	return result;
+}
+
+int TorqueJob::Trace() {
+	char status = 'Q';
+	while(status != 'C') { 
+		status = GetStatus();
+
+		if (status == 0) {
+			return -1;
+		}
+
+		usleep(UPDATE_INTERVAL_MS);
+	}
+	return 0;
+}
+
+int TorqueJob::Collect() {
+	if (util::readFile(outputpath_, output_) != 0) {
 		return -1;
 	}
 
+	util::deleteFile(scriptpath_);
+	util::deleteFile(outputpath_);
+
+	Log().Debug() << "torque output is: " << output_;
+
 	return 0;
+}
+
+void TorqueJob::Exit() {
+	if (connection_ < 0) {
+		return;
+	}
+	pbs_disconnect(connection_);
+
+	EACH_RECORDER(OnePlayerDone(get_id()));
 }

@@ -6,7 +6,7 @@
  */
 #include "hpgcjob_types.h"
 
-namespace HPGC { namespace HiGIS { namespace Server {
+namespace hpgc { namespace higis { namespace interface {
 
 int _kParallelEnvValues[] = {
   ParallelEnv::MPI,
@@ -355,8 +355,8 @@ uint32_t Job::write(::apache::thrift::protocol::TProtocol* oprot) const {
   return xfer;
 }
 
-const char* JobResult::ascii_fingerprint = "51553B00ECD9218B9C31C1EAEC5BD7E5";
-const uint8_t JobResult::binary_fingerprint[16] = {0x51,0x55,0x3B,0x00,0xEC,0xD9,0x21,0x8B,0x9C,0x31,0xC1,0xEA,0xEC,0x5B,0xD7,0xE5};
+const char* JobResult::ascii_fingerprint = "C515C8A5540DD1063BE4C1D3EA0FAD48";
+const uint8_t JobResult::binary_fingerprint[16] = {0xC5,0x15,0xC8,0xA5,0x54,0x0D,0xD1,0x06,0x3B,0xE4,0xC1,0xD3,0xEA,0x0F,0xAD,0x48};
 
 uint32_t JobResult::read(::apache::thrift::protocol::TProtocol* iprot) {
 
@@ -404,6 +404,14 @@ uint32_t JobResult::read(::apache::thrift::protocol::TProtocol* iprot) {
           xfer += iprot->skip(ftype);
         }
         break;
+      case 4:
+        if (ftype == ::apache::thrift::protocol::T_I32) {
+          xfer += iprot->readI32(this->id);
+          this->__isset.id = true;
+        } else {
+          xfer += iprot->skip(ftype);
+        }
+        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -428,13 +436,16 @@ uint32_t JobResult::write(::apache::thrift::protocol::TProtocol* oprot) const {
   xfer += oprot->writeFieldBegin("status", ::apache::thrift::protocol::T_I32, 3);
   xfer += oprot->writeI32((int32_t)this->status);
   xfer += oprot->writeFieldEnd();
+  xfer += oprot->writeFieldBegin("id", ::apache::thrift::protocol::T_I32, 4);
+  xfer += oprot->writeI32(this->id);
+  xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
 }
 
-const char* Result::ascii_fingerprint = "83883B3EB12F9C025FF62E89D0830807";
-const uint8_t Result::binary_fingerprint[16] = {0x83,0x88,0x3B,0x3E,0xB1,0x2F,0x9C,0x02,0x5F,0xF6,0x2E,0x89,0xD0,0x83,0x08,0x07};
+const char* Result::ascii_fingerprint = "D0136CBDBC37395CEF1F6B7B9059ED2A";
+const uint8_t Result::binary_fingerprint[16] = {0xD0,0x13,0x6C,0xBD,0xBC,0x37,0x39,0x5C,0xEF,0x1F,0x6B,0x7B,0x90,0x59,0xED,0x2A};
 
 uint32_t Result::read(::apache::thrift::protocol::TProtocol* iprot) {
 

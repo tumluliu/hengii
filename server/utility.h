@@ -6,7 +6,7 @@
  *    Description:  the public functions e.g. readFile or logging are placed in class
  *    				Utility
  *
- *        Version:  0.9
+ *        Version:  1.0
  *        Created:  03/19/2012 10:43:22 AM
  *       Revision:  none
  *       Compiler:  gcc
@@ -25,17 +25,14 @@
 #include <sstream>
 #include <vector>
 
-using namespace std;
-
-const int PARAM_SIZE = 1024;
-
-class Utility {
-	public:
-		static int readFile(const string&, string&);
-		static int deleteFile(const string&);
-		static vector<string> splitStringBySpace ( const string& );
-		static string intToString(int64_t);
-};
+namespace util {
+	int readFile(const std::string&, std::string&);
+	int deleteFile(const std::string&);
+	std::vector<std::string> splitStringBySpace ( const std::string& );
+	std::string intToString(int64_t);
+	std::string getCurrentTime();
+	int stoi(const std::string &s);
+}
 
 
 #endif

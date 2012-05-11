@@ -7,7 +7,7 @@ ACTUAL=$(cat)
 
 for arg in "$*"
 do
-	echo $ACTUAL | grep -q "$arg"
+	echo $ACTUAL | grep -q -F "$arg"
 	if [ ! $? -eq 0 ]; then
 		result="false"
 		miss="$arg"

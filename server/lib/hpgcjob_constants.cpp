@@ -6,7 +6,7 @@
  */
 #include "hpgcjob_constants.h"
 
-namespace HPGC { namespace HiGIS { namespace Server {
+namespace hpgc { namespace higis { namespace interface {
 
 const hpgcjobConstants g_hpgcjob_constants;
 

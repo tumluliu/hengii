@@ -3,73 +3,62 @@
  *
  *       Filename:  jobtracker.h
  *
- *    Description:  Declaration of JobTracker class
+ *    Description:  monitor a job, persist its status, 
+ *                  notify his followers and tracker
  *
- *        Version:  0.9 
- *        Created:  03/17/2012 10:59:18 AM
+ *        Version:  1.0
+ *        Created:  05/07/2012 08:49:15 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  LIU Lu (), luliu@nudt.edu.cn
+ *         Author:  YANG Anran (), 08to09@gmail.com
  *   Organization:  
  *
  * =====================================================================================
  */
-#ifndef _JOBTRACKER_H_
-#define _JOBTRACKER_H_
 
-#include <stdint.h>
-#include <fstream>
-#include <pthread.h>
-#include "lib/HpgcJob.h"
-#include "torquejob.h"
-#include "joblog.h"
+#ifndef  JOBTRACKER_H_
+#define  JOBTRACKER_H_
 
-using namespace HPGC::HiGIS::Server;
+#include <stdbool.h>
 
-const string MPI_EXEC_CMD = "mpiexec ";
-const int TRACE_JOB_INTERVAL_MILLI_S = 100;
+#include "chainplayer.h"
+#include "jobruntime.h"
 
-class JobTracker{
-	private:
-		int64_t flowId;
-		pthread_mutex_t* threadMutex;
-		pthread_cond_t* waitingCond;
-		JobStatus::type innerStatus;
-		JobStatus::type outerStatus; // the status determined by the job but not determined by TorqueJob
-		TorqueJob qJob;
-		Job userJob;
-		JobLog *log;
-		string output; // here to overwrite inner job output in some circumstance, e.g. meta file not found
-		vector<int32_t> &m_busyParentCountList;
-		static string constructCmdOptions( JobTracker*, map<string, string>&, ifstream& );
+/*
+ * =====================================================================================
+ *        Class:  JobTracker
+ *  Description:  He monitors the real job, everytime persists status change,
+ *                notify his followers and flow tracker
+ * =====================================================================================
+ */
+class JobTracker : public ChainPlayer
+{
 	public:
-		JobTracker( int64_t, vector<int32_t>& );
-		void setUserJob( const Job& );
-		Job getUserJob() const;
-		string getResult() const;
-		void setResult(const string &result);
-		string getCmdline() const;
-		int getConnection() const;
-		int submit();
-		int collect();
-		int trace();
-		int setProcessCount(int);
-		void setCmdline(const string&);
-		int64_t getFlowId() const;
-		string getId() const;
-		void setThreadMutex(pthread_mutex_t* mutex);
-		pthread_mutex_t* getThreadMutex();
-		pthread_cond_t* getWaitingCond();
-		void setWaitingCond(pthread_cond_t* cond);
-		JobStatus::type getStatus();
-		JobStatus::type updateInnerStatus();
-		void setStatus(JobStatus::type, const string &);
-		void setStatus(JobStatus::type);
+		/* ====================  LIFECYCLE     ======================================= */
+		JobTracker(Player *, JobRuntime *);                     /* constructor */
 
-		JobTracker & operator=(JobTracker const &);
+		/* ====================  ACCESSORS     ======================================= */
 
-		static void* jobWorker(void*);
-};
+		/* ====================  MUTATORS      ======================================= */
+
+	protected:
+		/* ====================  ACTIONS       ======================================= */
+		void PlayMySong();
+
+		/* ====================  EVENTS        ======================================= */
+		virtual void AllPlayersDone();
+
+	private:
+		/* ====================  DATA MEMBERS  ======================================= */
+		bool isover_;
+		Player *job_;
+		JobRuntime *state_;
+
+		/* ====================  LIFECYCLE     ======================================= */
+		JobTracker(const JobTracker &);
+		JobTracker &operator =(const JobTracker &);
+}; /* -----  end of class JobTracker  ----- */
+
 
 #endif

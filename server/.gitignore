@@ -1,8 +1,9 @@
 .*.un~
-.*.swp~
-*.o
-higine
-config.h
-tags/
-run.log
+.*.sw*
+cscope.external.files
+cscope.files
 cscope.out
+cscope.external.out
+tags
+*.o
+sandbox

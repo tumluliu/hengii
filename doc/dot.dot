@@ -1,0 +1,18 @@
+graph G {
+	Player -- ChainPlayer;
+	Recorder -- ChainPlayer;
+	JobRepo -- DbJobRepo;
+	hpgc -- HpgcJobHandler;
+	ChainPlayer -- JobTracker;
+	SqlDb -- MySqlDb;
+	IRecorder -- Recorder;
+	Player -- TorqueJob;
+	Recorder -- Tracker;
+	Player -- Tracker;
+	JobRuntime -- FlowRuntime [style=dotted];
+	IRecorder -- Player [style=dotted];
+	TrackerOwner -- HpgcJobHandler [style=dotted];
+	Tracker -- HpgcJobHandler [style=dotted];
+	ConjunctionExp -- Recorder [style=dotted];
+}
+

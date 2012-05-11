@@ -3,6 +3,7 @@
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # !!!!!!!!!!!REMEMBER TO RERUN IT AFTER MODIFY BEFORE MANUALLY RUN ANY TESTS!!!!!!
 
+export LOGLVL=5
 export HGPORT=9990
 export HGHOST=gdos-yanan
 

@@ -100,36 +100,6 @@ module HpgcJob
       raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_status failed: unknown result')
     end
 
-    def get_my_requests(user_id)
-      send_get_my_requests(user_id)
-      return recv_get_my_requests()
-    end
-
-    def send_get_my_requests(user_id)
-      send_message('get_my_requests', Get_my_requests_args, :user_id => user_id)
-    end
-
-    def recv_get_my_requests()
-      result = receive_message(Get_my_requests_result)
-      return result.success unless result.success.nil?
-      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_my_requests failed: unknown result')
-    end
-
-    def get_all_requests()
-      send_get_all_requests()
-      return recv_get_all_requests()
-    end
-
-    def send_get_all_requests()
-      send_message('get_all_requests', Get_all_requests_args)
-    end
-
-    def recv_get_all_requests()
-      result = receive_message(Get_all_requests_result)
-      return result.success unless result.success.nil?
-      raise ::Thrift::ApplicationException.new(::Thrift::ApplicationException::MISSING_RESULT, 'get_all_requests failed: unknown result')
-    end
-
   end
 
   class Processor
@@ -183,20 +153,6 @@ module HpgcJob
       result = Get_status_result.new()
       result.success = @handler.get_status(args.client_ticket)
       write_result(result, oprot, 'get_status', seqid)
-    end
-
-    def process_get_my_requests(seqid, iprot, oprot)
-      args = read_args(iprot, Get_my_requests_args)
-      result = Get_my_requests_result.new()
-      result.success = @handler.get_my_requests(args.user_id)
-      write_result(result, oprot, 'get_my_requests', seqid)
-    end
-
-    def process_get_all_requests(seqid, iprot, oprot)
-      args = read_args(iprot, Get_all_requests_args)
-      result = Get_all_requests_result.new()
-      result.success = @handler.get_all_requests()
-      write_result(result, oprot, 'get_all_requests', seqid)
     end
 
   end
@@ -390,69 +346,6 @@ module HpgcJob
 
     FIELDS = {
       SUCCESS => {:type => ::Thrift::Types::STRUCT, :name => 'success', :class => Result}
-    }
-
-    def struct_fields; FIELDS; end
-
-    def validate
-    end
-
-    ::Thrift::Struct.generate_accessors self
-  end
-
-  class Get_my_requests_args
-    include ::Thrift::Struct, ::Thrift::Struct_Union
-    USER_ID = 1
-
-    FIELDS = {
-      USER_ID => {:type => ::Thrift::Types::STRING, :name => 'user_id'}
-    }
-
-    def struct_fields; FIELDS; end
-
-    def validate
-    end
-
-    ::Thrift::Struct.generate_accessors self
-  end
-
-  class Get_my_requests_result
-    include ::Thrift::Struct, ::Thrift::Struct_Union
-    SUCCESS = 0
-
-    FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::I64}}
-    }
-
-    def struct_fields; FIELDS; end
-
-    def validate
-    end
-
-    ::Thrift::Struct.generate_accessors self
-  end
-
-  class Get_all_requests_args
-    include ::Thrift::Struct, ::Thrift::Struct_Union
-
-    FIELDS = {
-
-    }
-
-    def struct_fields; FIELDS; end
-
-    def validate
-    end
-
-    ::Thrift::Struct.generate_accessors self
-  end
-
-  class Get_all_requests_result
-    include ::Thrift::Struct, ::Thrift::Struct_Union
-    SUCCESS = 0
-
-    FIELDS = {
-      SUCCESS => {:type => ::Thrift::Types::LIST, :name => 'success', :element => {:type => ::Thrift::Types::I64}}
     }
 
     def struct_fields; FIELDS; end

@@ -9,7 +9,7 @@
 
 #include "hpgcjob_types.h"
 
-namespace HPGC { namespace HiGIS { namespace Server {
+namespace hpgc { namespace higis { namespace interface {
 
 class hpgcjobConstants {
  public:

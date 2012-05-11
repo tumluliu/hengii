@@ -14,7 +14,7 @@ using namespace ::apache::thrift::server;
 
 using boost::shared_ptr;
 
-using namespace  ::HPGC::HiGIS::Server;
+using namespace  ::hpgc::higis::interface;
 
 class HpgcJobHandler : virtual public HpgcJobIf {
  public:
@@ -50,16 +50,6 @@ class HpgcJobHandler : virtual public HpgcJobIf {
   void get_status(Result& _return, const int64_t client_ticket) {
     // Your implementation goes here
     printf("get_status\n");
-  }
-
-  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
-    // Your implementation goes here
-    printf("get_my_requests\n");
-  }
-
-  void get_all_requests(std::vector<int64_t> & _return) {
-    // Your implementation goes here
-    printf("get_all_requests\n");
   }
 
 };

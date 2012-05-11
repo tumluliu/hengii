@@ -1,10 +1,10 @@
 #!/bin/bash
 
-thrift --gen cpp hpgcjob.thrift
-thrift --gen rb hpgcjob.thrift
-thrift --gen java hpgcjob.thrift
-thrift --gen csharp hpgcjob.thrift
-thrift --gen py hpgcjob.thrift
+thrift -r --gen cpp hpgcjob.thrift
+thrift -r --gen rb hpgcjob.thrift
+thrift -r --gen java hpgcjob.thrift
+thrift -r --gen csharp hpgcjob.thrift
+thrift -r --gen py hpgcjob.thrift
 
 cp -r gen-cpp/* ../server/lib/
 cp -r gen-rb/* ../tests/act/lib/

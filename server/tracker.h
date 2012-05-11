@@ -1,68 +1,74 @@
 /*
  * =====================================================================================
  *
- *       Filename:  session.h
+ *       Filename:  tracker.h
  *
- *    Description:  declaration of Tracker class
+ *    Description:  job flow tracker
  *
- *        Version:  0.9
- *        Created:  03/17/2012 11:02:01 AM
+ *        Version:  1.0
+ *        Created:  05/08/2012 08:33:27 PM
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  LIU Lu (), luliu@nudt.edu.cn
+ *         Author:  YANG Anran (), 08to09@gmail.com
  *   Organization:  
  *
  * =====================================================================================
  */
-#ifndef _TRACKER_H_
-#define _TRACKER_H_
 
-#include <stdbool.h>
-#include "joblog.h"
-#include "jobtracker.h"
 
-const int MAX_JOB_COUNT = 20;
-const int TRACE_INTERVAL_MILLI_S = 100;
+#ifndef  TRACKER_H_
+#define  TRACKER_H_
 
-class Tracker{
-	private:
-		pthread_mutex_t threadMutex;
-		pthread_cond_t waitingCond;
-		pthread_attr_t threadAttr;
-		vector<JobTracker> jobTrackerList;
-		vector<int32_t> busyParentCountList;
-		vector<pthread_t> jobThreadIdList;
-		bool available;
-		int jobCount;
-		int64_t id;
-		string userId;
-		JobFlow flow;
-		JobLog *log;
-		bool isBusy;
+#include <vector>
 
+#include "recorder.h"
+#include "player.h"
+#include "flowruntime.h"
+
+/*
+ * =====================================================================================
+ *        Class:  Tracker
+ *  Description:  He starts a job flow, monitor it, and clean afterwards
+ * =====================================================================================
+ */
+class Tracker : public Recorder, public Player
+{
 	public:
-		Tracker();
-		Tracker(int64_t);
-		~Tracker();
-		vector<JobTracker> getJobTrackers() const;
-		JobTracker getJobTrackerAt(int) const;
-		vector<int32_t> getBusyParentCountList() const;
-		void init();
-		void setUserJobFlow(const JobFlow&);
-		void finalize();
-		void setAvailable(bool);
-		bool isAvailable() const;
-		int createJobThreads();
-		int64_t getId() const;
-		int getJobCount() const;
-		void setUserId(const string&);
-		string getUserId() const;
-		int trace();
-		Status::type getStatus() const;
-		Status::type getInnerStatus() const;
+		/* ====================  LIFECYCLE     ======================================= */
+		/* constructor. It only build tracker itsself, not its jobtrackers, for the 
+		 * IOC convenience. Because if not like this, tracker but not its creator 
+		 * MUST determine what batch job to use in jobtracker. He MUST also pull 
+		 * JobFlow the thrift dependent and cmdline construction in (and further more, 
+		 * its thousands of validations). It may be more intuitive that the tracker 
+		 * builds all his players but... Oops, it's a disaster... */
+		Tracker(FlowRuntime *);
 
-		static void* flowWorker(void* threadParam);
-};
+		/* ====================  EVENTS        ======================================= */
+		virtual void AllPlayersDone();
+
+		/* ====================  ACTIONS       ======================================= */
+		virtual void Play();
+
+		/* ====================  ACCESSORS     ======================================= */
+
+		/* ====================  MUTATORS      ======================================= */
+
+		/* ====================  OPERATORS     ======================================= */
+
+	protected:
+		/* ====================  DATA MEMBERS  ======================================= */
+
+	private:
+		/* ====================  DATA MEMBERS  ======================================= */
+		FlowRuntime *state_;
+		bool isover_;
+
+		/* ====================  DISABLED      ======================================= */
+		Tracker(const Tracker &);
+		Tracker &operator =(const Tracker &);
+
+}; /* -----  end of class Tracker  ----- */
+
 
 #endif

@@ -21,5 +21,5 @@ set -o nounset                              # Treat unset variables as an error
 
 find /usr/local/include/ -type f -name "mpi*" >> cscope.external.files
 find /usr/local/include/ -type f -name "pbs*" >> cscope.external.files
-find /usr/include/c++/4.6.0/ -type f >> cscope.external.files
+find /usr/include/c++/4.4.6/ -type f >> cscope.external.files
 find /usr/local/include/thrift/ -type f >> cscope.external.files

@@ -10,7 +10,7 @@
 #include <TProcessor.h>
 #include "hpgcjob_types.h"
 
-namespace HPGC { namespace HiGIS { namespace Server {
+namespace hpgc { namespace higis { namespace interface {
 
 class HpgcJobIf {
  public:
@@ -21,8 +21,6 @@ class HpgcJobIf {
   virtual void resume(const int64_t client_ticket) = 0;
   virtual void cancel(const int64_t client_ticket) = 0;
   virtual void get_status(Result& _return, const int64_t client_ticket) = 0;
-  virtual void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) = 0;
-  virtual void get_all_requests(std::vector<int64_t> & _return) = 0;
 };
 
 class HpgcJobIfFactory {
@@ -70,12 +68,6 @@ class HpgcJobNull : virtual public HpgcJobIf {
     return;
   }
   void get_status(Result& /* _return */, const int64_t /* client_ticket */) {
-    return;
-  }
-  void get_my_requests(std::vector<int64_t> & /* _return */, const std::string& /* user_id */) {
-    return;
-  }
-  void get_all_requests(std::vector<int64_t> & /* _return */) {
     return;
   }
 };
@@ -706,208 +698,6 @@ class HpgcJob_get_status_presult {
 
 };
 
-typedef struct _HpgcJob_get_my_requests_args__isset {
-  _HpgcJob_get_my_requests_args__isset() : user_id(false) {}
-  bool user_id;
-} _HpgcJob_get_my_requests_args__isset;
-
-class HpgcJob_get_my_requests_args {
- public:
-
-  HpgcJob_get_my_requests_args() : user_id("") {
-  }
-
-  virtual ~HpgcJob_get_my_requests_args() throw() {}
-
-  std::string user_id;
-
-  _HpgcJob_get_my_requests_args__isset __isset;
-
-  void __set_user_id(const std::string& val) {
-    user_id = val;
-  }
-
-  bool operator == (const HpgcJob_get_my_requests_args & rhs) const
-  {
-    if (!(user_id == rhs.user_id))
-      return false;
-    return true;
-  }
-  bool operator != (const HpgcJob_get_my_requests_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const HpgcJob_get_my_requests_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class HpgcJob_get_my_requests_pargs {
- public:
-
-
-  virtual ~HpgcJob_get_my_requests_pargs() throw() {}
-
-  const std::string* user_id;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _HpgcJob_get_my_requests_result__isset {
-  _HpgcJob_get_my_requests_result__isset() : success(false) {}
-  bool success;
-} _HpgcJob_get_my_requests_result__isset;
-
-class HpgcJob_get_my_requests_result {
- public:
-
-  HpgcJob_get_my_requests_result() {
-  }
-
-  virtual ~HpgcJob_get_my_requests_result() throw() {}
-
-  std::vector<int64_t>  success;
-
-  _HpgcJob_get_my_requests_result__isset __isset;
-
-  void __set_success(const std::vector<int64_t> & val) {
-    success = val;
-  }
-
-  bool operator == (const HpgcJob_get_my_requests_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const HpgcJob_get_my_requests_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const HpgcJob_get_my_requests_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _HpgcJob_get_my_requests_presult__isset {
-  _HpgcJob_get_my_requests_presult__isset() : success(false) {}
-  bool success;
-} _HpgcJob_get_my_requests_presult__isset;
-
-class HpgcJob_get_my_requests_presult {
- public:
-
-
-  virtual ~HpgcJob_get_my_requests_presult() throw() {}
-
-  std::vector<int64_t> * success;
-
-  _HpgcJob_get_my_requests_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-
-class HpgcJob_get_all_requests_args {
- public:
-
-  HpgcJob_get_all_requests_args() {
-  }
-
-  virtual ~HpgcJob_get_all_requests_args() throw() {}
-
-
-  bool operator == (const HpgcJob_get_all_requests_args & /* rhs */) const
-  {
-    return true;
-  }
-  bool operator != (const HpgcJob_get_all_requests_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const HpgcJob_get_all_requests_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-
-class HpgcJob_get_all_requests_pargs {
- public:
-
-
-  virtual ~HpgcJob_get_all_requests_pargs() throw() {}
-
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _HpgcJob_get_all_requests_result__isset {
-  _HpgcJob_get_all_requests_result__isset() : success(false) {}
-  bool success;
-} _HpgcJob_get_all_requests_result__isset;
-
-class HpgcJob_get_all_requests_result {
- public:
-
-  HpgcJob_get_all_requests_result() {
-  }
-
-  virtual ~HpgcJob_get_all_requests_result() throw() {}
-
-  std::vector<int64_t>  success;
-
-  _HpgcJob_get_all_requests_result__isset __isset;
-
-  void __set_success(const std::vector<int64_t> & val) {
-    success = val;
-  }
-
-  bool operator == (const HpgcJob_get_all_requests_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const HpgcJob_get_all_requests_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const HpgcJob_get_all_requests_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-typedef struct _HpgcJob_get_all_requests_presult__isset {
-  _HpgcJob_get_all_requests_presult__isset() : success(false) {}
-  bool success;
-} _HpgcJob_get_all_requests_presult__isset;
-
-class HpgcJob_get_all_requests_presult {
- public:
-
-
-  virtual ~HpgcJob_get_all_requests_presult() throw() {}
-
-  std::vector<int64_t> * success;
-
-  _HpgcJob_get_all_requests_presult__isset __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
 class HpgcJobClient : virtual public HpgcJobIf {
  public:
   HpgcJobClient(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> prot) :
@@ -946,12 +736,6 @@ class HpgcJobClient : virtual public HpgcJobIf {
   void get_status(Result& _return, const int64_t client_ticket);
   void send_get_status(const int64_t client_ticket);
   void recv_get_status(Result& _return);
-  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id);
-  void send_get_my_requests(const std::string& user_id);
-  void recv_get_my_requests(std::vector<int64_t> & _return);
-  void get_all_requests(std::vector<int64_t> & _return);
-  void send_get_all_requests();
-  void recv_get_all_requests(std::vector<int64_t> & _return);
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -971,8 +755,6 @@ class HpgcJobProcessor : public ::apache::thrift::TProcessor {
   void process_resume(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_cancel(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
   void process_get_status(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_get_my_requests(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
-  void process_get_all_requests(int32_t seqid, apache::thrift::protocol::TProtocol* iprot, apache::thrift::protocol::TProtocol* oprot, void* callContext);
  public:
   HpgcJobProcessor(boost::shared_ptr<HpgcJobIf> iface) :
     iface_(iface) {
@@ -982,8 +764,6 @@ class HpgcJobProcessor : public ::apache::thrift::TProcessor {
     processMap_["resume"] = &HpgcJobProcessor::process_resume;
     processMap_["cancel"] = &HpgcJobProcessor::process_cancel;
     processMap_["get_status"] = &HpgcJobProcessor::process_get_status;
-    processMap_["get_my_requests"] = &HpgcJobProcessor::process_get_my_requests;
-    processMap_["get_all_requests"] = &HpgcJobProcessor::process_get_all_requests;
   }
 
   virtual bool process(boost::shared_ptr<apache::thrift::protocol::TProtocol> piprot, boost::shared_ptr<apache::thrift::protocol::TProtocol> poprot, void* callContext);
@@ -1064,30 +844,6 @@ class HpgcJobMultiface : virtual public HpgcJobIf {
         return;
       } else {
         ifaces_[i]->get_status(_return, client_ticket);
-      }
-    }
-  }
-
-  void get_my_requests(std::vector<int64_t> & _return, const std::string& user_id) {
-    size_t sz = ifaces_.size();
-    for (size_t i = 0; i < sz; ++i) {
-      if (i == sz - 1) {
-        ifaces_[i]->get_my_requests(_return, user_id);
-        return;
-      } else {
-        ifaces_[i]->get_my_requests(_return, user_id);
-      }
-    }
-  }
-
-  void get_all_requests(std::vector<int64_t> & _return) {
-    size_t sz = ifaces_.size();
-    for (size_t i = 0; i < sz; ++i) {
-      if (i == sz - 1) {
-        ifaces_[i]->get_all_requests(_return);
-        return;
-      } else {
-        ifaces_[i]->get_all_requests(_return);
       }
     }
   }
