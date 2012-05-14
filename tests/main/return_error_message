@@ -1,0 +1,31 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: return_error_message
+# 
+#         USAGE: ./return_error_message 
+# 
+#   DESCRIPTION: server shall return error message 
+#
+#		 INPUTS: program name
+#		         output from stderr
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 05/14/2012 10:59:54 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+_prepare_program $1 
+expected=$($APPSHOME/$1 2>&1 1>/dev/null)
+_prepare_server
+_start_server | _contains "$expected" | _at server &
+sleep 0.1
+execute_program $1 | _contains "$expected" | _at client 
+_kill_server
+_collect server client

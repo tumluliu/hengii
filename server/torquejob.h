@@ -39,7 +39,7 @@ class TorqueJob : public Player
 	public:
 		/* ====================  LIFECYCLE     ======================================= */
         /* constructor, args: process cout; cmdline */
-		TorqueJob(int, const std::string &);     
+		TorqueJob(int64_t, int, const std::string &);     
 
 		/* ====================  ACCESSORS     ======================================= */
 		virtual std::string get_output() const;

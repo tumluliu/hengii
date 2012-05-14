@@ -108,7 +108,7 @@ MYSQL_RES *MySqlDb::Query( const std::string &query ) {
 				<< ", sql is: " << query;
 	}
 	else {
-		Log().Get(DATABASE, DEBUG) << "mysql query executed successfully. sql is: " << query;
+		//Log().Get(DATABASE, DEBUG) << "mysql query executed successfully. sql is: " << query;
 	}
 	ReturnConnection( conn );
 

@@ -55,55 +55,18 @@ int CmdlineBuilder::BuildAppOptions(
 		string & result, const std::map<string, string> &options, 
 		const std::string &appuri) {
 	result = "";
-	std::vector<AppOption> appOptionMetas;
+	std::vector<AppOption> meta;
 
-	if (BuildAppOptionsMeta(appOptionMetas, appuri) != 0) {
-		result = "start job error, program " + appuri + " not exist";
-		return -1;
-	}
+	AppOption::BuildMeta(meta, appuri);
 
-	for (size_t i = 0; i < appOptionMetas.size(); i++) {
-		bool lackEssential = true;
+	for (size_t i = 0; i < meta.size(); i++) {
 		for (std::map<string, string>::const_iterator it = options.begin();
 				it != options.end(); it++) {
-			if(appOptionMetas[i].get_name() == (*it).first) {
+			if(meta[i].get_name() == (*it).first) {
 				result = result + 
-					appOptionMetas[i].get_cmdswitch() + " " + (*it).second + " ";
-				lackEssential = false;
+					meta[i].get_cmdswitch() + " " + (*it).second + " ";
 			}
 		}
-		if (appOptionMetas[i].IsOptional() == false && lackEssential == true) {
-			result = "start job error, lack option " + appOptionMetas[i].get_name();
-			return -1;
-		}
-	}
-
-	for (std::map<string, string>::const_iterator it = options.begin(); 
-			it != options.end(); it++) {
-		if (AppOption::IsUnknown(appOptionMetas, (*it).first)) {
-			result = "start job error, option " + (*it).first + " unknown";
-			return -1;
-		}
-	}
-
-	return 0;
-}
-
-int CmdlineBuilder::BuildAppOptionsMeta(
-		std::vector<AppOption> &result, const string &appuri) {
-	string appMetaFile = APP_DIR + appuri + ".meta";
-
-	std::ifstream metafile(appMetaFile.c_str(), std::ios::in);
-	if (!metafile) { 
-		return -1;
-	}
-
-	string record;
-	std::vector<string> pieces;
-	while (getline(metafile, record)) {
-		pieces = util::splitStringBySpace(record);
-		AppOption appOptionMeta(pieces);
-		result.push_back(appOptionMeta);
 	}
 
 	return 0;

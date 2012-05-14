@@ -39,8 +39,12 @@ extern "C"
 
 using std::string;
 
-TorqueJob::TorqueJob(int processcount, const string &cmdline) 
-	: Player(-1), pbsid_(""), processcount_(processcount), cmdline_(cmdline), connection_(-1),
+/* Here the global unique id is set. Although one jobtracker only has one torque job so 
+ * there is unambigious when torque job notice the jobtracker, torque job itsself must 
+ * access some global resources, like pbs server and file system. So it's unacceptable if 
+ * two torque job are bitwisely the same. */
+TorqueJob::TorqueJob(int64_t id, int processcount, const string &cmdline) 
+	: Player(id), pbsid_(""), processcount_(processcount), cmdline_(cmdline), connection_(-1),
 	scriptpath_(""), outputpath_(""), errlogpath_(""),
 	output_("") { 
 	}
@@ -63,12 +67,7 @@ string TorqueJob::GenerateNameByTime() const {
 }
 
 string TorqueJob::GenerateScriptName() const {
-	string name;
-	int exist;
-	do {
-		name = GenerateNameByTime();
-	} while ((exist = access((PBS_OUT_DIR + name).c_str(), F_OK)) == 0);
-	return name;
+	return util::intToString(get_id());
 }
 
 int TorqueJob::CreateScript() {
@@ -235,12 +234,25 @@ int TorqueJob::Trace() {
 }
 
 int TorqueJob::Collect() {
+	string stderr_output;
 	if (util::readFile(outputpath_, output_) != 0) {
 		return -1;
 	}
+	if (util::readFile(errlogpath_, stderr_output) != 0) {
+		return -1;
+	}
+
+	std::stringstream ss;
+	ss << output_;
+	if (stderr_output != "") {
+		ss << std::endl << "============ Error msg ===============" << std::endl;
+		ss << stderr_output; 
+	}
+	output_ = ss.str();
 
 	util::deleteFile(scriptpath_);
 	util::deleteFile(outputpath_);
+	util::deleteFile(errlogpath_);
 
 	Log().Debug() << "torque output is: " << output_;
 

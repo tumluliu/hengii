@@ -29,7 +29,9 @@ const std::string MPI_EXEC_CMD = "mpiexec ";
 /*
  * =====================================================================================
  *        Class:  CmdlineBuilder
- *  Description:  He build command line based on some meta data and a job
+ *  Description:  He build command line based on some meta data and a job.
+ *                The class assumes the job is legal, so please validate the job
+ *                before give it to him.
  * =====================================================================================
  */
 class CmdlineBuilder
@@ -57,9 +59,6 @@ class CmdlineBuilder
 				std::string &,
 				const std::map<std::string, std::string> &options, 
 				const std::string &); 
-		/* args: 1:result;2:app uri. return:signal */
-		int BuildAppOptionsMeta(
-				std::vector<AppOption> &, const std::string &);
 		int BuildLoader(
 				std::string &, const hpgc::higis::interface::Context);
 }; /* -----  end of class CmdlineBuilder  ----- */

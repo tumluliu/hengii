@@ -41,7 +41,6 @@ class Player {
 	public:
 		/* ====================  LIFECYCLE     ======================================= */
 		/* input 1:id, 2:recorder */
-		Player();
 		Player(int64_t);                             /* constructor */
 		virtual ~Player();
 		Player(const Player &);

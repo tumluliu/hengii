@@ -23,7 +23,7 @@
 
 /* ====================  PROJECT       ======================================= */
 const std::string PROJECT_NAME = "HiGIS";
-const std::string VERSION = "1.0";
+const std::string VERSION = "1.01";
 const int PORT = 9990;
 const int THREAD_POOL_SIZE = 256;
 

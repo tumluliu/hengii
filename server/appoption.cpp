@@ -16,7 +16,11 @@
  * =====================================================================================
  */
 #include <stdlib.h>
+#include <fstream>
+
 #include "appoption.h"
+#include "config.h"
+#include "utility.h"
 
 using std::vector;
 using std::string;
@@ -53,4 +57,42 @@ std::string AppOption::get_cmdswitch() const {
 
 std::string AppOption::get_defaultvalue() const {
 	return defaultvalue_;
+}
+
+/* WARNING: This helper function is put here only TEMPORARILY.
+ * by YANG Anran @ 2012.5.14 */
+int AppOption::BuildMeta(
+		std::vector<AppOption> &result, const string &appuri) {
+	string appMetaFile = APP_DIR + appuri + ".meta";
+
+	std::ifstream metafile(appMetaFile.c_str(), std::ios::in);
+	if (!metafile) { 
+		return -1;
+	}
+
+	string record;
+	std::vector<string> pieces;
+	while (getline(metafile, record)) {
+		pieces = util::splitStringBySpace(record);
+		AppOption appOptionMeta(pieces);
+		result.push_back(appOptionMeta);
+	}	
+
+	metafile.close();
+
+	return 0;
+}
+
+
+bool AppOption::HasMeta(const std::string &appuri) {
+	string appMetaFile = APP_DIR + appuri + ".meta";
+
+	std::ifstream metafile(appMetaFile.c_str(), std::ios::in);
+	if (metafile) {
+		metafile.close();
+		return true; 
+	}
+	else {
+		return false;
+	}
 }

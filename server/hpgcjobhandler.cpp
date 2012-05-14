@@ -52,6 +52,7 @@ int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
 	std::cout << "number of jobs in this flow: " << flow.job_count << std::endl;
 
 	int64_t id = -1;
+	
 	TrackerOwner *man = new TrackerOwner(flow, user_id);
 	Tracker *car = man->Borrow(id);
 	if (car == NULL) {
@@ -118,7 +119,10 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 		JobRepoEntry::Open()->ReturnJobFlowRuntime(state);
 	}
 
-	Log().Debug() << "The result sent to client is: " << _return.message;
+	/* The log is toooo verbose without this condition */
+	if (_return.message != "") {
+		Log().Debug() << "The result sent to client is: " << _return.message;
+	}
 }
 
 void HpgcJobHandler::OnePlayerDone(int64_t id) {

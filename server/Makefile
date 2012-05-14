@@ -15,6 +15,8 @@ SRC := conjunctionexp.cpp \
 	appoption.cpp cmdlinebuilder.cpp \
 	pbsattr.cpp resources.cpp torquejob.cpp \
 	utility.cpp log.cpp \
+	validator.cpp \
+	jobvalidator.cpp optionvalidator.cpp programvalidator.cpp \
     hpgcjobhandler.cpp higine.cpp
 OBJ := $(patsubst %.cpp, %.o, $(SRC))
 THRIFTDIR := /usr/local/include/thrift

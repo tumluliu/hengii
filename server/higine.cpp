@@ -24,11 +24,16 @@
 #include "hpgcjobhandler.h"
 #include "config.h"
 #include "HpgcJob.h"
+#include "jobrepoentry.h"
 
 using hpgc::higis::interface::HpgcJobProcessor;
 
 int main() {
 	//init_daemon();
+	// WARNING: THIS is essential here to realize eagle init in ONLY ONE thread, to
+	// avoid thread-safety problem. Maybe I should clear the singleton out and hug
+	// the pure DI
+	JobRepoEntry::Open(); 
 	shared_ptr<HpgcJobHandler> handler(new HpgcJobHandler());
 	shared_ptr<TProcessor> processor(new HpgcJobProcessor(handler));
 	shared_ptr<TProtocolFactory> protocolFactory(new TBinaryProtocolFactory());

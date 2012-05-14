@@ -12,5 +12,6 @@ tests/.trash/*
 server/pbstmp/*
 server/config.h
 server/apps/*
+server/higine
 runtest.*log
 run.log

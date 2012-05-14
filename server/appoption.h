@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <stdbool.h>
 
 class AppOption
 {
@@ -38,6 +39,9 @@ class AppOption
 		/* ====================  TOOLS         ======================================= */
 		static bool IsUnknown(const std::vector<AppOption> &, 
 				const std::string &);
+		/* args: 1:result;2:app uri. return:signal */
+		static int BuildMeta(std::vector<AppOption> &result, const std::string &appuri);
+		static bool HasMeta(const std::string &appuri);
 
 	private:
 		/* ====================  DATA MEMBERS  ======================================= */

@@ -20,11 +20,6 @@
 
 #include "player.h"
 
-/* WARNING: I felt bad about this. However, it seems I was forced to do this for
- * some reason. Trying hard to remember this reason... by YANG Anran @ 2012.5.9 */
-Player::Player() : id_(0), recorders_(), isplaying_(false) {
-}
-
 Player::Player(int64_t id) : id_(id), recorders_(), isplaying_(false) {
 }
 

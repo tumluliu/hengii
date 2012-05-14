@@ -23,6 +23,8 @@
 #include "cmdlinebuilder.h"
 #include "log.h"
 #include "utility.h"
+#include "optionvalidator.h"
+#include "programvalidator.h"
 
 using std::string;
 using hpgc::higis::interface::JobFlow;
@@ -43,9 +45,11 @@ Tracker *TrackerOwner::Borrow(int64_t &id) {
 
 	id = JobRepoEntry::Open()->RegisterJobFlow(flow_, user_);
 	state_ = JobRepoEntry::Open()->BorrowJobFlowRuntime(id);
+
+	if(Validate() != 0) { return NULL; }
 	product_ = new Tracker(state_);
 
-	if(BuildJobTrackers() != 0) { return NULL; }
+	if(BuildJobTrackers(id) != 0) { return NULL; }
 	product_->Listen(jobtrackers_);
 
 	LinkJobTrackers();
@@ -54,7 +58,20 @@ Tracker *TrackerOwner::Borrow(int64_t &id) {
 	return product_;
 }
 
-int TrackerOwner::BuildJobTrackers() {
+int TrackerOwner::Validate() {
+	OptionValidator stage2;
+	ProgramValidator stage1(&stage2);
+	Validator checker(stage1);
+
+	std::string msg;
+	if(!checker.Chanllenge(flow_, msg)) {
+		Fail(msg);
+		return -1;
+	}
+	return 0;
+}
+
+int TrackerOwner::BuildJobTrackers(int64_t flowid) {
 	for (int i = 0; i < flow_.job_count; i++) {
 		CmdlineBuilder cmdBuilder;
 		string cmd;
@@ -66,8 +83,14 @@ int TrackerOwner::BuildJobTrackers() {
 
 		int np = util::stoi(
 				flow_.jobs[i].runtime_context.options["process_count"]);
+		/* WARNING: THIS is a workaround which also contains a magic number 10000.
+		 * And all will turn vulunerable when the job count is over 10000, which
+		 * is rather... ulikely. But it is still an ugly workaround because it involves
+		 * so many knowledges that is not expressed here.
+		 * by YANG Anran, @ 2012.5.14 */
+		int64_t id = flowid * 10000 + flow_.jobs[i].id;
 		Player *batchjob 
-			= new TorqueJob(np, cmd);
+			= new TorqueJob(id, np, cmd);
 
 		batchjobs_.push_back(batchjob);
 
@@ -116,9 +139,14 @@ void TrackerOwner::CleanUp() {
 	}
 }
 
-void TrackerOwner::Fail(int id, const string &msg) {
+void TrackerOwner::Fail(const string &msg) {
 	state_->set_status(Status::FAILED);
-	state_->set_message("job " + util::intToString(id) + ": " + msg);
+	state_->set_message(msg);
 	JobRepoEntry::Open()->UpdateFlowPartRuntime(state_);
+	CleanUp();
+}
+
+void TrackerOwner::Fail(int id, const string &msg) {
+	Fail("job " + util::intToString(id) + ": " + msg);
 	CleanUp();
 }

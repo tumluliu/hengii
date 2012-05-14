@@ -29,6 +29,7 @@
 #include "player.h"
 #include "flowruntime.h"
 #include "hpgcjob_types.h"
+#include "validator.h"
 
 /*
  * =====================================================================================
@@ -84,9 +85,13 @@ class TrackerOwner
 		void CleanUp();
 		/* args: failed job id; message */
 		void Fail(int, const std::string &);
+		/* args: failed message */
+		void Fail(const std::string &);
 
-		/* ====================  HELPERS       ======================================= */
-		int BuildJobTrackers();
+		/* ====================  STEPS         ======================================= */
+		int Validate();
+		/* args: flow id */
+		int BuildJobTrackers(int64_t);
 		int LinkJobTrackers();
 
 		/* ====================  DISABLED      ======================================= */
