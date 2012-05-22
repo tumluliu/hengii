@@ -1,6 +1,7 @@
 graph G {
 	Player -- ChainPlayer;
 	Recorder -- ChainPlayer;
+	DataRepo -- DbDataRepo;
 	JobRepo -- DbJobRepo;
 	MetaRepo -- FileMetaRepo;
 	ChainPlayer -- JobTracker;
@@ -15,26 +16,31 @@ graph G {
 	Player -- Tracker;
 	IRecorder -- TrackerCenter;
 	std -- TrackerCenter;
-	JobRepo -- TrackerFactory [style=dotted];
+	Resources -- TorqueJob [style=dotted];
+	JobRuntime -- JobTracker [style=dotted];
+	SqlDb -- DbDataRepo [style=dotted];
+	DataRepo -- TrackerFactory [style=dotted];
 	FlowRuntime -- Tracker [style=dotted];
 	MetaRepo -- ProgramValidator [style=dotted];
 	JobRuntime -- FlowRuntime [style=dotted];
-	CmdlineBuilder -- TrackerFactory [style=dotted];
-	BatchJobFactory -- TrackerFactory [style=dotted];
-	Player -- Tracker [style=dotted];
-	JobRuntime -- JobTracker [style=dotted];
-	MetaRepo -- CmdlineBuilder [style=dotted];
+	Player -- JobTracker [style=dotted];
 	JobValidator -- Validator [style=dotted];
+	JobRepo -- TrackerFactory [style=dotted];
+	DataRepo -- TrackerEnv [style=dotted];
+	TrackerEnv -- Tracker [style=dotted];
+	MetaRepo -- OptionValidator [style=dotted];
+	SqlDb -- DbJobRepo [style=dotted];
+	Validator -- TrackerFactory [style=dotted];
 	JobRepo -- TrackerCenter [style=dotted];
 	ConjunctionExp -- Recorder [style=dotted];
-	Player -- JobTracker [style=dotted];
-	Validator -- TrackerFactory [style=dotted];
-	JobRepo -- Tracker [style=dotted];
-	MetaRepo -- OptionValidator [style=dotted];
-	IRecorder -- Player [style=dotted];
-	SqlDb -- DbJobRepo [style=dotted];
-	Tracker -- TrackerCenter [style=dotted];
-	Resources -- TorqueJob [style=dotted];
 	JobRepo -- JobTracker [style=dotted];
+	MetaRepo -- CmdlineBuilder [style=dotted];
+	BatchJobFactory -- TrackerFactory [style=dotted];
+	JobRepo -- Tracker [style=dotted];
+	Player -- Tracker [style=dotted];
+	IRecorder -- Player [style=dotted];
+	MetaRepo -- FlowInfo [style=dotted];
+	MetaRepo -- TrackerFactory [style=dotted];
+	Tracker -- TrackerCenter [style=dotted];
 }
 
