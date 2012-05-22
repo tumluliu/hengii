@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# test for happy path , or the most "standard" way to use higine
-# parameters:
-# 1:the name of the to-run server-side program
-# 2:the process taken to run mpiexec
-# (implicit)3:a script called _contains_<program name>_output
-# The last param exists because to know a MPI program's exact output is impossible
-
 PROGRAM_NOT_EXIST_MESSAGE="start job error, program not_exist not exist"
 _prepare_server
 _start_server | _contains $PROGRAM_NOT_EXIST_MESSAGE | _at server &

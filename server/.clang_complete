@@ -1,6 +1,13 @@
 -DHAVE_INTYPES_H -DHAVE_NETINET_IN_H
+-I./
+-I./lib
+-I./core/
+-I./repo/
+-I./factory/
+-I./util/
+-I./batch/
 -I/usr/lib/clang/3.0/include/
 -I/usr/local/include/thrift/
 -I/usr/include/c++/4.4.4/
 -I/usr/include/c++/4.4.4/x86_64-redhat-linux/
--I./lib
+-std=c++0x

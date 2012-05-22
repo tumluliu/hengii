@@ -24,21 +24,22 @@
 #include "flowruntime.h"
 #include "jobruntime.h"
 #include "log.h"
-#include "jobrepoentry.h"
+#include "dbjobrepo.h"
+#include "mysqldb.h"
+#include "torquejobfactory.h"
+#include "filemetarepo.h"
+#include "optionvalidator.h"
+#include "programvalidator.h"
+#include "dbdatarepo.h"
 
 using hpgc::higis::interface::JobFlow;
 using hpgc::higis::interface::Job;
 using hpgc::higis::interface::Result;
 using hpgc::higis::interface::JobResult;
 
-HpgcJobHandler::HpgcJobHandler() : managers_(), trackers_(), lock_() {
-	pthread_mutex_init(&lock_, NULL);
-}
-
-HpgcJobHandler::~HpgcJobHandler() {
-	pthread_mutex_destroy(&lock_);
-	JobRepoEntry::Close();
-}
+HpgcJobHandler::HpgcJobHandler() : db_(new MySqlDb), repo_(new DbJobRepo(*db_)),
+	datarepo_(new DbDataRepo(*db_)), center_(new TrackerCenter(*repo_)) {
+	}
 
 int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user_id) {
 	JobFlow flow;
@@ -48,37 +49,25 @@ int64_t HpgcJobHandler::start_single_job(const Job& job, const std::string& user
 }
 
 int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
-	std::cout << "Start processing " << PROJECT_NAME << " job flow" << std::endl;
+	std::cout << "Start processing job flow" << std::endl;
 	std::cout << "number of jobs in this flow: " << flow.job_count << std::endl;
 
-	int64_t id = -1;
-	
-	TrackerOwner *man = new TrackerOwner(flow, user_id);
-	Tracker *car = man->Borrow(id);
-	if (car == NULL) {
-		if (id < 0) {
-			Log().Error() << "Cannot generate proper ticket";
+	FileMetaRepo metarepo;
+
+	std::shared_ptr<JobValidator> substage2(new OptionValidator(
+				std::shared_ptr<JobValidator>(), metarepo));
+	ProgramValidator substage1(substage2, metarepo);
+	Validator guard(substage1);
+
+	TorqueJobFactory batchfactory;
+	TrackerFactory man(flow, user_id, *repo_, batchfactory, guard, metarepo, *datarepo_);
+
+	int64_t id = repo_->RegisterJobFlow(flow, user_id);
+	if (id > 0) {
+		std::shared_ptr<Tracker> car(man.Create(id));
+		if (car != NULL){
+			center_->add_tracker(car);
 		}
-		else {
-			Log().Error() << "There is some error when generate tracker "
-				<< id;
-		}
-		delete man;
-	}
-	else {
-
-		pthread_mutex_lock(&lock_);
-
-		managers_.insert(
-				std::pair<int64_t, TrackerOwner*>(id, man));
-		trackers_.insert(
-				std::pair<int64_t, Tracker*>(id, car));
-		car->add_recorder(this);
-
-		Log().Debug() << "[MsgFlow] Start flow " << id;
-		car->GoPlay();
-
-		pthread_mutex_unlock(&lock_);
 	}
 
 	return id;
@@ -97,7 +86,8 @@ void HpgcJobHandler::cancel(const int64_t client_ticket) {
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
-	FlowRuntime *state = JobRepoEntry::Open()->BorrowJobFlowRuntime(client_ticket);
+	std::unique_ptr<FlowRuntime> state = 
+		repo_->CreateFlowRuntime(client_ticket);
 	if (state == NULL) {
 		_return.flow_status = hpgc::higis::interface::Status::NOT_EXIST;
 		_return.message = "get status error, job flow id not exist";
@@ -108,7 +98,7 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 			= static_cast<hpgc::higis::interface::Status::type>(state->get_status());
 		_return.message = state->get_message();
 		for (int i = 0; i < state->get_jobcount(); i++) {
-			JobRuntime *jobstate = state->get_jobruntime(i);
+			std::shared_ptr<JobRuntime> jobstate(state->get_jobruntime(i));
 			JobResult jobpart;
 			jobpart.status
 				= static_cast<hpgc::higis::interface::JobStatus::type>(
@@ -116,24 +106,10 @@ void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {
 			jobpart.message = jobstate->get_message();
 			_return.job_result_list.push_back(jobpart);
 		}
-		JobRepoEntry::Open()->ReturnJobFlowRuntime(state);
 	}
 
 	/* The log is toooo verbose without this condition */
 	if (_return.message != "") {
 		Log().Debug() << "The result sent to client is: " << _return.message;
 	}
-}
-
-void HpgcJobHandler::OnePlayerDone(int64_t id) {
-	Log().Debug() << "[MsgFlow] Flow " << id << " complete";
-	managers_[id]->Return(trackers_[id]);
-
-	delete managers_[id];
-	Log().Debug() << "[MsgFlow] Flow " << id << " die";
-
-	pthread_mutex_lock(&lock_);
-	managers_.erase(id);
-	trackers_.erase(id);
-	pthread_mutex_unlock(&lock_);
 }

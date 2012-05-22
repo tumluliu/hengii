@@ -1,0 +1,24 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: _to_db
+# 
+#         USAGE: ./_to_db 
+# 
+#   DESCRIPTION: operate databse using given sql, mainly in order to prepare
+#                test environment  
+#
+#		 INPUTS: (STDIN)sql
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 05/22/2012 10:16:53 AM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+mysql -h$DBHOST -u$DBUSER -p$DBPASS -s $DBNAME

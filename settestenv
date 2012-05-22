@@ -3,10 +3,16 @@
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!IMPORTANT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # !!!!!!!!!!!REMEMBER TO RERUN IT AFTER MODIFY BEFORE MANUALLY RUN ANY TESTS!!!!!!
 
+#-------------------------------------------------------------------------------
+#  params
+#-------------------------------------------------------------------------------
 export LOGLVL=5
 export HGPORT=9990
 export HGHOST=gdos-yanan
 
+#-------------------------------------------------------------------------------
+#  basic locations
+#-------------------------------------------------------------------------------
 export MAIN=$PWD
 export THOME=$MAIN/tests
 export SRCHOME=$MAIN/server/
@@ -15,6 +21,20 @@ export SERVERLOG=$MAIN/runtest.server.log
 export SERVERHOME=$THOME/.live/
 export APPSHOME=$SERVERHOME/apps/
 
+#-------------------------------------------------------------------------------
+#  database
+#-------------------------------------------------------------------------------
+export DBHOST=127.0.0.1 
+export DBUSER=myuser 
+export DBPASS=mypassword 
+export DBNAME=higis
+
+export DATASTAT_TABLE=gdos_sys_data
+export DATA_TABLE=GDOS_SYS_FEATURES
+
+#-------------------------------------------------------------------------------
+#  path
+#-------------------------------------------------------------------------------
 export PATH=$PATH:$MAIN/tests/main
 export PATH=$PATH:$MAIN/tests/pre
 export PATH=$PATH:$MAIN/tests/act

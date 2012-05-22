@@ -1,0 +1,35 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: cannot_create_existed_data
+# 
+#         USAGE: ./cannot_create_existed_data 
+# 
+#   DESCRIPTION: cannot create existed data, whether it already there, or it is
+#                being created 
+#
+#		 INPUTS: creator;args;data name
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 05/22/2012 03:07:04 PM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+NAME_COLLISION_MESSAGE="Create data $3 failure for it already exists"
+echo "insert into $DATA_TABLE(name) values('$3')" | _to_db
+_prepare_server
+_start_server | _contains $NAME_COLLISION_MESSAGE | _at server &
+sleep 0.1
+_prepare_program $1; execute_program $1 1 $2 | _contains $NAME_COLLISION_MESSAGE  | _at client 
+_prepare_program hello; execute_program hello 2 | _contains_hello_output 2 | _at state
+_kill_server
+_collect client server state
+echo "delete from $DATA_TABLE where name = '$3'" | _to_db
+
+

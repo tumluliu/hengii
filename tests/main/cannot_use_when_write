@@ -1,0 +1,43 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: cannot_use_when_write
+# 
+#         USAGE: ./cannot_use_when_write 
+# 
+#   DESCRIPTION: When a job is writing, no one but himself could use it.
+#
+#		 INPUTS: writer;reader;another writer;writer param;reader param;
+#		         another writer param;dataname
+#       OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 05/21/2012 09:19:20 PM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+READ_CONFLICT_MESSAGE="Cannot read data $7 for it is being written by others!";
+WRITE_CONFLICT_MESSAGE="Cannot update data $7 for it is being used by others!";
+
+echo "delete from $DATASTAT_TABLE where name='$7'" | _to_db
+_prepare_server
+_start_server | _contains | _at server &
+sleep 0.5
+_prepare_program $1 ; 
+_prepare_program $2 ; 
+_prepare_program $3 ; 
+execute_program $1 1 $4 | _contains "$($APPSHOME/$1 $7)" | _at writer &
+# WARNING: This is a rather arbitrary number to get reader after writer but before 
+# he complete. by YANG Anran @ 2012.5.22
+sleep 2
+execute_program $2 1 $5 | _contains $READ_CONFLICT_MESSAGE | _at reader &
+execute_program $3 1 $6 | _contains $WRITE_CONFLICT_MESSAGE | _at writer2 &
+_prepare_program hello; execute_program hello 2 | _contains_hello_output 2 | _at state
+_collect writer reader writer2 | _at client
+_kill_server
+_collect server client state

@@ -13,5 +13,7 @@ server/pbstmp/*
 server/config.h
 server/apps/*
 server/higine
+clients/gen-*
 runtest.*log
 run.log
+doc/codes/*

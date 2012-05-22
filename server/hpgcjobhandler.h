@@ -20,12 +20,15 @@
 #define HPGCJOBHANDLER_H_
 
 #include <map>
+#include <memory>
 #include <pthread.h>
 
-#include "trackerowner.h"
-#include "tracker.h"
 #include "config.h"
 #include "HpgcJob.h"
+#include "jobrepo.h"
+#include "datarepo.h"
+#include "trackercenter.h"
+#include "sqldb.h"
 
 /*
  * =====================================================================================
@@ -33,12 +36,11 @@
  *  Description:  He offers service to the world
  * =====================================================================================
  */
-class HpgcJobHandler : public hpgc::higis::interface::HpgcJobIf, public IRecorder
+class HpgcJobHandler : public hpgc::higis::interface::HpgcJobIf
 {
 	public:
 		/* ====================  LIFECYCLE     ======================================= */
 		HpgcJobHandler();                             /* constructor */
-		~HpgcJobHandler();                             /* destructor */
 
 		/* ====================  SERVICE       ======================================= */
 		int64_t start_single_job( const hpgc::higis::interface::Job& job, 
@@ -51,14 +53,12 @@ class HpgcJobHandler : public hpgc::higis::interface::HpgcJobIf, public IRecorde
 		void get_status( hpgc::higis::interface::Result& _return, 
 				const int64_t client_ticket);
 
-		/* ====================  As irecorder ======================================= */
-		virtual void OnePlayerDone(int64_t); 
-
 	private:
 		/* ====================  DATA MEMBERS  ======================================= */
-		std::map<int64_t, TrackerOwner*> managers_;
-		std::map<int64_t, Tracker*> trackers_;
-		pthread_mutex_t lock_;
+		std::unique_ptr<SqlDb> db_;
+		std::unique_ptr<JobRepo> repo_;
+		std::shared_ptr<DataRepo> datarepo_;
+		std::shared_ptr<TrackerCenter> center_;
 
 		/* ====================  DISABLED      ======================================= */
 		HpgcJobHandler(const HpgcJobHandler &);

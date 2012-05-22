@@ -34,6 +34,11 @@ const std::string DB_PASSWORD = "mypassword";
 const std::string DB_NAME = "higis";
 const int DB_PORT = 3306;
 const int MAX_DB_CONN_NUM = 10; // remember to ensure the db max_connections settings is higher than this
+const std::string JOB_TABLE_NAME = "gdos_sys_job";
+const std::string JOB_FLOW_TABLE_NAME = "gdos_sys_jobflow";
+const std::string DATA_STAT_TABLE_NAME = "gdos_sys_data";
+const std::string FEATURE_TABLE_NAME = "GDOS_SYS_FEATURES";
+const std::string RASTER_TABLE_NAME = "GDOS_SYS_RASTERS";
 
 /* ====================  PBS           ======================================= */
 const std::string PBS_ERRLOG_FILE_EXT = ".pbserr";

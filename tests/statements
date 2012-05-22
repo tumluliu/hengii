@@ -39,6 +39,9 @@ announce "缺必须参数，返回错误信息，服务正常继续" "without_es
 announce "多用户可以正常处理" "happy_with_many_users hello 2 hellooooo 1"
 announce "多作业流程可以正常执行" "happy_multijob_flow outchar 1 inchar 1 x X"
 announce "错误输出能正常返回" "return_error_message herro "
+announce "写数据时其他作业不能读写" "cannot_use_when_write writer reader writer output:fakedata input:fakedata output:fakedata fakedata" 
+announce "读数据时其他作业不能写能读" "cannot_write_but_read_when_read reader reader writer input:fakedata input:fakedata output:fakedata fakedata" 
+announce "不能创建已存在的文件" "cannot_create_existed_data creator newdata:fakedata fakedata" 
 
 #======= backup area ===================
 #announce "能得到自己的请求id" "happy_my_requests"
