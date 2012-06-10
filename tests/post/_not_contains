@@ -1,0 +1,25 @@
+#!/bin/bash
+
+# check if stdin contains specifical message
+# WARNING: code dumplication, may implement general _not, but seems very hard.
+# by YANG Anran @ 2012.5.25
+
+result="true"
+ACTUAL=$(cat)
+
+for arg in "$*"
+do
+	echo $ACTUAL | grep -q -F "$arg"
+	if [ $? -eq 0 ]; then
+		result="false"
+		redundant="$arg"
+		break
+	fi
+done
+
+# show result
+if [ $result == "false" ]; then
+	echo "false; contain $redundant"
+else
+	echo true
+fi

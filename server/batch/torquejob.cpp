@@ -46,11 +46,61 @@ using std::string;
 TorqueJob::TorqueJob(int64_t id, const Resources &resources, const string &cmdline) 
 	: Player(id), pbsid_(""), resources_(resources), cmdline_(cmdline), connection_(-1),
 	scriptpath_(""), outputpath_(""), errlogpath_(""),
-	output_("") { 
+	output_(""), sig_(BatchSignal::CONTINUE) { 
 	}
 
 string TorqueJob::get_output() const {
 	return output_;
+}
+
+void TorqueJob::Play() {
+	Log().Debug() << "recorder count is: " << get_recorders_num();
+	ExitReason::type baton = ExitReason::NORMAL;
+
+	baton = CreateScript();
+	if (baton == ExitReason::FAILED) {
+		SendFailed();
+		return;
+	}
+
+	baton = Connect();
+	if (baton == ExitReason::FAILED) {
+		util::deleteFile(scriptpath_);
+		SendFailed();
+		return;
+	}
+
+	baton = Submit();
+	if (baton == ExitReason::FAILED) {
+		util::deleteFile(scriptpath_);
+		pbs_disconnect(connection_);
+		SendFailed();
+		return;
+	}
+	util::deleteFile(scriptpath_);
+
+	baton = Trace();
+	if (baton == ExitReason::FAILED) {
+		pbs_disconnect(connection_);
+		SendFailed();
+		return;
+	}
+	else if (baton == ExitReason::CANCELED) {
+		Collect();
+		pbs_disconnect(connection_);
+		SendCanceled();
+		return;
+	}
+
+	baton = Collect();
+	if (baton == ExitReason::FAILED) {
+		pbs_disconnect(connection_);
+		SendFailed();
+		return;
+	}
+
+	pbs_disconnect(connection_);
+	SendFinished();
 }
 
 string TorqueJob::GenerateNameByTime() const {
@@ -70,30 +120,29 @@ string TorqueJob::GenerateScriptName() const {
 	return util::intToString(get_id());
 }
 
-int TorqueJob::CreateScript() {
+ExitReason::type TorqueJob::CreateScript() {
 	scriptpath_ = PBS_OUT_DIR + GenerateScriptName();
 
 	std::ofstream outputFile(scriptpath_.c_str(), std::ios::out);
 	if (outputFile.fail()) {
 		Log().Error() << "unable to open torque script file " + scriptpath_;
-		/* need error handling */
-		return -1;
+		return ExitReason::FAILED;
 	}
 
 	outputFile << cmdline_ << std::endl;
 	outputFile.close();
-	return 0;
+	return ExitReason::NORMAL;
 }
 
-int TorqueJob::Connect() {
+ExitReason::type TorqueJob::Connect() {
 	connection_ = pbs_connect(const_cast<char*>(PBS_SERVER_HOST.c_str())); 
 	if (connection_ < 0) {
 		Log().Get(TORQUE, ERROR) 
 			<< "Connect to Torque PBS server failed! Error number is "
 			<<  pbs_strerror(pbs_errno);
-		return -1;
+		return ExitReason::FAILED;
 	}
-	return 0;
+	return ExitReason::NORMAL;
 }
 
 const string TorqueJob::LocWithHost(const string &partial) const {
@@ -127,7 +176,7 @@ void TorqueJob::FillAttr(PbsAttr &attr) {
 	Log().Debug() << "pbs job " << pbsid_ << "errlog in: " << errlogpath_;
 }
 
-int TorqueJob::Submit() {
+ExitReason::type TorqueJob::Submit() {
 	PbsAttr attr;
 	FillAttr(attr);
 
@@ -141,7 +190,7 @@ int TorqueJob::Submit() {
 		Log().Get(TORQUE, ERROR) 
 			<< "Torque PBS job submission failed! Error no. is: "
 			<< pbs_strerror(pbs_errno);
-		return -1;
+		return ExitReason::FAILED;
 	}
 	pbsid_ = string(ret);
 	free(ret);
@@ -152,32 +201,10 @@ int TorqueJob::Submit() {
 		<< ", cmdline is: "
 		<< cmdline_;
 
-	return 0;
+	return ExitReason::NORMAL;
 }
 
-void TorqueJob::Fail() {
-	/* WARNING: not implemented! do some error handling here. 
-	 * by YANG Anran @ 2012.5.17 */
-}
-
-void TorqueJob::Play() {
-	Log().Debug() << "recorder count is: " << get_recorders_num();
-	/* A trick that using short-circuit.
-	 * The following actions will be taken one by one,
-	 * and if one fails(return value is not 0), the flow
-	 * will terminate immediately and do some error handling work */
-	if (
-			CreateScript() != 0 ||
-			Connect() != 0 ||
-			Submit() != 0 ||
-			Trace() != 0 ||
-			Collect() != 0) {
-		Fail();
-	}
-	Exit();
-}
-
-char TorqueJob::GetStatus() const {
+char TorqueJob::GetPbsStatus() const {
 	char result = 0;
 
 	/* WARNING: These rather ugly code is due to the strange distinction
@@ -218,27 +245,37 @@ char TorqueJob::GetStatus() const {
 	return result;
 }
 
-int TorqueJob::Trace() {
+ExitReason::type TorqueJob::Trace() {
 	char status = 'Q';
 	while(status != 'C') { 
-		status = GetStatus();
+		status = GetPbsStatus();
 
+		if (sig_ == BatchSignal::CANCEL) {
+			CancelPbsJob(); 
+			return ExitReason::CANCELED;
+		}
 		if (status == 0) {
-			return -1;
+			return ExitReason::FAILED;
 		}
 
 		usleep(UPDATE_INTERVAL_MS);
 	}
-	return 0;
+	return ExitReason::NORMAL;
 }
 
-int TorqueJob::Collect() {
+ExitReason::type TorqueJob::Collect() {
 	string stderr_output;
 	if (util::readFile(outputpath_, output_) != 0) {
-		return -1;
+		/* WARNING: Here should be more carefully thought. by YANG Anran 
+		 * @ 2012.5.25 */
+		/* wait a minute and retry */
+		sleep(WAIT_FOR_OUT_S);
+		if (util::readFile(outputpath_, output_) != 0) {
+			return ExitReason::FAILED;
+		}
 	}
 	if (util::readFile(errlogpath_, stderr_output) != 0) {
-		return -1;
+		return ExitReason::FAILED;
 	}
 
 	std::stringstream ss;
@@ -249,20 +286,31 @@ int TorqueJob::Collect() {
 	}
 	output_ = ss.str();
 
-	util::deleteFile(scriptpath_);
 	util::deleteFile(outputpath_);
 	util::deleteFile(errlogpath_);
 
 	Log().Debug() << "torque output is: " << output_;
 
-	return 0;
+	return ExitReason::NORMAL;
 }
 
-void TorqueJob::Exit() {
-	if (connection_ < 0) {
-		return;
-	}
-	pbs_disconnect(connection_);
+void TorqueJob::Stop() {
+	sig_ = BatchSignal::CANCEL;
+}
 
-	EACH_RECORDER(OnePlayerDone(get_id()));
+void TorqueJob::CancelPbsJob() {
+	pbs_deljob(connection_, const_cast<char*>(pbsid_.c_str()), NULL);
+}
+
+void TorqueJob::SendFinished() {
+	if(auto boss = get_bossrecorder().lock()) { boss->OnePlayerDone(get_id()); };
+}
+
+void TorqueJob::SendFailed() {
+	/* WARNING: not yet implemented by YANG Anran @ 2012.5.25 */
+	//if(auto boss = get_bossrecorder().lock()) { boss->OnePlayerFailed(get_id()); };
+}
+
+void TorqueJob::SendCanceled() {
+	if(auto boss = get_bossrecorder().lock()) { boss->OnePlayerCanceled(get_id()); };
 }

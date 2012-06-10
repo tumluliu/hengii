@@ -29,24 +29,30 @@ Recorder::~Recorder() {
 }
 
 void Recorder::OnePlayerDone(int64_t id) {
-	int pos;
-	if ((pos = get_index(id)) == -1) {
-		Log().Error() << "id " << id << " not named my player";
-		return;
-	}
-
-	Log().Info() << "Player " << id << " at " << pos << " done!";
-
-	EndOnePlayer(id);
-	if (playstate_.Set(pos, true)) {
+	if (playstate_.Set(get_index(id), true)) {
 		AllPlayersDone();
 	}
 }
 
-void Recorder::ListenPlayer(Player &player) {
-	player.add_recorder(shared_from_this());
+void Recorder::OnePlayerCanceled(int64_t id) {
+	if (playstate_.Set(get_index(id), true)) {
+		AllPlayersCanceled();
+	}
+}
+
+void Recorder::ListenPlayer(Player &player, bool asboss) {
+	if (asboss) {
+		player.set_bossrecorder(shared_from_this());
+	}
+	else {
+		player.add_recorder(shared_from_this());
+	}
 	idpos_.insert(std::pair<int64_t, int>(player.get_id(), playstate_.get_size()));
 	playstate_.Concat(1);
+}
+
+void Recorder::ListenPlayer(Player &player) {
+	ListenPlayer(player, false);
 }
 
 void Recorder::ClearPlaylist() {

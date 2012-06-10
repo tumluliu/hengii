@@ -51,7 +51,7 @@ class DataRequest
 		/* WARNING: Data type is here because the raster and feature data are dealt
 		 * seperately in database. It is ugly but now beyond my control. 
 		 * by YANG Anran @ 2012.5.19 */ 
-		/* WARNING: Here uri is not REAL uri, because the engine doesn't know it. it 
+		/* Here uri is not REAL uri, because the engine doesn't know it. it 
 		 * is what transfered in job's option list to uniquely(considering the data 
 		 * type is given) identify a dataset. by YANG Anran @ 2012.5.19 */
 		/* constructor, args:data uri;access type;data type */

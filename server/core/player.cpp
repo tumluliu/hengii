@@ -20,23 +20,11 @@
 
 #include "player.h"
 
-Player::Player(int64_t id) : id_(id), recorders_(), isplaying_(false) {
+Player::Player(int64_t id) : id_(id), bossrecorder_(std::weak_ptr<IRecorder>()), 
+	recorders_(), isplaying_(false) {
 }
 
 Player::~Player() {
-}
-
-/* WARNING: I felt bad about this. However, it seems I was forced to do this for
- * some reason. Trying hard to remember this reason... by YANG Anran @ 2012.5.9 */
-Player::Player(const Player &origin) 
-	: id_(origin.id_), recorders_(origin.recorders_), isplaying_(false) {}
-
-/* WARNING: I felt bad about this. However, it seems I was forced to do this for
- * some reason. Trying hard to remember this reason... by YANG Anran @ 2012.5.9 */
-Player &Player::operator=(const Player &rhs) {
-	this->id_ = rhs.id_;
-	this->recorders_ = rhs.recorders_;
-	return (*this);
 }
 
 int64_t Player::get_id() const {
@@ -47,12 +35,20 @@ std::weak_ptr<IRecorder> Player::get_recorder(int i) const {
 	return recorders_[i];
 }
 
+std::weak_ptr<IRecorder> Player::get_bossrecorder() const {
+	return bossrecorder_;
+}
+
 int Player::get_recorders_num() const {
 	return recorders_.size();
 }
 
 void Player::add_recorder(std::weak_ptr<IRecorder> recorder) {
 	recorders_.push_back(recorder);
+}
+
+void Player::set_bossrecorder(std::weak_ptr<IRecorder> bossrecorder) {
+	bossrecorder_ = bossrecorder;
 }
 
 void Player::GoPlay() {

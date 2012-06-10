@@ -73,7 +73,7 @@ void DbJobRepo::UpdateJobRuntime(const JobRuntime &data) {
 	UpdateJobStatus(data.get_fid(), data.get_id(), data.get_status(), data.get_message());
 }
 
-const string DbJobRepo::GetConflictFlowIdSql(int64_t id) const {
+const string DbJobRepo::IfFlowExistsSql(int64_t id) const {
 	std::stringstream ss;
 	ss << "select count(*) from " << JOB_FLOW_TABLE_NAME 
 		<< " where id = " << id << ";";
@@ -88,16 +88,16 @@ int64_t DbJobRepo::GenerateFlowId() {
 	prefix = time(0) * 1000;
 	id = prefix + rand() % 1000;
 
-	while (HasConflictFlowId(id)) {
+	while (IfFlowExists(id)) {
 		id += 1;
 	}
 
 	return id;
 }
 
-bool DbJobRepo::HasConflictFlowId(int64_t id) const {
-	if (db_.QuerySingle(GetConflictFlowIdSql(id)) == "0") {
-		Log().Debug() << "conflict id num is: " << db_.QuerySingle(GetConflictFlowIdSql(id));
+bool DbJobRepo::IfFlowExists(int64_t id) const {
+	if (db_.QuerySingle(IfFlowExistsSql(id)) == "0") {
+		Log().Debug() << "conflict id num is: " << db_.QuerySingle(IfFlowExistsSql(id));
 		return false;
 	}
 	else {

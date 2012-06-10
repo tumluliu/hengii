@@ -9,7 +9,7 @@ LIBSRC := ./lib/HpgcJob.cpp ./lib/hpgcjob_constants.cpp \
 LIBOBJ := $(patsubst %.cpp, %.o, $(LIBSRC))
 
 CORE_SRC := conjunctionexp.cpp irecorder.cpp player.cpp \
-	recorder.cpp chainplayer.cpp jobruntime.cpp flowruntime.cpp \
+	recorder.cpp jobruntime.cpp flowruntime.cpp \
 	jobtracker.cpp tracker.cpp trackercenter.cpp appoption.cpp datarequest.cpp \
 	trackerenv.cpp
 

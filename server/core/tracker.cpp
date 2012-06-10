@@ -24,34 +24,31 @@
 
 Tracker::Tracker(std::unique_ptr<FlowRuntime> state, JobRepo &repo, 
 		std::unique_ptr<TrackerEnv> env) 
-	: Player(state->get_id()), state_(std::move(state)), env_(std::move(env)), 
-	repo_(repo), isover_(false) {
+: Player(state->get_id()), state_(std::move(state)), env_(std::move(env)), 
+	repo_(repo) {
 	}
 
 void Tracker::AllPlayersDone() {
 	Log().Debug() << "All jobs of " << get_id() << " are done.";
 	state_->set_status(Status::FINISHED);
 	repo_.UpdateFlowPartRuntime(*state_);
-	isover_ = true;
-}
-
-void Tracker::Play() {
-	Log().Debug() << "[MsgFlow] Start jobs";
-	LoadAllPlayers();
-	while(!isover_) {
-		//Log().Debug() << get_id() << " is playing...";
-	}
-	Log().Debug() << "[MsgFlow] Report flow " << get_id()
-		<< " completion to " << get_recorders_num() << " recorders";
-	/* WARNING: not very elegant, but the only way to ensure that
-	 * no action is take after reporting completion(which leads to 
-	 * destruction) (This is not the case even when using for_each) */
-	if (auto boss = get_recorder(0).lock()) {
+	if (auto boss = get_bossrecorder().lock()) {
 		boss->OnePlayerDone(get_id());
 	}
 }
 
-void Tracker::LoadAllPlayers() {
+void Tracker::AllPlayersCanceled() {
+	Log().Debug() << "All jobs of " << get_id() << " are canceled.";
+	state_->set_status(Status::CANCELED);
+	repo_.UpdateFlowPartRuntime(*state_);
+	if (auto boss = get_bossrecorder().lock()) {
+		boss->OnePlayerCanceled(get_id());
+	}
+}
+
+void Tracker::Play() {
+	Log().Debug() << "[MsgFlow] Start jobs";
+
 	size_t i;
 
 	for (i = 0; i < playlist_.size(); i++) {
@@ -59,7 +56,17 @@ void Tracker::LoadAllPlayers() {
 	}
 }
 
+void Tracker::Stop() {
+	Log().Debug() << "[MsgFlow] Cancel jobs";
+
+	size_t i;
+
+	for (i = 0; i < playlist_.size(); i++) {
+		playlist_[i]->Stop();
+	}
+}
+
 void Tracker::add_jobtracker(std::shared_ptr<JobTracker> child) {
 	playlist_.push_back(child);
-	ListenPlayer(*child);
+	ListenPlayer(*child, true);
 }

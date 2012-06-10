@@ -27,7 +27,26 @@
 #include "config.h"
 #include "resources.h"
 
+struct ExitReason {
+	enum type {
+		NORMAL = 1,
+		CANCELED = 2,
+		FAILED = 3
+	};
+};
+
+struct BatchSignal {
+	enum type {
+		CONTINUE = 1,
+		CANCEL = 2,
+		PAUSE = 3,
+		RESUME = 4,
+		FAIL = 5
+	};
+};
+
 const float UPDATE_INTERVAL_MS = 500;
+const int WAIT_FOR_OUT_S = 1;
 
 /*
  * =====================================================================================
@@ -48,10 +67,12 @@ class TorqueJob : public Player
 		/* ====================  MUTATORS      ======================================= */
 
 		/* ====================  ACTIONS       ======================================= */
-		void Play();
+		virtual void Stop();
+
 
 	protected:
-		/* ====================  DATA MEMBERS  ======================================= */
+		/* ====================  ACTIONS       ======================================= */
+		virtual void Play();
 
 	private:
 		/* ====================  DATA MEMBERS  ======================================= */
@@ -63,6 +84,7 @@ class TorqueJob : public Player
 		std::string outputpath_;
 		std::string errlogpath_;
 		std::string output_;
+		BatchSignal::type sig_;
 
 		/* ====================  HELPERS       ======================================= */
 		std::string GenerateNameByTime() const;
@@ -70,17 +92,22 @@ class TorqueJob : public Player
 		const std::string LocWithHost(const std::string &) const;
 		const std::string ReqResourceStr() const;
 		void FillAttr(PbsAttr &);
-		char GetStatus() const;
+		char GetPbsStatus() const;
 
 		/* ====================  STEPS         ======================================= */
-		/* those who return int: if error, return -1 */
-		int CreateScript();
-		int Connect();
-		int Submit(); /* args: attr */
-		int Trace();
-		int Collect();
+		ExitReason::type CreateScript();
+		ExitReason::type Connect();
+		ExitReason::type Submit(); /* args: attr */
+		ExitReason::type Trace();
+		ExitReason::type Collect();
 		void Fail();
 		void Exit();
+		void SendFinished();
+		void SendFailed();
+		void SendCanceled();
+
+		/* ====================  EVENT HANDLERS  ===================================== */
+		void CancelPbsJob();
 }; /* -----  end of class TorqueJob  ----- */
 
 #endif

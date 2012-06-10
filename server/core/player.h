@@ -45,7 +45,6 @@ class Player {
 		/* input 1:id, 2:recorder */
 		Player(int64_t);                             /* constructor */
 		virtual ~Player();
-		Player(const Player &);
 
 		/* ====================  ACCESSORS     ======================================= */
 		int64_t get_id() const;
@@ -53,31 +52,44 @@ class Player {
 		virtual std::string get_output() const;
 
 		/* ====================  MUTATORS      ======================================= */
+		/* WARNING: Here bossrecorde seems not very generalised, maybe recorders with
+		 * role, or recorder groups are more suitable and can be implemented as 
+		 * composite pattern. However, it seems a overkill till now.
+		 * by YANG Anran @ 2012.5.24 */
+		void set_bossrecorder(std::weak_ptr<IRecorder>);
 		void add_recorder(std::weak_ptr<IRecorder>);
 
 		/* ====================  ACTIONS       ======================================= */
 		/* start to do something. asynchronous. */
 		void GoPlay();
-		/* do something. synchronous. */
-		virtual void Play() = 0;
+		virtual void Stop() = 0;
 
 		/* ====================  OPERATORS     ======================================= */
-		Player &operator=(const Player &);
 
 	protected:
 		/* ====================  ACCESSORS     ======================================= */
+		std::weak_ptr<IRecorder> get_bossrecorder() const;
 		std::weak_ptr<IRecorder> get_recorder(int) const;
 		int get_recorders_num() const;
+
+		/* ====================  ACTIONS       ======================================= */
+		/* do something. synchronous. */
+		virtual void Play() = 0;
 
 	private:
 		/* ====================  DATA MEMBERS  ======================================= */
 		int64_t id_;
+		std::weak_ptr<IRecorder> bossrecorder_;
 		std::vector<std::weak_ptr<IRecorder> > recorders_;
 		bool isplaying_;
 
 		/* ====================  ACTIONS       ======================================= */
 		/* The thread function, asynchronous part of method 'GoPlay' */
 		static void *Process(void *);
+
+		/* ====================  DISABLED      ======================================= */
+		Player(const Player &);
+		Player &operator=(const Player &);
 }; /* -----  end of class Player  ----- */
 
 #endif

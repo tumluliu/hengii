@@ -40,10 +40,11 @@ class TrackerCenter : public IRecorder, public std::enable_shared_from_this<Trac
 
 		/* ====================  As irecorder ======================================= */
 		virtual void OnePlayerDone(int64_t); 
+		virtual void OnePlayerCanceled(int64_t); 
 
-		/* ====================  MUTATORS      ======================================= */
-		/* add a tracker created with Tracker Factory, return id */
-		void add_tracker(std::shared_ptr<Tracker>);
+		/* ====================  TRACKER OPERATIONS  ================================= */
+		void LoadTracker(std::shared_ptr<Tracker>);
+		void CancelTracker(int64_t);
 
 	protected:
 		/* ====================  DATA MEMBERS  ======================================= */
@@ -57,6 +58,9 @@ class TrackerCenter : public IRecorder, public std::enable_shared_from_this<Trac
 		/* ====================  DISABLED      ======================================= */
 		TrackerCenter(const TrackerCenter &);
 		TrackerCenter &operator =(const TrackerCenter &);
+
+		/* ====================  HELPERS       ======================================= */
+		void KillTracker(int64_t);
 
 }; /* -----  end of class TrackerCenter  ----- */
 

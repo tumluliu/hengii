@@ -49,30 +49,33 @@ class Recorder : public IRecorder, public std::enable_shared_from_this<Recorder>
 
 		/* ====================  INITIALIZERS  ======================================= */
 		void ListenPlayer(Player &);
-		/* WARNING: This is not THREADSAFE!!
+		/* args: player;if as boss */
+		void ListenPlayer(Player &, bool);
+
+		/* NOTICE: This is not THREADSAFE!!
 		 * Please use it carefully! by YANG Anran @ 2012.5.10 */
 		void ClearPlaylist();
 
 		/* ====================  EVENTS        ======================================= */
 		/* input: 1:the done player id */
 		virtual void OnePlayerDone(int64_t);
+		/* input: 1:the canceled player id */
+		virtual void OnePlayerCanceled(int64_t);
 
 		/* ====================  ACCESSORS     ======================================= */
 		int get_player_num() const;
 
 	protected:
-		/* ====================  ACTIONS       ======================================= */
-		/* input: 1:the id of player to be ended */
-		virtual void EndOnePlayer(int64_t) {}
 		/* ====================  EVENTS        ======================================= */
 		virtual void AllPlayersDone() = 0;
+		virtual void AllPlayersCanceled() = 0;
 
 	private:
 		/* ====================  DATA MEMBERS  ======================================= */
 		/* The convienience dict to lookup player pos in playstate_ accoring to its id */
 		std::map<int64_t, int> idpos_;
-		/* player i is finished is equally to playstate[i] == true,
-		 * and vice versa */
+		/* that player i is terminated(finished, canceled, failed) is equally to 
+		 * playstate[i] == true, and vice versa */
 		ConjunctionExp playstate_;
 
 		/* ====================  ACCESSORS     ======================================= */

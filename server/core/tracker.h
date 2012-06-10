@@ -57,9 +57,11 @@ class Tracker : public Recorder, public Player
 
 		/* ====================  EVENTS        ======================================= */
 		virtual void AllPlayersDone();
+		virtual void AllPlayersCanceled();
 
 		/* ====================  ACTIONS       ======================================= */
 		virtual void Play();
+		virtual void Stop();
 
 	protected:
 		/* ====================  DATA MEMBERS  ======================================= */
@@ -71,14 +73,10 @@ class Tracker : public Recorder, public Player
 		/* Now only use its auto destruction */
 		std::unique_ptr<TrackerEnv> env_;
 		JobRepo &repo_;
-		bool isover_;
 
 		/* ====================  DISABLED      ======================================= */
 		Tracker(const Tracker &);
 		Tracker &operator =(const Tracker &);
-
-		/* ====================  ACTIONS       ======================================= */
-		void LoadAllPlayers();
 
 }; /* -----  end of class Tracker  ----- */
 

@@ -53,6 +53,7 @@ class DbJobRepo : public JobRepo {
 		/* update only flow part of jobflow runtime, not including its jobs' */
 		virtual void UpdateFlowPartRuntime(const FlowRuntime &);
 		virtual void UpdateJobRuntime(const JobRuntime &);
+		virtual bool IfFlowExists(int64_t) const;
 
 	protected:
 	private:
@@ -73,7 +74,7 @@ class DbJobRepo : public JobRepo {
 		const std::string GetJobCountSql( int64_t flowId ) const;
 		const std::string UpdateJobFlowStatusSql(int64_t, int, const std::string&) const;
 		const std::string GetJobIdsSql(int64_t) const;
-		const std::string GetConflictFlowIdSql(int64_t) const;
+		const std::string IfFlowExistsSql(int64_t) const;
 
 		/* ====================  MUTATORS      ======================================= */
 		/* args: job flow id; job id; username */
@@ -89,7 +90,6 @@ class DbJobRepo : public JobRepo {
 		int GetJobCount( int64_t flowId );
 		int GetFlowStatus( int64_t, std::string& );
 		int GetJobStatus( int64_t, int, std::string& );
-		bool HasConflictFlowId(int64_t) const;
 
 		/* ====================  Utils         ======================================= */
 		std::string GetCurrentTime();

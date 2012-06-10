@@ -30,6 +30,7 @@ public:
     /* ====================  EVENTS        ======================================= */
     /* input: 1:the done player id */
     virtual void OnePlayerDone(int64_t) = 0;
+    virtual void OnePlayerCanceled(int64_t) = 0;
 };
 
 #endif

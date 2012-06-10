@@ -29,7 +29,8 @@ int _kJobStatusValues[] = {
   JobStatus::QUEUING,
   JobStatus::FAILED,
   JobStatus::NOT_EXIST,
-  JobStatus::PAUSED
+  JobStatus::PAUSED,
+  JobStatus::CANCELED
 };
 const char* _kJobStatusNames[] = {
   "FINISHED",
@@ -38,25 +39,28 @@ const char* _kJobStatusNames[] = {
   "QUEUING",
   "FAILED",
   "NOT_EXIST",
-  "PAUSED"
+  "PAUSED",
+  "CANCELED"
 };
-const std::map<int, const char*> _JobStatus_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(7, _kJobStatusValues, _kJobStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _JobStatus_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(8, _kJobStatusValues, _kJobStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 int _kStatusValues[] = {
   Status::FINISHED,
   Status::RUNNING,
   Status::FAILED,
   Status::NOT_EXIST,
-  Status::PAUSED
+  Status::PAUSED,
+  Status::CANCELED
 };
 const char* _kStatusNames[] = {
   "FINISHED",
   "RUNNING",
   "FAILED",
   "NOT_EXIST",
-  "PAUSED"
+  "PAUSED",
+  "CANCELED"
 };
-const std::map<int, const char*> _Status_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(5, _kStatusValues, _kStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
+const std::map<int, const char*> _Status_VALUES_TO_NAMES(::apache::thrift::TEnumIterator(6, _kStatusValues, _kStatusNames), ::apache::thrift::TEnumIterator(-1, NULL, NULL));
 
 const char* Context::ascii_fingerprint = "B089C846F881A6F18D64AA924E6643EF";
 const uint8_t Context::binary_fingerprint[16] = {0xB0,0x89,0xC8,0x46,0xF8,0x81,0xA6,0xF1,0x8D,0x64,0xAA,0x92,0x4E,0x66,0x43,0xEF};

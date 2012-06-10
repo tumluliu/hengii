@@ -32,7 +32,15 @@ TrackerCenter::~TrackerCenter() {
 
 void TrackerCenter::OnePlayerDone(int64_t id) {
 	Log().Debug() << "[MsgFlow] Flow " << id << " complete";
+	KillTracker(id);
+}
 
+void TrackerCenter::OnePlayerCanceled(int64_t id) {
+	Log().Debug() << "[MsgFlow] Flow " << id << " canceled";
+	KillTracker(id);
+}
+
+void TrackerCenter::KillTracker(int64_t id) {
 	Log().Debug() << "[MsgFlow] Flow " << id << " die";
 
 	pthread_mutex_lock(&lock_);
@@ -40,7 +48,7 @@ void TrackerCenter::OnePlayerDone(int64_t id) {
 	pthread_mutex_unlock(&lock_);
 }
 
-void TrackerCenter::add_tracker(std::shared_ptr<Tracker> car) {
+void TrackerCenter::LoadTracker(std::shared_ptr<Tracker> car) {
 	pthread_mutex_lock(&lock_);
 
 	car->add_recorder(shared_from_this());
@@ -51,4 +59,14 @@ void TrackerCenter::add_tracker(std::shared_ptr<Tracker> car) {
 	trackers_.insert(std::make_pair(car->get_id(), car));
 
 	pthread_mutex_unlock(&lock_);
+}
+
+void TrackerCenter::CancelTracker(int64_t id) {
+	auto matched = trackers_.find(id);
+	if (matched != trackers_.end()) {
+		matched->second->Stop();
+	}
+	else {
+		Log().Info() << "The job flow has already done.";
+	}
 }

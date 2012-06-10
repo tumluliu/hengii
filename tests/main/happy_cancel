@@ -1,0 +1,37 @@
+#!/bin/bash - 
+#===============================================================================
+#
+#          FILE: happy_cancel
+# 
+#         USAGE: ./happy_cancel 
+# 
+#   DESCRIPTION: cancel job flow can work correctly 
+#
+#		 INPUTS: program, string in incomplete message; 
+#		         string only in complete message; time to cancel after submit
+#        OPTIONS: ---
+#  REQUIREMENTS: ---
+#          BUGS: ---
+#         NOTES: ---
+#        AUTHOR: YANG Anran (), 08to09@gmail.com
+#  ORGANIZATION: 
+#       CREATED: 05/25/2012 03:35:06 PM CST
+#      REVISION:  ---
+#===============================================================================
+
+set -o nounset                              # Treat unset variables as an error
+
+_prepare_server
+_start_server | _contains $2 | _at server &
+sleep 0.1
+_prepare_program $1 
+create_empty_flow.rb | add_job.rb $1 1 | add_job.rb hello 2  \
+	| add_order.rb 0 1 | session.rb start.rb print_id.rb > id
+sleep $4
+cat id | session.rb read_id.rb cancel.rb block_till_result.rb \
+	| tee >(_not_contains $3 | _at term) >(_not_contains "World" | _at depterm) | _contains $2 | _at submit &
+_collect submit term depterm | _at client
+_prepare_program hello; execute_program hello 2 | _contains_hello_output 2 | _at state
+_kill_server
+_collect server client state
+rm id

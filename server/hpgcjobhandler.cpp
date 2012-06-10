@@ -66,7 +66,7 @@ int64_t HpgcJobHandler::start(const JobFlow& flow, const std::string& user_id) {
 	if (id > 0) {
 		std::shared_ptr<Tracker> car(man.Create(id));
 		if (car != NULL){
-			center_->add_tracker(car);
+			center_->LoadTracker(car);
 		}
 	}
 
@@ -82,7 +82,12 @@ void HpgcJobHandler::resume(const int64_t client_ticket) {
 }
 
 void HpgcJobHandler::cancel(const int64_t client_ticket) {
-	Log().Info() << "trying to cancel " << client_ticket;
+	if (repo_->IfFlowExists(client_ticket)) {
+		center_->CancelTracker(client_ticket);
+	}
+	else {
+		Log().Error() << "cancel tracker error, id " << client_ticket << " not exist";
+	}
 }
 
 void HpgcJobHandler::get_status(Result& _return, const int64_t client_ticket) {

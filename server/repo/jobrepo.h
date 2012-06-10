@@ -51,6 +51,7 @@ class JobRepo
 		/* update only flow part of jobflow runtime, not including its jobs' */
 		virtual void UpdateFlowPartRuntime(const FlowRuntime &) = 0;
 		virtual void UpdateJobRuntime(const JobRuntime &) = 0;
+		virtual bool IfFlowExists(int64_t) const = 0;
 
 	protected:
 	private:

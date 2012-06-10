@@ -28,7 +28,8 @@ struct JobStatus {
 		QUEUING = 4,
 		FAILED = 5,
 		NOT_EXIST = 6,
-		PAUSED = 7
+		PAUSED = 7,
+		CANCELED = 8
 	};
 };
 
@@ -38,7 +39,8 @@ struct Status {
 		RUNNING = 2,
 		FAILED = 3,
 		NOT_EXIST = 4,
-		PAUSED = 5
+		PAUSED = 5,
+		CANCELED = 6
 	};
 };
 

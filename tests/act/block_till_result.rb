@@ -5,12 +5,14 @@
 # at last, print the result's message to std
 
 ret = client.get_status(id)
-while(ret.flow_status != Status::FINISHED && ret.flow_status != Status::FAILED && ret.flow_status != Status::NOT_EXIST)
+while(ret.flow_status != Status::FINISHED && ret.flow_status != Status::FAILED && ret.flow_status != Status::NOT_EXIST && ret.flow_status != Status::CANCELED)
 	ret = client.get_status(id)
 end
 
 case ret.flow_status
 when Status::FINISHED
+	log_level = :info
+when Status::CANCELED
 	log_level = :info
 when Status::FAILED 
 	log_level = :fatal
